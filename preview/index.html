@@ -28,9 +28,10 @@
     <div class="quick-nav-pills">
       <button class="nav-pill-btn active" onclick="switchTab('dashboard')">Dispatch Radar</button>
       <button class="nav-pill-btn" onclick="switchTab('deliveries')">Active Trips</button>
-      <button class="nav-pill-btn" onclick="switchTab('history')">Completed History</button>
+      <button class="nav-pill-btn" onclick="switchTab('returns')">Reverse Logistics <span id="pill-return-badge" style="background:#ef4444;color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;">0</span></button>
+      <button class="nav-pill-btn" onclick="switchTab('history')">Trip Log</button>
       <button class="nav-pill-btn" onclick="switchTab('profile')">Fleet &amp; Profile</button>
-      <button class="nav-pill-btn" onclick="openDoorstepModal('VM-ORD-9081', 'Chidi Okafor')">Verify Doorstep OTP</button>
+      <button class="nav-pill-btn" onclick="openDoorstepModal('VM-ORD-9081', 'Chidi Okafor')">Manifest Handover</button>
       <button class="nav-pill-btn" style="border-color: #ef4444; color: #ef4444; font-weight: 800;" onclick="openSecurityProofModal()"><i class="fa-solid fa-shield-halved"></i> Role Invariant Proof</button>
     </div>
   </div>
@@ -154,6 +155,17 @@
           </div>
         </section>
 
+        <!-- 3. RETURNS VIEW (Reverse Logistics Shop Dropoff) -->
+        <section class="screen-view" id="view-returns">
+          <div class="brand-app-bar">
+            <span class="bar-title">Reverse Logistics Dropoff</span>
+            <button class="icon-round-btn" onclick="renderReturns()"><i class="fa-solid fa-arrows-rotate"></i></button>
+          </div>
+          <div class="screen-content" id="returns-full-list">
+            <!-- Dynamically Injected -->
+          </div>
+        </section>
+
         <!-- 4. PROFILE VIEW (Fleet Courier Console) -->
         <section class="screen-view" id="view-profile">
           <div class="brand-app-bar">
@@ -172,13 +184,16 @@
               </div>
             </div>
 
-            <!-- Corporate Fleet Affiliation -->
+            <!-- Corporate Fleet Affiliation & Payroll Action -->
             <div class="white-card" style="margin-top: 12px; border-left: 4px solid #ffd700;">
               <div class="mini-label" style="color: #92400e; font-weight: 800;">EMPLOYING LOGISTICS FLEET</div>
               <div style="font-size: 15px; font-weight: 900; color: #1e1b4b; margin: 4px 0;">Speedy Parcel Express</div>
               <div style="font-size: 11px; color: #6b7280; line-height: 1.45;">
                 Couriers operate under corporate employment. All trip commissions, bonuses, and driver salaries are settled directly by your logistics company.
               </div>
+              <button onclick="openPayrollModal()" style="margin-top: 10px; width: 100%; padding: 8px 12px; font-size: 11px; font-weight: 800; background: rgba(255, 215, 0, 0.15); border: 1px solid #ffd700; color: #92400e; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <i class="fa-solid fa-receipt"></i> View Fleet Remuneration &amp; Statement
+              </button>
             </div>
 
             <!-- Dispatch Equipment -->
@@ -217,7 +232,11 @@
         </button>
         <button class="nav-tab" onclick="switchTab('deliveries')">
           <i class="fa-solid fa-box"></i>
-          <span>Trips</span>
+          <span>Missions</span>
+        </button>
+        <button class="nav-tab" onclick="switchTab('returns')">
+          <i class="fa-solid fa-arrow-rotate-left"></i>
+          <span style="position:relative;">Returns <span id="nav-return-badge" style="display:none;position:absolute;top:-7px;right:-12px;background:#ef4444;color:#fff;font-size:8px;font-weight:900;padding:1px 4px;border-radius:6px;">0</span></span>
         </button>
         <button class="nav-tab" onclick="switchTab('history')">
           <i class="fa-solid fa-history"></i>
@@ -234,19 +253,64 @@
 
   <!-- MODALS -->
 
-  <!-- 1. Doorstep Customer OTP Modal -->
+  <!-- 1. Doorstep Customer Manifest Handover Modal -->
   <div class="modal-backdrop" id="modal-doorstep-otp">
-    <div class="modal-card">
-      <div class="modal-icon-header emerald"><i class="fa-solid fa-qrcode"></i></div>
-      <div class="modal-title">Doorstep Package Handover</div>
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-icon-header emerald"><i class="fa-solid fa-clipboard-check"></i></div>
+      <div class="modal-title">Doorstep Handover Manifest</div>
       <div class="modal-subtitle" id="modal-doorstep-order-num">Order #VM-ORD-9081</div>
-      <div class="modal-prompt">
-        Ask recipient <strong id="modal-doorstep-cust-name">Chidi Okafor</strong> for their 6-digit delivery security PIN to certify package handover.
+      <div class="modal-prompt" style="font-size: 11px; line-height: 1.5; color: #9ca3af;">
+        Verify customer package acceptance. If any item is damaged or rejected, select the return reason. Rejected goods automatically enter courier custody for shop return.
       </div>
+
+      <!-- Item Checklist -->
+      <div id="manifest-items-list" style="margin: 12px 0; max-height: 180px; overflow-y: auto; text-align: left; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 10px; border: 1px solid rgba(255,255,255,0.08);">
+        <!-- Injected -->
+      </div>
+
+      <div style="font-size: 10.5px; color: #9ca3af; margin-bottom: 4px; text-align: left; font-weight: 700;">CUSTOMER 6-DIGIT SECURITY PIN:</div>
       <input type="text" id="doorstep-pin-input" maxlength="6" placeholder="883921" class="pin-input">
       <div class="modal-btn-row">
         <button class="btn-cancel" onclick="closeModals()">Cancel</button>
-        <button class="btn-confirm emerald" onclick="submitDoorstepPin()">Verify Handover</button>
+        <button class="btn-confirm emerald" onclick="submitDoorstepManifest()">Certify Handover</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Vendor Return Handover OTP Modal -->
+  <div class="modal-backdrop" id="modal-vendor-return-otp">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-icon-header" style="background: rgba(255, 215, 0, 0.15); color: #ffd700;"><i class="fa-solid fa-store"></i></div>
+      <div class="modal-title">Vendor Return Handover</div>
+      <div class="modal-subtitle" id="modal-return-case-num" style="color: #ffd700;">Case #RET-9081</div>
+      <div class="modal-prompt" style="font-size: 11.5px; line-height: 1.5; color: #9ca3af;">
+        Deliver rejected goods back to merchant at <strong id="modal-return-shop-name" style="color:#ffffff;">Shop Counter</strong>. Ask the merchant for their <strong>6-digit Return Confirmation PIN</strong>.
+      </div>
+      <input type="text" id="vendor-return-pin-input" maxlength="6" placeholder="654321" class="pin-input" style="border-color: #ffd700; color: #ffd700;">
+      <div class="modal-btn-row">
+        <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+        <button class="btn-confirm" style="background: #ffd700; color: #000; font-weight: 800;" onclick="submitVendorReturnPin()">Certify Store Return</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Fleet Remuneration & Payroll Statement Modal -->
+  <div class="modal-backdrop" id="modal-fleet-payroll">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-icon-header" style="background: rgba(255, 215, 0, 0.15); color: #ffd700;"><i class="fa-solid fa-receipt"></i></div>
+      <div class="modal-title">Fleet Remuneration Console</div>
+      <div class="modal-subtitle" style="color: #ffd700;">CORPORATE PAYROLL &amp; AUDIT</div>
+      <div style="text-align: left; margin: 12px 0; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); font-size: 11.5px; line-height: 1.6;">
+        <div style="color: #9ca3af;">Employing Fleet: <strong style="color: #fff;">Speedy Parcel Express</strong></div>
+        <div style="color: #9ca3af;">Remuneration Model: <strong style="color: #10b981;">Direct Employer Remuneration (Zero-Wallet)</strong></div>
+        <div style="color: #9ca3af;">Shift Completed Trips: <strong style="color: #ffd700;">48 Trips</strong></div>
+        <div style="color: #9ca3af;">On-Time SLA Compliance: <strong style="color: #10b981;">99.4%</strong></div>
+        <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 10.5px; color: #9ca3af;">
+          ✓ All courier payments, bonuses, and fuel allowances are disbursed bi-weekly by Speedy Parcel Express. Couriers never hold escrow customer balances.
+        </div>
+      </div>
+      <div class="modal-btn-row">
+        <button class="btn-cancel" onclick="closeModals()">Close Console</button>
       </div>
     </div>
   </div>

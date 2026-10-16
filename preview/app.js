@@ -26,7 +26,11 @@
         status: 'ready_for_pickup', // 'ready_for_pickup', 'out_for_delivery', 'delivered'
         pickupPin: '482910',
         hasArrived: false,
-        customerOtp: '883921'
+        customerOtp: '883921',
+        manifestItems: [
+          { id: 1, name: 'iPhone 14 Pro Heavy Duty Case', orderedQty: 1 },
+          { id: 2, name: 'Anker 65W GaN Compact Charger', orderedQty: 1 }
+        ]
       },
       {
         id: 102,
@@ -44,7 +48,26 @@
         status: 'out_for_delivery',
         pickupPin: 'Verified',
         hasArrived: false,
-        customerOtp: '519204'
+        customerOtp: '519204',
+        manifestItems: [
+          { id: 3, name: 'Sony WH-1000XM5 Wireless Headphones', orderedQty: 1 }
+        ]
+      }
+    ],
+    activeReturns: [
+      {
+        id: 401,
+        caseNumber: 'RET-9071',
+        orderNumber: 'VM-ORD-9071',
+        shopName: 'Apex Retail Plaza (Hub #04)',
+        shopAddress: 'Computer Village, Ikeja, Lagos',
+        shopPhone: '+234 801 234 5678',
+        rejectionCategory: 'vendor_issue',
+        rejectionCategoryLabel: 'Vendor Fault / Wrong Item',
+        rejectionNotes: 'Wrong color sent by vendor, customer declined',
+        itemsSummary: '1x iPhone 14 Pro Case (Matte Black)',
+        status: 'in_transit_back_to_vendor',
+        vendorOtp: '654321'
       }
     ],
     history: [
@@ -97,7 +120,9 @@
 
     if (tabName === 'dashboard') renderDashboard();
     if (tabName === 'deliveries') renderDeliveries();
+    if (tabName === 'returns') renderReturns();
     if (tabName === 'history') renderHistory();
+    updateBadges();
   };
 
   // --- Duty Switch ---
@@ -219,7 +244,7 @@
             </div>
           `}
           <button class="btn-emerald" onclick="openDoorstepModal(${item.id}, '${item.customerName}')">
-            <i class="fa-solid fa-qrcode"></i> Enter Customer Delivery PIN
+            <i class="fa-solid fa-clipboard-check"></i> Complete Doorstep Handover (PIN &amp; Manifest)
           </button>
         `}
       </div>
@@ -251,20 +276,41 @@
     window.state.activeModalOrderId = orderId;
     const modal = document.getElementById('modal-doorstep-otp');
     const numEl = document.getElementById('modal-doorstep-order-num');
-    const custEl = document.getElementById('modal-doorstep-cust-name');
     const pinInp = document.getElementById('doorstep-pin-input');
+    const manifestEl = document.getElementById('manifest-items-list');
 
     const item = window.state.activeDeliveries.find(d => d.id == orderId) || window.state.activeDeliveries[0];
     if (numEl) numEl.textContent = `Order #${item ? item.orderNumber : 'VM-ORD-9081'}`;
-    if (custEl) custEl.textContent = item ? item.customerName : customerName;
     if (pinInp) {
       pinInp.value = item ? item.customerOtp : '883921';
+    }
+
+    if (manifestEl && item) {
+      manifestEl.innerHTML = `
+        <div style="font-size: 11px; font-weight: 800; color: #ffd700; margin-bottom: 6px;">ITEMIZED ACCEPTANCE MANIFEST:</div>
+        ${(item.manifestItems || []).map((m, idx) => `
+          <div style="background: rgba(255,255,255,0.05); padding: 8px; border-radius: 8px; margin-bottom: 6px; border: 1px solid rgba(255,255,255,0.08);">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-size: 11px; font-weight: 800; color: #fff;">${m.name}</span>
+              <span style="font-size: 10px; color: #9ca3af;">Qty: ${m.orderedQty}</span>
+            </div>
+            <div style="margin-top: 6px;">
+              <select id="item-status-${idx}" style="width: 100%; font-size: 10.5px; background: #1f1438; color: #fff; border: 1px solid #5e17eb; padding: 4px 6px; border-radius: 6px;">
+                <option value="accepted">✓ Accepted by Customer (Good Condition)</option>
+                <option value="vendor_issue">❌ Reject: Vendor Fault / Wrong Item</option>
+                <option value="transit_damage">❌ Reject: Transit Damage en route</option>
+                <option value="customer_change_of_mind">❌ Reject: Customer Change of Mind</option>
+              </select>
+            </div>
+          </div>
+        `).join('')}
+      `;
     }
 
     if (modal) modal.classList.add('active');
   };
 
-  window.submitDoorstepPin = function() {
+  window.submitDoorstepManifest = function() {
     const pin = document.getElementById('doorstep-pin-input')?.value.trim();
     if (!pin || pin.length !== 6) {
       alert('Please enter the 6-digit delivery security PIN presented by the recipient.');
@@ -276,6 +322,34 @@
 
     if (!item) return;
 
+    let rejectedCount = 0;
+    let rejectedSummary = [];
+    (item.manifestItems || []).forEach((m, idx) => {
+      const select = document.getElementById(`item-status-${idx}`);
+      if (select && select.value !== 'accepted') {
+        rejectedCount++;
+        const reason = select.value;
+        const label = select.options[select.selectedIndex].text.replace('❌ Reject: ', '');
+        rejectedSummary.push(m.name);
+
+        // Add to active reverse logistics return custody
+        window.state.activeReturns.push({
+          id: Date.now() + idx,
+          caseNumber: `RET-${item.orderNumber.replace('VM-ORD-', '')}-${idx+1}`,
+          orderNumber: item.orderNumber,
+          shopName: item.shopName,
+          shopAddress: item.shopAddress,
+          shopPhone: item.shopPhone,
+          rejectionCategory: reason,
+          rejectionCategoryLabel: label,
+          rejectionNotes: `Customer inspection rejected line during doorstep handover.`,
+          itemsSummary: `1x ${m.name}`,
+          status: 'in_transit_back_to_vendor',
+          vendorOtp: '654321'
+        });
+      }
+    });
+
     // Delivery certified & logged to fleet
     window.state.completedTrips += 1;
 
@@ -285,7 +359,7 @@
       orderNumber: item.orderNumber,
       customerName: item.customerName,
       destinationLga: item.destinationLga,
-      itemsSummary: item.itemsSummary,
+      itemsSummary: item.itemsSummary + (rejectedCount > 0 ? ` (${rejectedCount} items returned)` : ''),
       category: item.category,
       timestamp: 'Just Now'
     });
@@ -295,9 +369,114 @@
     closeModals();
     renderDashboard();
     renderDeliveries();
+    renderReturns();
     renderHistory();
-    showToast(`✓ Delivery Certified! Order ${item.orderNumber} successfully logged to Fleet Dispatch.`);
+    updateBadges();
+
+    if (rejectedCount > 0) {
+      showToast(`✓ Handover Certified with Partial Return! ${rejectedCount} parcel(s) entered courier custody for vendor return drop-off.`);
+    } else {
+      showToast(`✓ Delivery Certified! Full order ${item.orderNumber} successfully delivered & logged to Fleet Dispatch.`);
+    }
   };
+
+  // --- Render Returns ---
+  window.renderReturns = function() {
+    const list = document.getElementById('returns-full-list');
+    if (!list) return;
+
+    updateBadges();
+
+    if (window.state.activeReturns.length === 0) {
+      list.innerHTML = `
+        <div class="white-card" style="text-align: center; color: #6B7280; padding: 28px;">
+          <i class="fa-solid fa-circle-check" style="font-size: 32px; color: #10B981; margin-bottom: 8px;"></i>
+          <div style="font-size: 14px; font-weight: 800; color: #1E1B4B;">No Pending Return Dropoffs</div>
+          <div style="font-size: 11px; color: #9CA3AF; margin-top: 4px;">Zero customer-rejected parcels in courier custody. All reverse logistics cleared.</div>
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = window.state.activeReturns.map(item => `
+      <div class="white-card" style="border-left: 4px solid #F59E0B; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="background: rgba(245, 158, 11, 0.15); color: #D97706; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 6px;">
+            ${item.caseNumber}
+          </span>
+          <span style="background: rgba(239, 68, 68, 0.12); color: #EF4444; font-size: 9.5px; font-weight: 800; padding: 2px 6px; border-radius: 4px;">
+            ${item.rejectionCategoryLabel}
+          </span>
+        </div>
+        <div style="font-size: 13px; font-weight: 900; color: #1E1B4B; margin-top: 8px;">${item.orderNumber}</div>
+        <div style="font-size: 11px; color: #4B5563; margin-top: 2px;">${item.itemsSummary}</div>
+        <div style="font-size: 10px; color: #9CA3AF; margin-top: 2px; font-style: italic;">Note: ${item.rejectionNotes}</div>
+        <div style="margin: 10px 0; padding-top: 8px; border-top: 1px dashed rgba(0,0,0,0.08); font-size: 11px;">
+          <div style="font-weight: 800; color: #1E1B4B;"><i class="fa-solid fa-store" style="color: #F59E0B;"></i> RETURN TO: ${item.shopName}</div>
+          <div style="color: #6B7280; font-size: 10.5px;">${item.shopAddress}</div>
+          <div style="color: #D97706; font-size: 10px; font-weight: 700; margin-top: 2px;">Shop Tel: ${item.shopPhone}</div>
+        </div>
+        <button onclick="openVendorReturnModal(${item.id})" style="width: 100%; background: #FFD700; color: #000; font-weight: 800; border: none; padding: 9px; border-radius: 8px; cursor: pointer; font-size: 11px; display: flex; align-items: center; justify-content: center; gap: 6px;">
+          <i class="fa-solid fa-store"></i> Handover Parcel at Shop &amp; Enter Vendor PIN
+        </button>
+      </div>
+    `).join('');
+  };
+
+  window.openVendorReturnModal = function(caseId) {
+    window.state.activeReturnCaseId = caseId;
+    const item = window.state.activeReturns.find(r => r.id == caseId) || window.state.activeReturns[0];
+    if (!item) return;
+
+    const numEl = document.getElementById('modal-return-case-num');
+    const shopEl = document.getElementById('modal-return-shop-name');
+    const pinInp = document.getElementById('vendor-return-pin-input');
+
+    if (numEl) numEl.textContent = `Case #${item.caseNumber} • ${item.orderNumber}`;
+    if (shopEl) shopEl.textContent = item.shopName;
+    if (pinInp) pinInp.value = item.vendorOtp || '654321';
+
+    const m = document.getElementById('modal-vendor-return-otp');
+    if (m) m.classList.add('active');
+  };
+
+  window.submitVendorReturnPin = function() {
+    const pin = document.getElementById('vendor-return-pin-input')?.value.trim();
+    if (!pin || pin.length !== 6) {
+      alert('Please enter the 6-digit Return Confirmation PIN provided by the merchant at the shop counter.');
+      return;
+    }
+
+    const caseId = window.state.activeReturnCaseId;
+    const item = window.state.activeReturns.find(r => r.id == caseId);
+    if (!item) return;
+
+    window.state.activeReturns = window.state.activeReturns.filter(r => r.id != caseId);
+
+    closeModals();
+    renderReturns();
+    updateBadges();
+    showToast(`✓ Return Handover Certified! Parcel returned to ${item.shopName} counter.`);
+  };
+
+  window.openPayrollModal = function() {
+    const m = document.getElementById('modal-fleet-payroll');
+    if (m) m.classList.add('active');
+  };
+
+  function updateBadges() {
+    const retCount = window.state.activeReturns.length;
+    const navBadge = document.getElementById('nav-return-badge');
+    const pillBadge = document.getElementById('pill-return-badge');
+
+    if (navBadge) {
+      navBadge.textContent = retCount;
+      navBadge.style.display = retCount > 0 ? 'inline-block' : 'none';
+    }
+    if (pillBadge) {
+      pillBadge.textContent = retCount;
+    }
+  }
 
   window.closeModals = function() {
     document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));

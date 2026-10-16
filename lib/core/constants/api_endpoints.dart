@@ -15,4 +15,8 @@ class ApiEndpoints {
   static const String riderMarkArrived = '/rider/orders/mark-arrived';
   static const String riderVerifyPickupOtp = '/rider/orders/verify-pickup-otp';
   static const String riderVerifyDeliveryOtp = '/rider/orders/verify-delivery-otp';
+  static const String riderDoorstepHandover = '/rider/orders/doorstep-handover';
+  static const String riderVerifyVendorReturnOtp = '/rider/orders/verify-vendor-return-otp';
+  static const String riderActiveReturns = '/rider/returns/active';
+  static const String riderDeliveryAttemptFailed = '/rider/orders/delivery-attempt-failed';
 }

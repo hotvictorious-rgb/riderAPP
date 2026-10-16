@@ -1,3 +1,5 @@
+import 'order_item_manifest_model.dart';
+
 class DeliveryAssignmentModel {
   final int id;
   final String orderNumber;
@@ -10,6 +12,7 @@ class DeliveryAssignmentModel {
   final String destinationLga;
   final String itemsSummary;
   final int itemsCount;
+  final List<OrderItemManifestModel> manifestItems;
   final String dispatchCategory;
   final String orderStatus;
   final String? pickupPin; // 6-digit courier PIN for vendor handover
@@ -30,6 +33,7 @@ class DeliveryAssignmentModel {
     required this.destinationLga,
     required this.itemsSummary,
     required this.itemsCount,
+    this.manifestItems = const [],
     this.dispatchCategory = 'EXPRESS COURIER',
     required this.orderStatus,
     this.pickupPin,
@@ -47,10 +51,12 @@ class DeliveryAssignmentModel {
     // Build rich summary from eager loaded order_items
     String summary = 'Standard Package';
     int count = 1;
+    final manifest = <OrderItemManifestModel>[];
     final itemsList = json['items'] as List<dynamic>?;
     if (itemsList != null && itemsList.isNotEmpty) {
       count = itemsList.length;
       final descriptions = itemsList.map((item) {
+        manifest.add(OrderItemManifestModel.fromJson(item as Map<String, dynamic>));
         final name = item['product_name'] ?? 'Product';
         final qty = item['quantity'] ?? 1;
         return '$qty x $name';
@@ -85,6 +91,7 @@ class DeliveryAssignmentModel {
       destinationLga: lgaName.isNotEmpty ? lgaName : 'Metropolitan Zone',
       itemsSummary: summary,
       itemsCount: count,
+      manifestItems: manifest,
       dispatchCategory: json['dispatch_category'] as String? ?? 'EXPRESS COURIER',
       orderStatus: json['order_status'] as String? ?? 'ready_for_pickup',
       pickupPin: json['pickup_verification_code'] as String?,
@@ -123,6 +130,7 @@ class DeliveryAssignmentModel {
     String? destinationLga,
     String? itemsSummary,
     int? itemsCount,
+    List<OrderItemManifestModel>? manifestItems,
     String? dispatchCategory,
     String? orderStatus,
     String? pickupPin,
@@ -143,6 +151,7 @@ class DeliveryAssignmentModel {
       destinationLga: destinationLga ?? this.destinationLga,
       itemsSummary: itemsSummary ?? this.itemsSummary,
       itemsCount: itemsCount ?? this.itemsCount,
+      manifestItems: manifestItems ?? this.manifestItems,
       dispatchCategory: dispatchCategory ?? this.dispatchCategory,
       orderStatus: orderStatus ?? this.orderStatus,
       pickupPin: pickupPin ?? this.pickupPin,

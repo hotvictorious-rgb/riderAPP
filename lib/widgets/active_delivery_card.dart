@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../models/delivery_assignment_model.dart';
+import '../screens/deliveries/delivery_detail_screen.dart';
 
 class ActiveDeliveryCard extends StatelessWidget {
   final DeliveryAssignmentModel assignment;
   final VoidCallback onPickupAction;
   final VoidCallback onMarkArrivedAction;
   final VoidCallback onVerifyDeliveryAction;
+  final VoidCallback? onDeliveryIssueAction;
 
   const ActiveDeliveryCard({
     super.key,
@@ -14,6 +16,7 @@ class ActiveDeliveryCard extends StatelessWidget {
     required this.onPickupAction,
     required this.onMarkArrivedAction,
     required this.onVerifyDeliveryAction,
+    this.onDeliveryIssueAction,
   });
 
   @override
@@ -23,7 +26,14 @@ class ActiveDeliveryCard extends StatelessWidget {
     final isEnRoute = assignment.isOutForDelivery;
     final hasArrived = assignment.hasRiderArrived;
 
-    return Container(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (_) => DeliveryDetailScreen(assignment: assignment)),
+        );
+      },
+      child: Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -219,8 +229,8 @@ class ActiveDeliveryCard extends StatelessWidget {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: onPickupAction,
-                icon: const Icon(Icons.check_circle_outline, size: 16),
-                label: const Text('Confirm Shop Handover & Start Route'),
+                icon: const Icon(Icons.store, size: 16),
+                label: const Text('Enter Merchant Pickup PIN & Start Route'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.dispatchAmber,
                   foregroundColor: Colors.black,
@@ -274,7 +284,7 @@ class ActiveDeliveryCard extends StatelessWidget {
               child: ElevatedButton.icon(
                 onPressed: onVerifyDeliveryAction,
                 icon: const Icon(Icons.verified_user, size: 16),
-                label: const Text('Enter Customer Delivery PIN'),
+                label: const Text('Complete Doorstep Handover (PIN & Manifest)'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.dispatchEmerald,
                   foregroundColor: Colors.white,
@@ -282,9 +292,24 @@ class ActiveDeliveryCard extends StatelessWidget {
                 ),
               ),
             ),
+            if (onDeliveryIssueAction != null) ...[
+              const SizedBox(height: 6),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: onDeliveryIssueAction,
+                  icon: const Icon(Icons.report_problem_outlined, size: 14, color: AppColors.urgentRed),
+                  label: const Text(
+                    'Customer Unreachable? Report Failed Attempt',
+                    style: TextStyle(color: AppColors.urgentRed, fontSize: 11, fontWeight: FontWeight.w700),
+                  ),
+                ),
+              ),
+            ],
           ],
         ],
       ),
+    ),
     );
   }
 }

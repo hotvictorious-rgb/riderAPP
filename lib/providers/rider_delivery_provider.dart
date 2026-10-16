@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../core/constants/api_endpoints.dart';
 import '../core/network/api_client.dart';
 import '../models/delivery_assignment_model.dart';
+import '../models/return_case_model.dart';
 
 class RiderDeliveryProvider with ChangeNotifier {
   final ApiClient _apiClient;
@@ -11,6 +12,7 @@ class RiderDeliveryProvider with ChangeNotifier {
   String? _errorMessage;
   List<DeliveryAssignmentModel> _activeDeliveries = [];
   List<DeliveryAssignmentModel> _history = [];
+  List<ReturnCaseModel> _activeReturns = [];
   DeliveryAssignmentModel? _selectedDelivery;
 
   RiderDeliveryProvider(this._apiClient);
@@ -19,6 +21,7 @@ class RiderDeliveryProvider with ChangeNotifier {
   String? get errorMessage => _errorMessage;
   List<DeliveryAssignmentModel> get activeDeliveries => _activeDeliveries;
   List<DeliveryAssignmentModel> get history => _history;
+  List<ReturnCaseModel> get activeReturns => _activeReturns;
   DeliveryAssignmentModel? get selectedDelivery => _selectedDelivery;
 
   void selectDelivery(DeliveryAssignmentModel item) {
@@ -154,6 +157,156 @@ class RiderDeliveryProvider with ChangeNotifier {
     _isLoading = false;
     notifyListeners();
     return false;
+  }
+
+  Future<void> fetchActiveReturns() async {
+    try {
+      final response = await _apiClient.get(ApiEndpoints.riderActiveReturns);
+      if (response.statusCode == 200 && response.data['data'] != null) {
+        final list = response.data['data'] as List;
+        _activeReturns = list.map((e) => ReturnCaseModel.fromJson(e as Map<String, dynamic>)).toList();
+        notifyListeners();
+      }
+    } catch (_) {
+      // Graceful offline or empty returns
+    }
+  }
+
+  Future<Map<String, dynamic>> submitDoorstepHandover({
+    required int orderId,
+    required String otp,
+    required List<Map<String, dynamic>> manifestItems,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiClient.post(
+        ApiEndpoints.riderDoorstepHandover,
+        data: {
+          'order_id': orderId,
+          'otp': otp.trim(),
+          'manifest_items': manifestItems,
+        },
+      );
+
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        _updateLocalOrderStatus(orderId, 'delivered');
+        await fetchActiveReturns();
+        _isLoading = false;
+        notifyListeners();
+        return {
+          'success': true,
+          'message': response.data['message'] ?? 'Doorstep handover verified successfully.',
+          'data': response.data['data'],
+        };
+      }
+      _errorMessage = response.data['message'] ?? 'Doorstep handover failed.';
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'message': _errorMessage!};
+    } catch (e) {
+      if (e is DioException && e.response != null) {
+        _errorMessage = e.response?.data['message'] ?? 'Doorstep handover failed.';
+      } else {
+        _errorMessage = 'Network connection failed. Could not verify doorstep handover.';
+      }
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'message': _errorMessage!};
+    }
+  }
+
+  Future<bool> verifyVendorReturnOtp({
+    required int returnCaseId,
+    required String otp,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiClient.post(
+        ApiEndpoints.riderVerifyVendorReturnOtp,
+        data: {
+          'return_case_id': returnCaseId,
+          'otp': otp.trim(),
+        },
+      );
+
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        _activeReturns.removeWhere((c) => c.id == returnCaseId);
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      }
+      _errorMessage = response.data['message'] ?? 'Vendor return verification failed.';
+    } catch (e) {
+      if (e is DioException && e.response != null) {
+        _errorMessage = e.response?.data['message'] ?? 'Vendor return verification failed.';
+      } else {
+        _errorMessage = 'Network connection failed. Could not verify vendor return OTP.';
+      }
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return false;
+  }
+
+  Future<Map<String, dynamic>> recordDeliveryAttemptFailed({
+    required int orderId,
+    required String reason,
+    String? notes,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+
+    try {
+      final response = await _apiClient.post(
+        ApiEndpoints.riderDeliveryAttemptFailed,
+        data: {
+          'order_id': orderId,
+          'reason': reason,
+          if (notes != null && notes.isNotEmpty) 'notes': notes.trim(),
+        },
+      );
+
+      if (response.statusCode == 200 && response.data['status'] == true) {
+        final data = response.data['data'] as Map<String, dynamic>?;
+        final maxAttemptsReached = data?['max_attempts_reached'] == true;
+
+        if (maxAttemptsReached) {
+          _activeDeliveries.removeWhere((o) => o.id == orderId);
+          await fetchActiveReturns();
+        } else {
+          await fetchActiveDeliveries();
+        }
+
+        _isLoading = false;
+        notifyListeners();
+        return {
+          'success': true,
+          'message': response.data['message'] ?? 'Delivery attempt logged.',
+          'max_attempts_reached': maxAttemptsReached,
+        };
+      }
+      _errorMessage = response.data['message'] ?? 'Unable to record delivery attempt failure.';
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'message': _errorMessage!};
+    } catch (e) {
+      if (e is DioException && e.response != null) {
+        _errorMessage = e.response?.data['message'] ?? 'Failed to log delivery attempt failure.';
+      } else {
+        _errorMessage = 'Network connection failed. Could not log delivery attempt.';
+      }
+      _isLoading = false;
+      notifyListeners();
+      return {'success': false, 'message': _errorMessage!};
+    }
   }
 
   void _updateLocalArrivedStatus(int orderId) {

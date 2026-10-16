@@ -4,6 +4,7 @@ import '../../core/constants/app_colors.dart';
 import '../../providers/rider_auth_provider.dart';
 import '../../providers/rider_dashboard_provider.dart';
 import '../auth/rider_login_screen.dart';
+import '../earnings/rider_earnings_screen.dart';
 
 class RiderProfileScreen extends StatelessWidget {
   const RiderProfileScreen({super.key});
@@ -205,6 +206,61 @@ class RiderProfileScreen extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Fleet Remuneration & Payroll Action Button
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const RiderEarningsScreen()),
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF2A1550), Color(0xFF160A30)],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.richGold.withOpacity(0.4), width: 1.2),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.richGold.withOpacity(0.15),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: AppColors.richGold.withOpacity(0.3)),
+                      ),
+                      child: const Icon(Icons.receipt_long, color: AppColors.richGold, size: 22),
+                    ),
+                    const SizedBox(width: 14),
+                    const Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Fleet Remuneration & Settlement',
+                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            'View salary model, commission audit & shift statements',
+                            style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_forward_ios, color: AppColors.richGold, size: 14),
+                  ],
+                ),
               ),
             ),
             const SizedBox(height: 16),

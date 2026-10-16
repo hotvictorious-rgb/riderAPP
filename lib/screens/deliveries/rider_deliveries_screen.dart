@@ -3,7 +3,9 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/rider_delivery_provider.dart';
 import '../../widgets/active_delivery_card.dart';
-import '../../widgets/customer_delivery_otp_dialog.dart';
+import '../../widgets/doorstep_handover_manifest_dialog.dart';
+import '../../widgets/shop_pickup_otp_dialog.dart';
+import '../../widgets/delivery_attempt_failed_dialog.dart';
 
 class RiderDeliveriesScreen extends StatelessWidget {
   const RiderDeliveriesScreen({super.key});
@@ -19,7 +21,10 @@ class RiderDeliveriesScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => deliv.fetchActiveDeliveries(),
+            onPressed: () {
+              deliv.fetchActiveDeliveries();
+              deliv.fetchActiveReturns();
+            },
           ),
         ],
       ),
@@ -45,20 +50,24 @@ class RiderDeliveriesScreen extends StatelessWidget {
                     final item = deliv.activeDeliveries[idx];
                     return ActiveDeliveryCard(
                       assignment: item,
-                      onPickupAction: () async {
-                        final success = await deliv.verifyPickupOtp(item.id, item.pickupPin ?? '');
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              backgroundColor: success ? AppColors.dispatchEmerald : AppColors.urgentRed,
-                              content: Text(
-                                success
-                                    ? 'Shop Handover Verified! Order is now En Route.'
-                                    : (deliv.errorMessage ?? 'Pickup verification failed.'),
+                      onPickupAction: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => ShopPickupOtpDialog(
+                            orderNumber: item.orderNumber,
+                            shopName: item.shopName,
+                            onVerify: (otp) => deliv.verifyPickupOtp(item.id, otp),
+                          ),
+                        ).then((success) {
+                          if (success == true && context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                backgroundColor: AppColors.dispatchEmerald,
+                                content: Text('Shop Handover Verified! Order is now En Route.'),
                               ),
-                            ),
-                          );
-                        }
+                            );
+                          }
+                        });
                       },
                       onMarkArrivedAction: () async {
                         final success = await deliv.markArrived(item.id);
@@ -78,26 +87,54 @@ class RiderDeliveriesScreen extends StatelessWidget {
                       onVerifyDeliveryAction: () {
                         showDialog(
                           context: context,
-                          builder: (_) => CustomerDeliveryOtpDialog(
-                            orderNumber: item.orderNumber,
-                            customerName: item.customerName,
-                            onVerify: (otp) async {
-                              final success = await deliv.verifyCustomerDeliveryOtp(item.id, otp);
-                              if (context.mounted) {
+                          builder: (_) => DoorstepHandoverManifestDialog(
+                            assignment: item,
+                            onSubmit: (otp, manifest) async {
+                              final res = await deliv.submitDoorstepHandover(
+                                orderId: item.id,
+                                otp: otp,
+                                manifestItems: manifest,
+                              );
+                              if (context.mounted && res['success'] == true) {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
-                                    backgroundColor: success ? AppColors.dispatchEmerald : AppColors.urgentRed,
-                                    content: Text(
-                                      success
-                                          ? 'Delivery Handover Certified! Logged to Fleet Dispatch.'
-                                          : (deliv.errorMessage ?? 'Invalid delivery code.'),
-                                    ),
+                                    backgroundColor: AppColors.dispatchEmerald,
+                                    content: Text(res['message'] ?? 'Delivery Handover Certified! Logged to Fleet Dispatch.'),
                                   ),
                                 );
                               }
+                              return res;
                             },
                           ),
                         );
+                      },
+                      onDeliveryIssueAction: () {
+                        showDialog(
+                          context: context,
+                          builder: (_) => DeliveryAttemptFailedDialog(
+                            orderNumber: item.orderNumber,
+                            customerName: item.customerName,
+                            onSubmit: (reason, notes) => deliv.recordDeliveryAttemptFailed(
+                              orderId: item.id,
+                              reason: reason,
+                              notes: notes,
+                            ),
+                          ),
+                        ).then((res) {
+                          if (res != null && res['success'] == true && context.mounted) {
+                            final maxReached = res['max_attempts_reached'] == true;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                backgroundColor: maxReached ? AppColors.dispatchAmber : AppColors.dispatchEmerald,
+                                content: Text(
+                                  maxReached
+                                      ? 'Max attempts reached! Parcel moved to Returns tab for shop return.'
+                                      : 'Failed attempt logged. Customer notified.',
+                                ),
+                              ),
+                            );
+                          }
+                        });
                       },
                     );
                   },

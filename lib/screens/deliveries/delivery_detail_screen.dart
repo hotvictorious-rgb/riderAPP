@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/delivery_assignment_model.dart';
@@ -131,7 +131,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               phone: _current.shopPhone,
               icon: Icons.store,
               accentColor: AppColors.dispatchAmber,
-              pinLabel: isPickup ? 'Courier PIN: ${_current.pickupPin ?? "Required"}' : 'Handover Certified âœ“',
+              pinLabel: isPickup ? 'Courier PIN: ${_current.pickupPin ?? "Required"}' : 'Handover Certified ✓',
             ),
             const SizedBox(height: 14),
 
@@ -143,7 +143,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               phone: _current.customerPhone,
               icon: Icons.location_on,
               accentColor: AppColors.dispatchEmerald,
-              pinLabel: isDelivered ? 'Delivery PIN Verified âœ“' : (hasArrived ? 'Doorstep Alert Sent â€¢ Request PIN' : 'Pending Arrival'),
+              pinLabel: isDelivered ? 'Delivery PIN Verified ✓' : (hasArrived ? 'Doorstep Alert Sent • Request PIN' : 'Pending Arrival'),
             ),
             const SizedBox(height: 16),
 
@@ -250,7 +250,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                       if (success && mounted) setState(() {});
                     },
                     icon: const Icon(Icons.location_on, size: 18),
-                    label: const Text("ðŸ“ I'm Here â€¢ Notify Doorstep Arrival"),
+                    label: const Text("ðŸ“ I'm Here • Notify Doorstep Arrival"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryPurple,
                       foregroundColor: Colors.white,
@@ -540,7 +540,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               if (_current.deliveryAttemptPhoto != null)
                 _buildAuditThumbnail('Attempt Failure', _current.deliveryAttemptPhoto!, isWarning: true),
               ..._current.rejectionPhotos.map((p) => _buildAuditThumbnail('Rejection Defect', p, isDanger: true)),
-              ..._current.manifestItems.where((m) => m.defectPhotoUrl != null).map((m) => _buildAuditThumbnail('Defect: ', m.defectPhotoUrl!, isDanger: true)),
+              ..._current.manifestItems.where((m) => m.defectPhotoUrl != null).map((m) => _buildAuditThumbnail('Defect: ${m.productName}', m.defectPhotoUrl!, isDanger: true)),
             ],
           ),
         ],

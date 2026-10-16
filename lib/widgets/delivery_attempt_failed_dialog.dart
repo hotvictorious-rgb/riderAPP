@@ -41,6 +41,10 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
   }
 
   Future<void> _handleSubmit() async {
+    if (_livePhoto == null) {
+      setState(() => _error = 'Mandatory: Live camera photo of premises / locked gate is required as proof of attempt.');
+      return;
+    }
     setState(() {
       _isSubmitting = true;
       _error = null;

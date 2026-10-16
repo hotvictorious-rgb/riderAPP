@@ -37,6 +37,10 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
       setState(() => _error = 'Please enter the 6-digit Shop Handover PIN.');
       return;
     }
+    if (_livePhoto == null) {
+      setState(() => _error = 'Mandatory: Live photo of package at merchant counter is required before verifying OTP.');
+      return;
+    }
 
     setState(() {
       _isLoading = true;

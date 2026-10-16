@@ -73,6 +73,18 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
       setState(() => _error = 'Please enter the full 6-digit Customer Security PIN.');
       return;
     }
+    if (_overallPhoto == null) {
+      setState(() => _error = 'Mandatory: Live photo of package condition at doorstep is required.');
+      return;
+    }
+    if (_hasRejections) {
+      for (final item in _manifest) {
+        if (item.rejectedQuantity > 0 && _itemDefectPhotos[item.orderItemId] == null) {
+          setState(() => _error = 'Mandatory: Please snap a live defect photo for rejected item "".');
+          return;
+        }
+      }
+    }
 
     if (_hasRejections) {
       for (final item in _manifest) {

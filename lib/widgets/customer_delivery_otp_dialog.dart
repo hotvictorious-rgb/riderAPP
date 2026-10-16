@@ -113,6 +113,15 @@ class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
                 Expanded(
                   child: ElevatedButton(
                     onPressed: () {
+                      if (_livePhoto == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            backgroundColor: AppColors.urgentRed,
+                            content: Text('Mandatory: Live photo of parcel at doorstep is required before verifying OTP.'),
+                          ),
+                        );
+                        return;
+                      }
                       if (_otpController.text.length == 6) {
                         widget.onVerify(_otpController.text.trim(), _livePhoto);
                         Navigator.pop(context);

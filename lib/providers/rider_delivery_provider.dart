@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../core/constants/api_endpoints.dart';
@@ -111,7 +111,7 @@ class RiderDeliveryProvider with ChangeNotifier {
           'otp': otp.trim(),
           'proof_photo': await MultipartFile.fromFile(
             livePhoto.path,
-            filename: 'pickup__.jpg',
+            filename: 'pickup_${orderId}.jpg',
           ),
         });
       } else {
@@ -156,7 +156,7 @@ class RiderDeliveryProvider with ChangeNotifier {
           'otp': otp.trim(),
           'proof_photo': await MultipartFile.fromFile(
             livePhoto.path,
-            filename: 'delivery__.jpg',
+            filename: 'delivery_${orderId}.jpg',
           ),
         });
       } else {
@@ -223,14 +223,14 @@ class RiderDeliveryProvider with ChangeNotifier {
         if (overallPhoto != null) {
           map['proof_photo'] = await MultipartFile.fromFile(
             overallPhoto.path,
-            filename: 'doorstep__.jpg',
+            filename: 'doorstep_${orderId}.jpg',
           );
         }
         if (itemDefectPhotos != null) {
           for (final entry in itemDefectPhotos.entries) {
-            map['item_photo_'] = await MultipartFile.fromFile(
+            map['item_photo_${entry.key}'] = await MultipartFile.fromFile(
               entry.value.path,
-              filename: 'defect__.jpg',
+              filename: 'defect_${entry.key}.jpg',
             );
           }
         }
@@ -292,7 +292,7 @@ class RiderDeliveryProvider with ChangeNotifier {
           'otp': otp.trim(),
           'proof_photo': await MultipartFile.fromFile(
             livePhoto.path,
-            filename: 'vendor_return__.jpg',
+            filename: 'vendor_return_${returnCaseId}.jpg',
           ),
         });
       } else {
@@ -346,7 +346,7 @@ class RiderDeliveryProvider with ChangeNotifier {
           if (notes != null && notes.isNotEmpty) 'notes': notes.trim(),
           'proof_photo': await MultipartFile.fromFile(
             livePhoto.path,
-            filename: 'attempt__.jpg',
+            filename: 'attempt_${orderId}.jpg',
           ),
         };
         payload = FormData.fromMap(map);

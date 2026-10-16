@@ -36,6 +36,10 @@ class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
       setState(() => _error = 'Please enter the 6-digit Vendor Shop Return PIN.');
       return;
     }
+    if (_livePhoto == null) {
+      setState(() => _error = 'Mandatory: Live photo of returned package at merchant counter is required.');
+      return;
+    }
 
     setState(() {
       _isSubmitting = true;

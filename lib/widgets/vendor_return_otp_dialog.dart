@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../models/return_case_model.dart';
@@ -89,12 +89,12 @@ class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Case: ',
+              'Case: ${widget.returnCase.caseNumber}',
               style: const TextStyle(color: AppColors.richGold, fontSize: 12, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             Text(
-              'Drop-off at .\nAsk the merchant for their 6-digit Return Confirmation PIN.',
+              'Drop-off at ${widget.returnCase.shopName}.\nAsk the merchant for their 6-digit Return Confirmation PIN.',
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, height: 1.4),
             ),

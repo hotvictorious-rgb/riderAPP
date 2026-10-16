@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import 'live_camera_proof_card.dart';
@@ -102,7 +102,7 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
             const SizedBox(height: 3),
             Center(
               child: Text(
-                'Order  • ',
+                'Order ${widget.orderNumber} • ${widget.customerName}',
                 style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600),
               ),
             ),

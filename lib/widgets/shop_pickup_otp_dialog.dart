@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import 'live_camera_proof_card.dart';
@@ -92,7 +92,7 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Order ',
+              'Order ${widget.orderNumber}',
               style: const TextStyle(color: AppColors.dispatchAmber, fontSize: 12, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 12),
@@ -105,7 +105,7 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
                 border: Border.all(color: Colors.white.withOpacity(0.06)),
               ),
               child: Text(
-                'Collect package at . Ask merchant staff for their 6-digit Pickup Handover PIN to certify collection.',
+                'Collect package at ${widget.shopName}. Ask merchant staff for their 6-digit Pickup Handover PIN to certify collection.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, height: 1.45),
               ),

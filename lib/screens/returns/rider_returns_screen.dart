@@ -174,41 +174,56 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
           if (item.doorstepPhotoPath != null && item.doorstepPhotoPath!.isNotEmpty) ...[
             const SizedBox(height: 12),
             Container(
-              padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.04),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AppColors.urgentRed.withOpacity(0.3)),
               ),
-              child: Row(
-                children: [
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: Image.network(
-                      item.doorstepPhotoPath!,
-                      width: 48,
-                      height: 48,
-                      fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => Container(
-                        width: 48,
-                        height: 48,
-                        color: Colors.white10,
-                        child: const Icon(Icons.broken_image, size: 20, color: Colors.white38),
-                      ),
-                    ),
+              child: Material(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(10),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(10),
+                  onTap: () => _openImageDialog(
+                    context,
+                    item.doorstepPhotoPath!,
+                    'Return Defect Evidence • ${item.caseNumber}',
                   ),
-                  const SizedBox(width: 10),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Row(
                       children: [
-                        Text('Doorstep Defect Evidence', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
-                        SizedBox(height: 2),
-                        Text('Live photo evidence sealed in audit ledger.', style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(6),
+                          child: Image.network(
+                            item.doorstepPhotoPath!,
+                            width: 48,
+                            height: 48,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, __, ___) => Container(
+                              width: 48,
+                              height: 48,
+                              color: Colors.white10,
+                              child: const Icon(Icons.broken_image, size: 20, color: Colors.white38),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Doorstep Defect Evidence', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
+                              SizedBox(height: 2),
+                              Text('Tap to inspect full audit photo before handover.', style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.fullscreen, color: AppColors.richGold, size: 18),
                       ],
                     ),
                   ),
-                ],
+                ),
               ),
             ),
           ],
@@ -247,6 +262,61 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  void _openImageDialog(BuildContext context, String url, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.obsidianCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.urgentRed.withOpacity(0.5)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+              InteractiveViewer(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                  child: Image.network(
+                    url,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Padding(
+                      padding: EdgeInsets.all(32),
+                      child: Center(child: Text('Unable to load photo', style: TextStyle(color: Colors.white54))),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

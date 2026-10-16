@@ -244,13 +244,13 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                     onPressed: () async {
                       final success = await deliv.markArrived(_current.id);
                       _showSnack(
-                        success ? 'ðŸ“ Doorstep Arrival Logged! Customer notified.' : (deliv.errorMessage ?? 'Failed to log arrival.'),
+                        success ? '📍  Doorstep Arrival Logged! Customer notified.' : (deliv.errorMessage ?? 'Failed to log arrival.'),
                         isSuccess: success,
                       );
                       if (success && mounted) setState(() {});
                     },
                     icon: const Icon(Icons.location_on, size: 18),
-                    label: const Text("ðŸ“ I'm Here • Notify Doorstep Arrival"),
+                    label: const Text("📍  I'm Here • Notify Doorstep Arrival"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryPurple,
                       foregroundColor: Colors.white,

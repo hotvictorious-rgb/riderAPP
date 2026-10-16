@@ -147,7 +147,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                             backgroundColor: success ? AppColors.dispatchEmerald : AppColors.urgentRed,
                             content: Text(
                               success
-                                  ? 'ðŸ“ Doorstep Arrival Logged! Customer notified.'
+                                  ? '📍  Doorstep Arrival Logged! Customer notified.'
                                   : (deliv.errorMessage ?? 'Failed to log arrival.'),
                             ),
                           ),

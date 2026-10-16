@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../models/delivery_assignment_model.dart';
@@ -80,7 +80,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
     if (_hasRejections) {
       for (final item in _manifest) {
         if (item.rejectedQuantity > 0 && _itemDefectPhotos[item.orderItemId] == null) {
-          setState(() => _error = 'Mandatory: Please snap a live defect photo for rejected item "".');
+          setState(() => _error = 'Mandatory: Please snap a live defect photo for rejected item "${item.productName}".');
           return;
         }
       }
@@ -89,7 +89,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
     if (_hasRejections) {
       for (final item in _manifest) {
         if (item.rejectedQuantity > 0 && item.rejectionCategory == null) {
-          setState(() => _error = 'Please select a return reason for "".');
+          setState(() => _error = 'Please select a return reason for "${item.productName}".');
           return;
         }
       }
@@ -159,7 +159,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
               ),
               const SizedBox(height: 12),
               Text(
-                'Handover: ',
+                'Handover: ${widget.assignment.customerName}',
                 style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
               ),
               Text(
@@ -365,7 +365,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                 ),
               ),
               Text(
-                'Total: ',
+                'Total: ${item.orderedQuantity}',
                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w700),
               ),
             ],
@@ -375,7 +375,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Accepted: ',
+                'Accepted: ${item.acceptedQuantity}',
                 style: const TextStyle(color: AppColors.dispatchEmerald, fontSize: 11, fontWeight: FontWeight.w800),
               ),
               Row(
@@ -398,7 +398,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                         : null,
                   ),
                   Text(
-                    '',
+                    '${item.rejectedQuantity}',
                     style: TextStyle(
                       color: item.rejectedQuantity > 0 ? AppColors.urgentRed : Colors.white,
                       fontWeight: FontWeight.w900,
@@ -453,7 +453,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                   _itemDefectPhotos.remove(item.orderItemId);
                 }
               }),
-              title: 'Live Defect Photo: ',
+              title: 'Live Defect Photo: ${item.productName}',
               hint: 'Snap live picture of damaged item/broken seal.',
               isRequired: false,
             ),

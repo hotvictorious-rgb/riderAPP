@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import 'live_camera_proof_card.dart';
@@ -58,7 +58,7 @@ class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Ask  for their 6-digit delivery security PIN to confirm handover.',
+              'Ask ${widget.customerName} for their 6-digit delivery security PIN to confirm handover.',
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
             ),

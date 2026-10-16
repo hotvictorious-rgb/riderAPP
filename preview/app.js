@@ -11,50 +11,67 @@
     corridor: 'Ikeja - Lekki Express Corridor',
     activeDeliveries: [
       {
-        id: 'ord-1',
+        id: 101,
         orderNumber: 'VM-ORD-9081',
         shopName: 'Apex Retail Plaza (Hub #04)',
         shopAddress: 'Computer Village, Ikeja, Lagos',
+        shopPhone: '+234 801 234 5678',
         customerName: 'Chidi Okafor',
         customerPhone: '+234 803 111 2233',
         deliveryAddress: '14 Admiralty Way, Lekki Phase 1, Lagos',
-        itemsSummary: 'iPhone 14 Pro Case & Anker 65W GaN Fast Charger',
+        destinationLga: 'Lekki Phase 1',
+        itemsSummary: '1x iPhone 14 Pro Case, 1x Anker 65W GaN Charger',
+        itemsCount: 2,
         category: 'EXPRESS COURIER',
         status: 'ready_for_pickup', // 'ready_for_pickup', 'out_for_delivery', 'delivered'
         pickupPin: '482910',
+        hasArrived: false,
         customerOtp: '883921'
       },
       {
-        id: 'ord-2',
+        id: 102,
         orderNumber: 'VM-ORD-9077',
         shopName: 'Vic Tech & Electronics HQ',
         shopAddress: 'Shop 12, Ikeja City Mall, Alausa',
+        shopPhone: '+234 802 333 4455',
         customerName: 'Amina Bello',
         customerPhone: '+234 802 555 9900',
         deliveryAddress: 'Plot 8, Victoria Island Financial Strip, Lagos',
-        itemsSummary: 'Sony WH-1000XM5 Wireless Noise-Canceling',
+        destinationLga: 'Victoria Island',
+        itemsSummary: '1x Sony WH-1000XM5 Wireless Headphones',
+        itemsCount: 1,
         category: 'FRAGILE DISPATCH',
         status: 'out_for_delivery',
         pickupPin: 'Verified',
+        hasArrived: false,
         customerOtp: '519204'
       }
     ],
     history: [
       {
+        id: 99,
         orderNumber: 'VM-ORD-9064',
         customerName: 'Babajide Adeleke',
+        destinationLga: 'Surulere',
+        itemsSummary: '1x Samsung T7 Shield SSD 1TB',
         category: 'STANDARD DISPATCH',
         timestamp: 'Yesterday, 04:12 PM'
       },
       {
+        id: 98,
         orderNumber: 'VM-ORD-9052',
         customerName: 'Grace Danjuma',
+        destinationLga: 'Ikeja GRA',
+        itemsSummary: '2x Baseus USB-C Braided Cables',
         category: 'EXPRESS COURIER',
         timestamp: 'Oct 14, 2026'
       },
       {
+        id: 97,
         orderNumber: 'VM-ORD-9031',
         customerName: 'Tariq Hassan',
+        destinationLga: 'Yaba Tech Corridor',
+        itemsSummary: '1x Logitech MX Master 3S Mouse',
         category: 'PRIORITY CARGO',
         timestamp: 'Oct 12, 2026'
       }
@@ -150,8 +167,8 @@
     return `
       <div class="white-card">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span class="trip-step-badge ${isPickup ? 'pickup' : 'enroute'}">
-            ${isPickup ? '<i class="fa-solid fa-store"></i> STEP 1: PICKUP AT SHOP' : '<i class="fa-solid fa-truck-fast"></i> STEP 2: OUT FOR DELIVERY'}
+          <span class="trip-step-badge ${isPickup ? 'pickup' : (item.hasArrived ? 'delivered' : 'enroute')}">
+            ${isPickup ? '<i class="fa-solid fa-store"></i> STEP 1: PICKUP AT SHOP' : (item.hasArrived ? '<i class="fa-solid fa-circle-check"></i> STEP 2: ARRIVED AT DOORSTEP' : '<i class="fa-solid fa-truck-fast"></i> STEP 2: OUT FOR DELIVERY')}
           </span>
           <span style="font-size: 10px; font-weight: 800; color: #92400E; background: #FEF3C7; padding: 2px 7px; border-radius: 6px;">
             <i class="fa-solid fa-bolt"></i> ${item.category}
@@ -163,16 +180,22 @@
         <div class="route-step-box">
           <div class="route-step-row">
             <i class="fa-solid fa-store" style="color: #F59E0B; margin-top: 2px;"></i>
-            <div>
-              <div style="font-size: 12px; font-weight: 800; color: #1E1B4B;">${item.shopName}</div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between;">
+                <span style="font-size: 12px; font-weight: 800; color: #1E1B4B;">${item.shopName}</span>
+                <span style="font-size: 10px; color: #D97706; font-weight: 700;">${item.shopPhone}</span>
+              </div>
               <div style="font-size: 10.5px; color: #6B7280;">${item.shopAddress}</div>
             </div>
           </div>
           <div class="route-step-row">
             <i class="fa-solid fa-location-dot" style="color: #10B981; margin-top: 2px;"></i>
-            <div>
-              <div style="font-size: 12px; font-weight: 800; color: #1E1B4B;">${item.customerName} (${item.customerPhone})</div>
-              <div style="font-size: 10.5px; color: #6B7280;">${item.deliveryAddress}</div>
+            <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between;">
+                <span style="font-size: 12px; font-weight: 800; color: #1E1B4B;">${item.customerName}</span>
+                <span style="font-size: 10px; color: #15803D; font-weight: 700;">${item.customerPhone}</span>
+              </div>
+              <div style="font-size: 10.5px; color: #6B7280;">${item.deliveryAddress} (${item.destinationLga})</div>
             </div>
           </div>
         </div>
@@ -181,21 +204,21 @@
           <div class="pin-reveal-box">
             <i class="fa-solid fa-key"></i> COURIER PIN FOR SHOP HANDOVER: <strong>${item.pickupPin}</strong>
           </div>
-          <button class="btn-primary" onclick="verifyPickup('${item.id}')">
+          <button class="btn-primary" onclick="verifyPickup(${item.id})">
             <i class="fa-solid fa-clipboard-check"></i> Merchant Verified Handover • Start Route
           </button>
         ` : `
           ${!item.hasArrived ? `
-            <button class="btn-primary" style="background: linear-gradient(135deg, #5E17EB, #7C3AED); margin-bottom: 8px;" onclick="riderMarkArrived('${item.id}')">
+            <button class="btn-primary" style="background: linear-gradient(135deg, #5E17EB, #7C3AED); margin-bottom: 8px;" onclick="riderMarkArrived(${item.id})">
               <i class="fa-solid fa-location-crosshairs"></i> 📍 I'm Here • Notify Customer Doorstep Arrival
             </button>
           ` : `
             <div style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 8px; padding: 10px; margin-bottom: 8px; text-align: center;">
-              <div style="color: #15803D; font-weight: 800; font-size: 12px;"><i class="fa-solid fa-circle-check"></i> Customer Phone Alerted!</div>
-              <div style="color: #166534; font-size: 11px; margin-top: 2px;">Input box triggered open on customer's device.</div>
+              <div style="color: #15803D; font-weight: 800; font-size: 12px;"><i class="fa-solid fa-circle-check"></i> Customer Phone Alerted at Doorstep!</div>
+              <div style="color: #166534; font-size: 11px; margin-top: 2px;">Ask recipient for their 6-digit delivery security PIN.</div>
             </div>
           `}
-          <button class="btn-emerald" onclick="openDoorstepModal('${item.id}', '${item.customerName}')">
+          <button class="btn-emerald" onclick="openDoorstepModal(${item.id}, '${item.customerName}')">
             <i class="fa-solid fa-qrcode"></i> Enter Customer Delivery PIN
           </button>
         `}
@@ -205,16 +228,17 @@
 
   // --- Handover and Doorstep OTP Logic ---
   window.riderMarkArrived = function(orderId) {
-    const item = window.state.activeDeliveries.find(d => d.id === orderId);
+    const item = window.state.activeDeliveries.find(d => d.id == orderId);
     if (!item) return;
 
     item.hasArrived = true;
+    renderDashboard();
     renderDeliveries();
-    showToast(`📍 "I'm Here" sent! Doorstep PIN input box triggered on customer's phone.`);
+    showToast(`📍 "I'm Here" sent! Doorstep arrival logged & customer notified.`);
   };
 
   window.verifyPickup = function(orderId) {
-    const item = window.state.activeDeliveries.find(d => d.id === orderId);
+    const item = window.state.activeDeliveries.find(d => d.id == orderId);
     if (!item) return;
 
     item.status = 'out_for_delivery';
@@ -230,7 +254,7 @@
     const custEl = document.getElementById('modal-doorstep-cust-name');
     const pinInp = document.getElementById('doorstep-pin-input');
 
-    const item = window.state.activeDeliveries.find(d => d.id === orderId) || window.state.activeDeliveries[0];
+    const item = window.state.activeDeliveries.find(d => d.id == orderId) || window.state.activeDeliveries[0];
     if (numEl) numEl.textContent = `Order #${item ? item.orderNumber : 'VM-ORD-9081'}`;
     if (custEl) custEl.textContent = item ? item.customerName : customerName;
     if (pinInp) {
@@ -248,22 +272,25 @@
     }
 
     const orderId = window.state.activeModalOrderId || window.state.activeDeliveries[0]?.id;
-    const item = window.state.activeDeliveries.find(d => d.id === orderId) || window.state.activeDeliveries[0];
+    const item = window.state.activeDeliveries.find(d => d.id == orderId) || window.state.activeDeliveries[0];
 
     if (!item) return;
 
-    // Delivery certified & logged! (No rider wallet credited; logged to corporate fleet terminal)
+    // Delivery certified & logged to fleet
     window.state.completedTrips += 1;
 
     // Move to history
     window.state.history.unshift({
+      id: item.id,
       orderNumber: item.orderNumber,
       customerName: item.customerName,
+      destinationLga: item.destinationLga,
+      itemsSummary: item.itemsSummary,
       category: item.category,
       timestamp: 'Just Now'
     });
 
-    window.state.activeDeliveries = window.state.activeDeliveries.filter(d => d.id !== item.id);
+    window.state.activeDeliveries = window.state.activeDeliveries.filter(d => d.id != item.id);
 
     closeModals();
     renderDashboard();
@@ -299,7 +326,8 @@
       <div class="white-card" style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <div style="font-size: 13px; font-weight: 800; color: #1E1B4B;">${item.orderNumber}</div>
-          <div style="font-size: 11px; color: #6B7280; margin-top: 2px;">${item.customerName} • ${item.timestamp}</div>
+          <div style="font-size: 11px; color: #6B7280; margin-top: 2px;">${item.customerName} (${item.destinationLga}) • ${item.timestamp}</div>
+          <div style="font-size: 10px; color: #9CA3AF; margin-top: 2px;">${item.itemsSummary}</div>
         </div>
         <div style="text-align: right;">
           <span style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 9.5px; font-weight: 900; padding: 3px 8px; border-radius: 6px;">

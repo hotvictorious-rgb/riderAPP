@@ -114,36 +114,59 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                 ...deliv.activeDeliveries.map(
                   (a) => ActiveDeliveryCard(
                     assignment: a,
-                    onAction: () {
-                      if (a.isReadyForPickup) {
+                    onPickupAction: () async {
+                      final success = await deliv.verifyPickupOtp(a.id, a.pickupPin ?? '482910');
+                      if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            backgroundColor: AppColors.dispatchAmber,
+                            backgroundColor: success ? AppColors.dispatchEmerald : AppColors.urgentRed,
                             content: Text(
-                              'Present 6-digit Courier PIN [${a.pickupPin}] to shop counter staff to release package.',
-                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w800),
+                              success
+                                  ? 'Shop Handover Verified! Order is now En Route.'
+                                  : (deliv.errorMessage ?? 'Pickup verification failed.'),
                             ),
                           ),
                         );
-                        deliv.verifyPickupOtp(a.id, a.pickupPin ?? '482910');
-                      } else {
-                        showDialog(
-                          context: context,
-                          builder: (_) => CustomerDeliveryOtpDialog(
-                            orderNumber: a.orderNumber,
-                            customerName: a.customerName,
-                            onVerify: (otp) {
-                              deliv.verifyCustomerDeliveryOtp(a.id, otp);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  backgroundColor: AppColors.dispatchEmerald,
-                                  content: Text('Delivery Handover Certified! Logged to Fleet Dispatch.'),
-                                ),
-                              );
-                            },
+                      }
+                    },
+                    onMarkArrivedAction: () async {
+                      final success = await deliv.markArrived(a.id);
+                      if (context.mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            backgroundColor: success ? AppColors.dispatchEmerald : AppColors.urgentRed,
+                            content: Text(
+                              success
+                                  ? '📍 Doorstep Arrival Logged! Customer notified.'
+                                  : (deliv.errorMessage ?? 'Failed to log arrival.'),
+                            ),
                           ),
                         );
                       }
+                    },
+                    onVerifyDeliveryAction: () {
+                      showDialog(
+                        context: context,
+                        builder: (_) => CustomerDeliveryOtpDialog(
+                          orderNumber: a.orderNumber,
+                          customerName: a.customerName,
+                          onVerify: (otp) async {
+                            final success = await deliv.verifyCustomerDeliveryOtp(a.id, otp);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  backgroundColor: success ? AppColors.dispatchEmerald : AppColors.urgentRed,
+                                  content: Text(
+                                    success
+                                        ? 'Delivery Handover Certified! Logged to Fleet Dispatch.'
+                                        : (deliv.errorMessage ?? 'Invalid delivery code.'),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      );
                     },
                   ),
                 ),

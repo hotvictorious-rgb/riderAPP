@@ -155,7 +155,9 @@ void main() {
         customerName: 'Amina Bello',
         customerPhone: '+2348022223333',
         deliveryAddress: 'Plot 4, Lekki Expressway',
+        destinationLga: 'Lekki Phase 1',
         itemsSummary: '1x Wireless Gaming Mouse',
+        itemsCount: 1,
         dispatchCategory: 'EXPRESS COURIER',
         orderStatus: 'ready_for_pickup',
         pickupPin: '556677',
@@ -167,6 +169,8 @@ void main() {
       expect(assignment.isDelivered, isFalse);
       expect(assignment.dispatchCategory, equals('EXPRESS COURIER'));
       expect(assignment.pickupPin, equals('556677'));
+      expect(assignment.destinationLga, equals('Lekki Phase 1'));
+      expect(assignment.hasRiderArrived, isFalse);
     });
   });
 }

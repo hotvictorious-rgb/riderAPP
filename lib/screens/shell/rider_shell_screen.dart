@@ -3,7 +3,7 @@ import '../../core/constants/app_colors.dart';
 import '../dashboard/rider_dashboard_screen.dart';
 import '../deliveries/rider_deliveries_screen.dart';
 import '../history/rider_history_screen.dart';
-import '../wallet/rider_wallet_screen.dart';
+import '../profile/rider_profile_screen.dart';
 
 class RiderShellScreen extends StatefulWidget {
   const RiderShellScreen({super.key});
@@ -19,7 +19,7 @@ class _RiderShellScreenState extends State<RiderShellScreen> {
     RiderDashboardScreen(),
     RiderDeliveriesScreen(),
     RiderHistoryScreen(),
-    RiderWalletScreen(),
+    RiderProfileScreen(),
   ];
 
   @override
@@ -42,10 +42,10 @@ class _RiderShellScreenState extends State<RiderShellScreen> {
           unselectedFontSize: 11,
           elevation: 0,
           items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Dispatch'),
-            BottomNavigationBarItem(icon: Icon(Icons.local_shipping), label: 'Active Trips'),
-            BottomNavigationBarItem(icon: Icon(Icons.history), label: 'History'),
-            BottomNavigationBarItem(icon: Icon(Icons.account_balance_wallet), label: 'Wallet'),
+            BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
+            BottomNavigationBarItem(icon: Icon(Icons.local_shipping), label: 'Missions'),
+            BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Trip Log'),
+            BottomNavigationBarItem(icon: Icon(Icons.badge_outlined), label: 'Fleet Profile'),
           ],
         ),
       ),

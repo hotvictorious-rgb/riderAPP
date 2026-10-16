@@ -6,7 +6,7 @@ import '../../providers/rider_delivery_provider.dart';
 import '../../widgets/active_delivery_card.dart';
 import '../../widgets/customer_delivery_otp_dialog.dart';
 import '../../widgets/rider_duty_switch_card.dart';
-import '../../widgets/rider_earnings_card.dart';
+import '../../widgets/rider_telemetry_card.dart';
 import '../profile/rider_profile_screen.dart';
 
 class RiderDashboardScreen extends StatefulWidget {
@@ -37,7 +37,8 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
         title: const Text('DISPATCH RADAR'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings),
+            icon: const Icon(Icons.person_outline),
+            tooltip: 'Courier Profile',
             onPressed: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const RiderProfileScreen()));
             },
@@ -58,22 +59,19 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
               RiderDutySwitchCard(
                 isOnline: dash.isDutyOnline,
                 fleetName: dash.profile?.fleetCompany ?? 'Speedy Parcel Express',
-                vehicleType: dash.profile?.vehicleType ?? 'Motorbike (Bajaj Boxer)',
+                vehicleType: dash.profile?.vehicleType ?? 'Motorbike (Bajaj Boxer 150cc)',
                 licensePlate: dash.profile?.licensePlate ?? 'KJA-104-XY',
                 onToggle: () => dash.toggleDuty(),
               ),
               const SizedBox(height: 16),
 
-              // Wallet & Daily Telemetry Card
-              RiderEarningsCard(
-                walletBalance: dash.dashboardMetrics?.walletBalance ?? 14500.00,
-                todayEarnings: dash.dashboardMetrics?.todayEarnings ?? 6200.00,
+              // Operational Telemetry HUD Card
+              RiderTelemetryCard(
                 completedTrips: dash.dashboardMetrics?.completedTripsCount ?? 48,
-                onWithdraw: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Instant withdrawal request submitted to Access Bank.')),
-                  );
-                },
+                activeMissions: deliv.activeDeliveries.length,
+                assignedCorridor: dash.dashboardMetrics?.assignedCorridor ?? 'Ikeja - Lekki Express Corridor',
+                fleetName: dash.profile?.fleetCompany ?? 'Speedy Parcel Express',
+                onTimeRate: dash.dashboardMetrics?.onTimeRatePercent ?? 99.4,
               ),
               const SizedBox(height: 24),
 
@@ -83,7 +81,12 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                 children: [
                   const Text(
                     'ACTIVE ASSIGNMENTS',
-                    style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                    style: TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                   Text(
                     '${deliv.activeDeliveries.length} Pending Handover',
@@ -129,13 +132,12 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                           builder: (_) => CustomerDeliveryOtpDialog(
                             orderNumber: a.orderNumber,
                             customerName: a.customerName,
-                            deliveryCharge: a.deliveryCharge,
                             onVerify: (otp) {
                               deliv.verifyCustomerDeliveryOtp(a.id, otp);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   backgroundColor: AppColors.dispatchEmerald,
-                                  content: Text('Delivery Certified! ₦2,500.00 credited to Rider Wallet.'),
+                                  content: Text('Delivery Handover Certified! Logged to Fleet Dispatch.'),
                                 ),
                               );
                             },

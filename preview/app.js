@@ -1,14 +1,14 @@
 // Victorious MARKET — Sovereign Rider Dispatch Terminal Engine
-// Perfectly synchronized with index.html, style.css, and newVmarket Backend Delivery Handshake Invariants
+// Synchronized with dispatch-only closed-loop fleet settlement architecture (Zero Courier Wallets)
 
 (function() {
   'use strict';
 
   window.state = {
     isOnline: true,
-    walletBalance: 14500.00,
-    todayEarnings: 6200.00,
     completedTrips: 48,
+    onTimeRate: 99.4,
+    corridor: 'Ikeja - Lekki Express Corridor',
     activeDeliveries: [
       {
         id: 'ord-1',
@@ -19,7 +19,7 @@
         customerPhone: '+234 803 111 2233',
         deliveryAddress: '14 Admiralty Way, Lekki Phase 1, Lagos',
         itemsSummary: 'iPhone 14 Pro Case & Anker 65W GaN Fast Charger',
-        fee: 2500.00,
+        category: 'EXPRESS COURIER',
         status: 'ready_for_pickup', // 'ready_for_pickup', 'out_for_delivery', 'delivered'
         pickupPin: '482910',
         customerOtp: '883921'
@@ -33,7 +33,7 @@
         customerPhone: '+234 802 555 9900',
         deliveryAddress: 'Plot 8, Victoria Island Financial Strip, Lagos',
         itemsSummary: 'Sony WH-1000XM5 Wireless Noise-Canceling',
-        fee: 3500.00,
+        category: 'FRAGILE DISPATCH',
         status: 'out_for_delivery',
         pickupPin: 'Verified',
         customerOtp: '519204'
@@ -43,31 +43,24 @@
       {
         orderNumber: 'VM-ORD-9064',
         customerName: 'Babajide Adeleke',
-        fee: 2200.00,
+        category: 'STANDARD DISPATCH',
         timestamp: 'Yesterday, 04:12 PM'
       },
       {
         orderNumber: 'VM-ORD-9052',
         customerName: 'Grace Danjuma',
-        fee: 1800.00,
+        category: 'EXPRESS COURIER',
         timestamp: 'Oct 14, 2026'
       },
       {
         orderNumber: 'VM-ORD-9031',
         customerName: 'Tariq Hassan',
-        fee: 2500.00,
+        category: 'PRIORITY CARGO',
         timestamp: 'Oct 12, 2026'
       }
     ],
     activeModalOrderId: null
   };
-
-  function formatNaira(amount) {
-    return '₦ ' + Number(amount).toLocaleString('en-NG', {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    });
-  }
 
   // --- Tab Navigation ---
   window.switchTab = function(tabName) {
@@ -88,7 +81,6 @@
     if (tabName === 'dashboard') renderDashboard();
     if (tabName === 'deliveries') renderDeliveries();
     if (tabName === 'history') renderHistory();
-    if (tabName === 'wallet') renderWallet();
   };
 
   // --- Duty Switch ---
@@ -127,15 +119,13 @@
   function renderDashboard() {
     renderDutyStatus();
 
-    const w1 = document.getElementById('wallet-balance-text');
-    const t1 = document.getElementById('today-earnings-text');
     const c1 = document.getElementById('completed-count-pill');
     const badge = document.getElementById('active-trips-badge');
+    const subtext = document.getElementById('active-trips-subtext');
 
-    if (w1) w1.textContent = formatNaira(window.state.walletBalance);
-    if (t1) t1.textContent = formatNaira(window.state.todayEarnings);
-    if (c1) c1.textContent = `${window.state.completedTrips} Trips Completed`;
+    if (c1) c1.textContent = `${window.state.completedTrips} Trips`;
     if (badge) badge.textContent = `${window.state.activeDeliveries.length} Active`;
+    if (subtext) subtext.textContent = `${window.state.activeDeliveries.length} En Route`;
 
     const container = document.getElementById('dashboard-assignments-list');
     if (!container) return;
@@ -163,7 +153,9 @@
           <span class="trip-step-badge ${isPickup ? 'pickup' : 'enroute'}">
             ${isPickup ? '<i class="fa-solid fa-store"></i> STEP 1: PICKUP AT SHOP' : '<i class="fa-solid fa-truck-fast"></i> STEP 2: OUT FOR DELIVERY'}
           </span>
-          <span class="fee-text">+${formatNaira(item.fee)} Earned</span>
+          <span style="font-size: 10px; font-weight: 800; color: #92400E; background: #FEF3C7; padding: 2px 7px; border-radius: 6px;">
+            <i class="fa-solid fa-bolt"></i> ${item.category}
+          </span>
         </div>
         <div style="font-size: 14px; font-weight: 900; color: #1E1B4B;">${item.orderNumber}</div>
         <div style="font-size: 11.5px; color: #6B7280; margin-top: 2px;">${item.itemsSummary}</div>
@@ -193,8 +185,18 @@
             <i class="fa-solid fa-clipboard-check"></i> Merchant Verified Handover • Start Route
           </button>
         ` : `
-          <button class="btn-emerald" onclick="openDoorstepModal('${item.id}', '${item.customerName}', ${item.fee})">
-            <i class="fa-solid fa-qrcode"></i> Arrived at Doorstep • Enter Customer PIN
+          ${!item.hasArrived ? `
+            <button class="btn-primary" style="background: linear-gradient(135deg, #5E17EB, #7C3AED); margin-bottom: 8px;" onclick="riderMarkArrived('${item.id}')">
+              <i class="fa-solid fa-location-crosshairs"></i> 📍 I'm Here • Notify Customer Doorstep Arrival
+            </button>
+          ` : `
+            <div style="background: #F0FDF4; border: 1px solid #86EFAC; border-radius: 8px; padding: 10px; margin-bottom: 8px; text-align: center;">
+              <div style="color: #15803D; font-weight: 800; font-size: 12px;"><i class="fa-solid fa-circle-check"></i> Customer Phone Alerted!</div>
+              <div style="color: #166534; font-size: 11px; margin-top: 2px;">Input box triggered open on customer's device.</div>
+            </div>
+          `}
+          <button class="btn-emerald" onclick="openDoorstepModal('${item.id}', '${item.customerName}')">
+            <i class="fa-solid fa-qrcode"></i> Enter Customer Delivery PIN
           </button>
         `}
       </div>
@@ -202,6 +204,15 @@
   }
 
   // --- Handover and Doorstep OTP Logic ---
+  window.riderMarkArrived = function(orderId) {
+    const item = window.state.activeDeliveries.find(d => d.id === orderId);
+    if (!item) return;
+
+    item.hasArrived = true;
+    renderDeliveries();
+    showToast(`📍 "I'm Here" sent! Doorstep PIN input box triggered on customer's phone.`);
+  };
+
   window.verifyPickup = function(orderId) {
     const item = window.state.activeDeliveries.find(d => d.id === orderId);
     if (!item) return;
@@ -209,10 +220,10 @@
     item.status = 'out_for_delivery';
     renderDashboard();
     renderDeliveries();
-    showToast(`✓ Package picked up from ${item.shopName}! En route to customer.`);
+    showToast(`✓ Package picked up from ${item.shopName}! En route to recipient.`);
   };
 
-  window.openDoorstepModal = function(orderId, customerName, fee) {
+  window.openDoorstepModal = function(orderId, customerName) {
     window.state.activeModalOrderId = orderId;
     const modal = document.getElementById('modal-doorstep-otp');
     const numEl = document.getElementById('modal-doorstep-order-num');
@@ -232,7 +243,7 @@
   window.submitDoorstepPin = function() {
     const pin = document.getElementById('doorstep-pin-input')?.value.trim();
     if (!pin || pin.length !== 6) {
-      alert('Please enter the 6-digit delivery PIN presented by the customer.');
+      alert('Please enter the 6-digit delivery security PIN presented by the recipient.');
       return;
     }
 
@@ -241,16 +252,14 @@
 
     if (!item) return;
 
-    // Settle delivery fee!
-    window.state.walletBalance += item.fee;
-    window.state.todayEarnings += item.fee;
+    // Delivery certified & logged! (No rider wallet credited; logged to corporate fleet terminal)
     window.state.completedTrips += 1;
 
     // Move to history
     window.state.history.unshift({
       orderNumber: item.orderNumber,
       customerName: item.customerName,
-      fee: item.fee,
+      category: item.category,
       timestamp: 'Just Now'
     });
 
@@ -260,8 +269,7 @@
     renderDashboard();
     renderDeliveries();
     renderHistory();
-    renderWallet();
-    showToast(`✓ Doorstep PIN Verified! +${formatNaira(item.fee)} credited to Rider Wallet.`);
+    showToast(`✓ Delivery Certified! Order ${item.orderNumber} successfully logged to Fleet Dispatch.`);
   };
 
   window.closeModals = function() {
@@ -275,7 +283,7 @@
     if (!list) return;
 
     if (window.state.activeDeliveries.length === 0) {
-      list.innerHTML = `<div class="white-card" style="text-align: center; color: #6B7280; padding: 24px;"><i class="fa-solid fa-box-open" style="font-size: 28px; margin-bottom: 8px;"></i><p>No active trips assigned</p></div>`;
+      list.innerHTML = `<div class="white-card" style="text-align: center; color: #6B7280; padding: 24px;"><i class="fa-solid fa-box-open" style="font-size: 28px; margin-bottom: 8px;"></i><p>No active missions assigned</p></div>`;
       return;
     }
 
@@ -291,37 +299,19 @@
       <div class="white-card" style="display: flex; justify-content: space-between; align-items: center;">
         <div>
           <div style="font-size: 13px; font-weight: 800; color: #1E1B4B;">${item.orderNumber}</div>
-          <div style="font-size: 11px; color: #6B7280;">${item.customerName} • ${item.timestamp}</div>
+          <div style="font-size: 11px; color: #6B7280; margin-top: 2px;">${item.customerName} • ${item.timestamp}</div>
         </div>
         <div style="text-align: right;">
-          <div style="font-size: 13px; font-weight: 900; color: #10B981;">+${formatNaira(item.fee)}</div>
-          <div style="font-size: 9.5px; color: #10B981; font-weight: 700;">Delivered</div>
+          <span style="background: rgba(16, 185, 129, 0.15); color: #10B981; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 9.5px; font-weight: 900; padding: 3px 8px; border-radius: 6px;">
+            <i class="fa-solid fa-circle-check"></i> VERIFIED
+          </span>
+          <div style="font-size: 9.5px; color: #9CA3AF; font-weight: 700; margin-top: 3px;">${item.category}</div>
         </div>
       </div>
     `).join('');
   }
 
-  // --- Render Wallet ---
-  function renderWallet() {
-    const w2 = document.getElementById('wallet-balance-val2');
-    const t2 = document.getElementById('today-pay-val2');
-
-    if (w2) w2.textContent = formatNaira(window.state.walletBalance);
-    if (t2) t2.textContent = formatNaira(window.state.todayEarnings);
-  }
-
-  window.requestPayout = function() {
-    if (window.state.walletBalance <= 0) {
-      alert('No available payout balance.');
-      return;
-    }
-    const amt = window.state.walletBalance;
-    window.state.walletBalance = 0;
-    renderDashboard();
-    renderWallet();
-    showToast(`✓ Instant withdrawal of ${formatNaira(amt)} transferred to Zenith Bank (******4756)!`);
-  };
-
+  // --- Security Barrier Role Invariant Testing Modal ---
   window.openSecurityProofModal = function() {
     const m = document.getElementById('modal-security-proof');
     if (m) m.classList.add('active');
@@ -357,56 +347,9 @@
     }
   };
 
-  window.openDoorstepModal = function(orderNum, custName, fee) {
-    const m = document.getElementById('modal-doorstep-otp');
-    if (orderNum) {
-      const elNum = document.getElementById('modal-doorstep-order-num');
-      if (elNum) elNum.textContent = 'Order #' + orderNum;
-    }
-    if (custName) {
-      const elCust = document.getElementById('modal-doorstep-cust-name');
-      if (elCust) elCust.textContent = custName;
-    }
-    const pinIn = document.getElementById('doorstep-pin-input');
-    if (pinIn) pinIn.value = '';
-    if (m) m.classList.add('active');
-  };
-
-  window.closeModals = function() {
-    document.querySelectorAll('.modal-backdrop').forEach(m => m.classList.remove('active'));
-  };
-
-  window.submitDoorstepPin = function() {
-    const pinIn = document.getElementById('doorstep-pin-input');
-    const pin = pinIn ? pinIn.value.trim() : '';
-    if (pin.length !== 6) {
-      alert('Please enter a valid 6-digit delivery security OTP from the customer.');
-      return;
-    }
-
-    // Deliver first active order
-    if (window.state.activeDeliveries.length > 0) {
-      const delivered = window.state.activeDeliveries.shift();
-      delivered.status = 'delivered';
-      window.state.walletBalance += delivered.fee;
-      window.state.todayEarnings += delivered.fee;
-      window.state.completedTrips += 1;
-      window.state.history.unshift({
-        orderNumber: delivered.orderNumber,
-        customerName: delivered.customerName,
-        fee: delivered.fee,
-        timestamp: 'Just Now'
-      });
-      renderDashboard();
-      renderDeliveries();
-      renderHistory();
-      renderWallet();
-      closeModals();
-      showToast(`✓ Order ${delivered.orderNumber} Certified Delivered! ${formatNaira(delivered.fee)} credited to Rider Wallet.`);
-    } else {
-      closeModals();
-      showToast('Delivery Certified!');
-    }
+  window.saveApiUrl = function() {
+    const url = document.getElementById('api-server-url')?.value.trim();
+    showToast(`API Server configured to: ${url}`);
   };
 
   function showToast(msg) {
@@ -444,7 +387,6 @@
     renderDashboard();
     renderDeliveries();
     renderHistory();
-    renderWallet();
   }
 
   if (document.readyState === 'loading') {

@@ -2,6 +2,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rider_app/core/network/api_client.dart';
 import 'package:rider_app/core/services/storage_service.dart';
+import 'package:rider_app/models/delivery_assignment_model.dart';
+import 'package:rider_app/models/rider_dashboard_model.dart';
 import 'package:rider_app/models/rider_profile_model.dart';
 import 'package:rider_app/providers/rider_auth_provider.dart';
 
@@ -123,6 +125,48 @@ void main() {
         isOnline: true,
       );
       expect(emptyFleetRider.hasLogisticsCompany, isFalse);
+    });
+  });
+
+  group('OPERATIONAL INVARIANT: Zero-Wallet Closed-Loop Corporate Fleet', () {
+    test('8. RiderDashboardModel enforces operational telemetry without wallet balances', () {
+      final telemetry = RiderDashboardModel.fromJson({
+        'active_assignments_count': 3,
+        'completed_trips_count': 52,
+        'shift_status': 'ON DUTY',
+        'assigned_corridor': 'Ikeja - Lekki Express Corridor',
+        'on_time_rate': 99.8,
+      });
+
+      expect(telemetry.activeAssignmentsCount, equals(3));
+      expect(telemetry.completedTripsCount, equals(52));
+      expect(telemetry.shiftStatus, equals('ON DUTY'));
+      expect(telemetry.assignedCorridor, equals('Ikeja - Lekki Express Corridor'));
+      expect(telemetry.onTimeRatePercent, equals(99.8));
+    });
+
+    test('9. DeliveryAssignmentModel encapsulates dispatch routing without courier fees', () {
+      final assignment = DeliveryAssignmentModel(
+        id: 201,
+        orderNumber: 'VM-ORD-9901',
+        shopName: 'Victoria Island Electronics',
+        shopAddress: 'Adeola Odeku St, VI',
+        shopPhone: '+2348011112222',
+        customerName: 'Amina Bello',
+        customerPhone: '+2348022223333',
+        deliveryAddress: 'Plot 4, Lekki Expressway',
+        itemsSummary: '1x Wireless Gaming Mouse',
+        dispatchCategory: 'EXPRESS COURIER',
+        orderStatus: 'ready_for_pickup',
+        pickupPin: '556677',
+        timestamp: 'Today, 14:00',
+      );
+
+      expect(assignment.orderNumber, equals('VM-ORD-9901'));
+      expect(assignment.isReadyForPickup, isTrue);
+      expect(assignment.isDelivered, isFalse);
+      expect(assignment.dispatchCategory, equals('EXPRESS COURIER'));
+      expect(assignment.pickupPin, equals('556677'));
     });
   });
 }

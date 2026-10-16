@@ -16,7 +16,7 @@
       <i class="fa-solid fa-motorcycle"></i> OFFICIAL DISPATCH COURIER TERMINAL
     </div>
     <h1><span style="color: #ffd700;">Victorious</span> <span style="color: #ffffff;">MARKET</span> Rider Terminal</h1>
-    <p>FinTech-Grade Sovereign Courier Handshake &amp; Doorstep OTP Verification Operating System</p>
+    <p>Corporate Fleet Logistics Handshake &amp; Doorstep OTP Verification Operating System</p>
   </header>
 
   <!-- Studio Controls -->
@@ -29,9 +29,9 @@
       <button class="nav-pill-btn active" onclick="switchTab('dashboard')">Dispatch Radar</button>
       <button class="nav-pill-btn" onclick="switchTab('deliveries')">Active Trips</button>
       <button class="nav-pill-btn" onclick="switchTab('history')">Completed History</button>
-      <button class="nav-pill-btn" onclick="switchTab('wallet')">Rider Wallet &amp; Payout</button>
-      <button class="nav-pill-btn" onclick="openDoorstepModal('VM-ORD-9081', 'Chidi Okafor', 2500)">Verify Doorstep OTP</button>
-      <button class="nav-pill-btn" style="border-color: #ef4444; color: #ef4444; font-weight: 800;" onclick="openSecurityProofModal()"><i class="fa-solid fa-shield-halved"></i> Proof: Only Riders Allowed</button>
+      <button class="nav-pill-btn" onclick="switchTab('profile')">Fleet &amp; Profile</button>
+      <button class="nav-pill-btn" onclick="openDoorstepModal('VM-ORD-9081', 'Chidi Okafor')">Verify Doorstep OTP</button>
+      <button class="nav-pill-btn" style="border-color: #ef4444; color: #ef4444; font-weight: 800;" onclick="openSecurityProofModal()"><i class="fa-solid fa-shield-halved"></i> Role Invariant Proof</button>
     </div>
   </div>
 
@@ -91,24 +91,33 @@
               </div>
             </div>
 
-            <!-- Rider Earnings Obsidian Card -->
-            <div class="fintech-card">
+            <!-- Operational Telemetry Card (Zero-Wallet Closed-Loop Fleet HUD) -->
+            <div class="fintech-card" style="background: linear-gradient(135deg, #1E0E45 0%, #100726 100%); border: 1.5px solid rgba(94, 23, 235, 0.4);">
               <div class="card-glow"></div>
               <div class="card-header-row">
-                <span class="escrow-badge"><i class="fa-solid fa-wallet"></i> DISPATCH SETTLED WALLET</span>
-                <span class="trip-count-pill" id="completed-count-pill">48 Trips Completed</span>
+                <span class="escrow-badge" style="background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.35); color: #10B981;">
+                  <i class="fa-solid fa-satellite-dish"></i> FLEET TELEMETRY • LIVE DISPATCH
+                </span>
+                <span class="trip-count-pill" style="color: #ffd700; font-weight: 800;">99.4% On-Time</span>
               </div>
-              <div class="merchant-name-label">Available Payout Balance</div>
-              <div class="balance-figure" id="wallet-balance-text">₦ 14,500.00</div>
-              <div class="escrow-subtext">
-                <span class="green-dot"></span> Today's Delivery Earnings: <strong id="today-earnings-text">₦ 6,200.00</strong>
+              <div class="merchant-name-label">Shift Deliveries Completed</div>
+              <div class="balance-figure" id="completed-count-pill" style="color: #ffffff; font-size: 30px;">48 Trips</div>
+              <div class="escrow-subtext" style="margin-top: 6px;">
+                <span class="green-dot"></span> Active Missions: <strong id="active-trips-subtext" style="color: #f59e0b; margin-left: 4px;">2 En Route</strong>
+                <span style="color: #6b7280; margin: 0 6px;">•</span> Corridor: <span style="color: #d1d5db; margin-left: 4px;">Ikeja - Lekki</span>
               </div>
-              <div class="card-action-row">
-                <button class="gold-action-btn" onclick="requestPayout()">
-                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Instant Withdrawal
+              
+              <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; margin-top: 12px; font-size: 10.5px; color: #9ca3af; line-height: 1.45;">
+                <i class="fa-solid fa-building" style="color: #ffd700; margin-right: 4px;"></i>
+                <strong>Corporate Fleet Employment:</strong> All courier compensation is disbursed directly by <strong>Speedy Parcel Express</strong>. No escrow wallet required.
+              </div>
+
+              <div class="card-action-row" style="margin-top: 12px;">
+                <button class="gold-action-btn" onclick="switchTab('deliveries')" style="background: #5E17EB; color: #ffffff;">
+                  <i class="fa-solid fa-truck-fast"></i> View Active Missions
                 </button>
-                <button class="outline-action-btn" onclick="switchTab('deliveries')">
-                  <i class="fa-solid fa-route"></i> Live Routes
+                <button class="outline-action-btn" onclick="switchTab('history')">
+                  <i class="fa-solid fa-clock-rotate-left"></i> Trip Log
                 </button>
               </div>
             </div>
@@ -128,7 +137,7 @@
         <!-- 2. DELIVERIES VIEW -->
         <section class="screen-view" id="view-deliveries">
           <div class="brand-app-bar">
-            <span class="bar-title">Active Dispatch Trips</span>
+            <span class="bar-title">Active Dispatch Missions</span>
           </div>
           <div class="screen-content" id="deliveries-full-list">
             <!-- Dynamically Injected -->
@@ -145,70 +154,55 @@
           </div>
         </section>
 
-        <!-- 4. WALLET VIEW -->
-        <section class="screen-view" id="view-wallet">
-          <div class="brand-app-bar">
-            <span class="bar-title">Rider Wallet &amp; Payout</span>
-          </div>
-          <div class="screen-content">
-            <div class="white-card">
-              <div class="card-header-row">
-                <span class="mini-label">LINKED DISBURSEMENT ACCOUNT</span>
-              </div>
-              <div class="bank-name-large">Zenith Bank PLC</div>
-              <div class="account-number-display">******4756</div>
-              <div class="beneficiary-name">MUSA HARUNA (DISPATCH COURIER)</div>
-              <hr class="thin-divider">
-              <div class="cooldown-status-row">
-                <i class="fa-solid fa-shield-halved"></i>
-                <span>48-Hour Cooldown Protection: Earnings disbursed directly to verified NUBAN.</span>
-              </div>
-            </div>
-
-            <div class="sums-row">
-              <div class="sum-box">
-                <div class="mini-label">Available Balance</div>
-                <div class="sum-val green" id="wallet-balance-val2">₦ 14,500.00</div>
-              </div>
-              <div class="sum-box">
-                <div class="mini-label">Today's Pay</div>
-                <div class="sum-val purple" id="today-pay-val2">₦ 6,200.00</div>
-              </div>
-            </div>
-
-            <button class="btn-primary" style="width: 100%; margin-top: 14px;" onclick="requestPayout()">
-              <i class="fa-solid fa-paper-plane"></i> Request Instant Disbursement
-            </button>
-          </div>
-        </section>
-
-        <!-- 5. PROFILE VIEW -->
+        <!-- 4. PROFILE VIEW (Fleet Courier Console) -->
         <section class="screen-view" id="view-profile">
           <div class="brand-app-bar">
-            <span class="bar-title">Courier Settings</span>
+            <span class="bar-title">Fleet Courier Console</span>
           </div>
           <div class="screen-content">
+            <!-- Courier Badge -->
             <div class="white-card">
               <div class="user-row">
                 <div class="user-avatar-circle" style="background: #10B981;"><i class="fa-solid fa-motorcycle"></i></div>
                 <div>
                   <div class="user-name-title">Musa Haruna</div>
-                  <div class="user-sub">musa@speedyfleet.ng</div>
-                  <span class="role-pill" style="background: #DCFCE7; color: #15803D;">SPEEDY PARCEL EXPRESS</span>
+                  <div class="user-sub">musa@speedyfleet.ng • +234 805 555 6677</div>
+                  <span class="role-pill" style="background: #DCFCE7; color: #15803D; font-weight: 800;">VERIFIED FLEET COURIER</span>
                 </div>
               </div>
             </div>
 
-            <div class="white-card" style="margin-top: 14px;">
-              <div class="mini-label">API SERVER ENDPOINT</div>
-              <div class="server-input-row">
+            <!-- Corporate Fleet Affiliation -->
+            <div class="white-card" style="margin-top: 12px; border-left: 4px solid #ffd700;">
+              <div class="mini-label" style="color: #92400e; font-weight: 800;">EMPLOYING LOGISTICS FLEET</div>
+              <div style="font-size: 15px; font-weight: 900; color: #1e1b4b; margin: 4px 0;">Speedy Parcel Express</div>
+              <div style="font-size: 11px; color: #6b7280; line-height: 1.45;">
+                Couriers operate under corporate employment. All trip commissions, bonuses, and driver salaries are settled directly by your logistics company.
+              </div>
+            </div>
+
+            <!-- Dispatch Equipment -->
+            <div class="white-card" style="margin-top: 12px;">
+              <div class="mini-label">DISPATCH EQUIPMENT &amp; CORRIDOR</div>
+              <div style="margin-top: 8px; font-size: 11.5px; color: #1e1b4b; line-height: 1.7;">
+                <div><i class="fa-solid fa-motorcycle" style="color: #5e17eb; width: 18px;"></i> <strong>Vehicle:</strong> Bajaj Boxer 150cc Cargo</div>
+                <div><i class="fa-solid fa-id-card" style="color: #5e17eb; width: 18px;"></i> <strong>Plate Number:</strong> KJA-104-XY</div>
+                <div><i class="fa-solid fa-map-location-dot" style="color: #5e17eb; width: 18px;"></i> <strong>Assigned Hub:</strong> Ikeja - Lekki Express Corridor</div>
+                <div><i class="fa-solid fa-shield-halved" style="color: #10b981; width: 18px;"></i> <strong>Safety Inspection:</strong> Accredited &amp; Insured</div>
+              </div>
+            </div>
+
+            <!-- Server Connection -->
+            <div class="white-card" style="margin-top: 12px;">
+              <div class="mini-label">DISPATCH API GATEWAY</div>
+              <div class="server-input-row" style="margin-top: 6px;">
                 <input type="text" id="api-server-url" value="http://127.0.0.1:8080" class="styled-input">
                 <button class="btn-save-sm" onclick="saveApiUrl()">Save</button>
               </div>
             </div>
 
-            <button class="btn-logout" onclick="switchTab('dashboard')">
-              <i class="fa-solid fa-arrow-right-from-bracket"></i> End Shift
+            <button class="btn-logout" onclick="toggleDuty(); showToast('Shift Ended. Radar Set Offline.');" style="margin-top: 14px;">
+              <i class="fa-solid fa-power-off"></i> Toggle Shift Offline
             </button>
           </div>
         </section>
@@ -229,9 +223,9 @@
           <i class="fa-solid fa-history"></i>
           <span>History</span>
         </button>
-        <button class="nav-tab" onclick="switchTab('wallet')">
-          <i class="fa-solid fa-wallet"></i>
-          <span>Wallet</span>
+        <button class="nav-tab" onclick="switchTab('profile')">
+          <i class="fa-solid fa-id-badge"></i>
+          <span>Profile</span>
         </button>
       </nav>
 
@@ -244,15 +238,15 @@
   <div class="modal-backdrop" id="modal-doorstep-otp">
     <div class="modal-card">
       <div class="modal-icon-header emerald"><i class="fa-solid fa-qrcode"></i></div>
-      <div class="modal-title">Doorstep Delivery Completion</div>
+      <div class="modal-title">Doorstep Package Handover</div>
       <div class="modal-subtitle" id="modal-doorstep-order-num">Order #VM-ORD-9081</div>
       <div class="modal-prompt">
-        Ask customer <strong id="modal-doorstep-cust-name">Chidi Okafor</strong> for their 6-digit delivery security PIN.
+        Ask recipient <strong id="modal-doorstep-cust-name">Chidi Okafor</strong> for their 6-digit delivery security PIN to certify package handover.
       </div>
       <input type="text" id="doorstep-pin-input" maxlength="6" placeholder="883921" class="pin-input">
       <div class="modal-btn-row">
         <button class="btn-cancel" onclick="closeModals()">Cancel</button>
-        <button class="btn-confirm emerald" onclick="submitDoorstepPin()">Verify &amp; Unlock Fee</button>
+        <button class="btn-confirm emerald" onclick="submitDoorstepPin()">Verify Handover</button>
       </div>
     </div>
   </div>

@@ -8,8 +8,7 @@ class DeliveryAssignmentModel {
   final String customerPhone;
   final String deliveryAddress;
   final String itemsSummary;
-  final double deliveryCharge;
-  final double orderTotal;
+  final String dispatchCategory; // 'EXPRESS COURIER', 'STANDARD DISPATCH'
   final String orderStatus; // ready_for_pickup, out_for_delivery, delivered
   final String? pickupPin; // 6-digit courier PIN for vendor handover
   final String timestamp;
@@ -24,8 +23,7 @@ class DeliveryAssignmentModel {
     required this.customerPhone,
     required this.deliveryAddress,
     required this.itemsSummary,
-    required this.deliveryCharge,
-    required this.orderTotal,
+    this.dispatchCategory = 'EXPRESS COURIER',
     required this.orderStatus,
     this.pickupPin,
     required this.timestamp,
@@ -45,15 +43,14 @@ class DeliveryAssignmentModel {
       customerPhone: customer?['phone'] ?? '+234 803 111 2233',
       deliveryAddress: json['delivery_address'] ?? '14 Admiralty Way, Lekki Phase 1, Lagos',
       itemsSummary: json['items_summary'] ?? '2 items (iPhone 14 Case, Fast Charger)',
-      deliveryCharge: (json['delivery_charge'] as num?)?.toDouble() ?? 2500.00,
-      orderTotal: (json['order_amount'] as num?)?.toDouble() ?? 42000.00,
+      dispatchCategory: json['dispatch_category'] ?? 'EXPRESS COURIER',
       orderStatus: json['order_status'] ?? 'ready_for_pickup',
       pickupPin: json['pickup_verification_code'] ?? '482910',
       timestamp: json['created_at'] ?? 'Today, 11:30 AM',
     );
   }
 
-  bool get isReadyForPickup => orderStatus == 'ready_for_pickup' || orderStatus == 'processing';
+  bool get isReadyForPickup => orderStatus == 'ready_for_pickup' || orderStatus == 'processing' || orderStatus == 'confirmed';
   bool get isOutForDelivery => orderStatus == 'out_for_delivery';
   bool get isDelivered => orderStatus == 'delivered';
 }

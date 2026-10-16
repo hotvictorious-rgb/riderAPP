@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
-import '../core/utils/currency_formatter.dart';
 import '../models/delivery_assignment_model.dart';
 
 class ActiveDeliveryCard extends StatelessWidget {
@@ -53,7 +52,7 @@ class ActiveDeliveryCard extends StatelessWidget {
                   isPickup
                       ? 'STEP 1: PICKUP AT SHOP'
                       : isDelivered
-                          ? 'DELIVERED & SETTLED'
+                          ? 'DELIVERED & LOGGED TO FLEET'
                           : 'STEP 2: OUT FOR DELIVERY',
                   style: TextStyle(
                     color: isPickup
@@ -66,12 +65,27 @@ class ActiveDeliveryCard extends StatelessWidget {
                   ),
                 ),
               ),
-              Text(
-                CurrencyFormatter.format(assignment.deliveryCharge),
-                style: const TextStyle(
-                  color: AppColors.richGold,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w900,
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                decoration: BoxDecoration(
+                  color: AppColors.richGold.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.richGold.withOpacity(0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.flash_on, size: 12, color: AppColors.richGold),
+                    const SizedBox(width: 3),
+                    Text(
+                      assignment.dispatchCategory,
+                      style: const TextStyle(
+                        color: AppColors.richGold,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -124,7 +138,7 @@ class ActiveDeliveryCard extends StatelessWidget {
                 label: Text(
                   isPickup
                       ? 'Present Courier PIN (${assignment.pickupPin})'
-                      : 'Enter Customer Delivery PIN',
+                      : 'Enter Customer Handover PIN',
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isPickup ? AppColors.dispatchAmber : AppColors.primaryPurple,

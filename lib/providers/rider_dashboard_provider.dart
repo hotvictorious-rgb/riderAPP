@@ -34,18 +34,28 @@ class RiderDashboardProvider with ChangeNotifier {
       final response = await _apiClient.get(ApiEndpoints.riderDashboard);
       if (response.statusCode == 200 && response.data['data'] != null) {
         final data = response.data['data'];
-        _profile = RiderProfileModel.fromJson(data['rider']);
-        _dashboardMetrics = RiderDashboardModel.fromJson(data['fintech_metrics']);
+        if (data['rider'] != null) {
+          _profile = RiderProfileModel.fromJson(data['rider']);
+        }
+        if (data['operational_telemetry'] != null) {
+          _dashboardMetrics = RiderDashboardModel.fromJson(data['operational_telemetry']);
+        } else {
+          _dashboardMetrics = RiderDashboardModel(
+            activeAssignmentsCount: 0,
+            completedTripsCount: 0,
+            shiftStatus: _profile?.isOnline == true ? 'ON DUTY' : 'OFF DUTY',
+          );
+        }
         _isDutyOnline = _profile?.isOnline ?? true;
         await _storageService.setDutyOnline(_isDutyOnline);
       }
     } catch (_) {
-      // Offline fallback state with realistic data
+      // Offline fallback state with realistic operational telemetry
       final cachedUser = _storageService.getUserData();
       final cachedFleet = cachedUser?['fleet_company'] as String? ?? 'Speedy Parcel Express';
       final cachedName = cachedUser?['name'] as String? ?? 'Musa Haruna';
       final cachedEmail = cachedUser?['email'] as String? ?? 'musa@speedyfleet.ng';
-      final cachedVehicle = cachedUser?['vehicle_type'] as String? ?? 'Motorbike (Bajaj Boxer)';
+      final cachedVehicle = cachedUser?['vehicle_type'] as String? ?? 'Motorbike (Bajaj Boxer 150cc)';
       final cachedPlate = cachedUser?['license_plate'] as String? ?? 'KJA-104-XY';
 
       _profile = RiderProfileModel(
@@ -61,11 +71,11 @@ class RiderDashboardProvider with ChangeNotifier {
         isOnline: _isDutyOnline,
       );
       _dashboardMetrics = RiderDashboardModel(
-        walletBalance: 14500.00,
-        todayEarnings: 6200.00,
-        totalEarnings: 98500.00,
         activeAssignmentsCount: 2,
         completedTripsCount: 48,
+        shiftStatus: _isDutyOnline ? 'ON DUTY' : 'OFF DUTY',
+        assignedCorridor: 'Ikeja - Lekki Express Corridor',
+        onTimeRatePercent: 99.4,
       );
     }
 

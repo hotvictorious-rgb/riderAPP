@@ -14,7 +14,7 @@ class RiderDeliveriesScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.obsidianBg,
-      appBar: AppBar(title: const Text('ACTIVE DISPATCH TRIPS')),
+      appBar: AppBar(title: const Text('ACTIVE DISPATCH MISSIONS')),
       body: deliv.activeDeliveries.isEmpty
           ? const Center(child: Text('No active assignments', style: TextStyle(color: AppColors.textMuted)))
           : ListView.builder(
@@ -42,13 +42,12 @@ class RiderDeliveriesScreen extends StatelessWidget {
                         builder: (_) => CustomerDeliveryOtpDialog(
                           orderNumber: item.orderNumber,
                           customerName: item.customerName,
-                          deliveryCharge: item.deliveryCharge,
                           onVerify: (otp) {
                             deliv.verifyCustomerDeliveryOtp(item.id, otp);
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 backgroundColor: AppColors.dispatchEmerald,
-                                content: Text('Delivery Handover Certified! Fee credited to wallet.'),
+                                content: Text('Delivery Handover Certified! Logged to Fleet Dispatch.'),
                               ),
                             );
                           },

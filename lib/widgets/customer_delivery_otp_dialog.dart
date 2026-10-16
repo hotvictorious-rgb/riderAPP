@@ -4,14 +4,12 @@ import '../core/constants/app_colors.dart';
 class CustomerDeliveryOtpDialog extends StatefulWidget {
   final String orderNumber;
   final String customerName;
-  final double deliveryCharge;
   final Function(String otp) onVerify;
 
   const CustomerDeliveryOtpDialog({
     super.key,
     required this.orderNumber,
     required this.customerName,
-    required this.deliveryCharge,
     required this.onVerify,
   });
 
@@ -21,6 +19,12 @@ class CustomerDeliveryOtpDialog extends StatefulWidget {
 
 class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
   final TextEditingController _otpController = TextEditingController();
+
+  @override
+  void dispose() {
+    _otpController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,7 +55,7 @@ class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Ask ${widget.customerName} for their 6-digit delivery code.',
+              'Ask ${widget.customerName} for their 6-digit delivery security PIN to confirm handover.',
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
             ),
@@ -61,15 +65,26 @@ class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
               keyboardType: TextInputType.number,
               maxLength: 6,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.richGold, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 8),
+              style: const TextStyle(
+                color: AppColors.richGold,
+                fontSize: 24,
+                fontWeight: FontWeight.w900,
+                letterSpacing: 8,
+              ),
               decoration: InputDecoration(
                 counterText: '',
                 hintText: '••••••',
                 hintStyle: const TextStyle(color: AppColors.textMuted, letterSpacing: 8),
                 filled: true,
                 fillColor: Colors.black26,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.obsidianBorder)),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.primaryPurple, width: 2)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppColors.obsidianBorder),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppColors.primaryPurple, width: 2),
+                ),
               ),
             ),
             const SizedBox(height: 20),
@@ -91,7 +106,7 @@ class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
                       }
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: AppColors.dispatchEmerald),
-                    child: const Text('Complete Trip'),
+                    child: const Text('Verify Handover'),
                   ),
                 ),
               ],

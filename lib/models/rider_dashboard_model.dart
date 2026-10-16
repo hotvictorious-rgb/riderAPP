@@ -1,25 +1,25 @@
 class RiderDashboardModel {
-  final double walletBalance;
-  final double todayEarnings;
-  final double totalEarnings;
   final int activeAssignmentsCount;
   final int completedTripsCount;
+  final String shiftStatus;
+  final String assignedCorridor;
+  final double onTimeRatePercent;
 
   RiderDashboardModel({
-    required this.walletBalance,
-    required this.todayEarnings,
-    required this.totalEarnings,
     required this.activeAssignmentsCount,
     required this.completedTripsCount,
+    this.shiftStatus = 'ON DUTY',
+    this.assignedCorridor = 'Metropolitan Dispatch Zone',
+    this.onTimeRatePercent = 99.4,
   });
 
   factory RiderDashboardModel.fromJson(Map<String, dynamic> json) {
     return RiderDashboardModel(
-      walletBalance: (json['wallet_balance'] as num?)?.toDouble() ?? 14500.00,
-      todayEarnings: (json['today_earnings'] as num?)?.toDouble() ?? 6200.00,
-      totalEarnings: (json['total_earnings'] as num?)?.toDouble() ?? 98500.00,
-      activeAssignmentsCount: json['active_assignments_count'] ?? 2,
-      completedTripsCount: json['completed_trips_count'] ?? 48,
+      activeAssignmentsCount: json['active_assignments_count'] ?? 0,
+      completedTripsCount: json['completed_trips_count'] ?? 0,
+      shiftStatus: json['shift_status'] ?? 'ON DUTY',
+      assignedCorridor: json['assigned_corridor'] ?? 'Metropolitan Dispatch Zone',
+      onTimeRatePercent: (json['on_time_rate'] as num?)?.toDouble() ?? 99.4,
     );
   }
 }

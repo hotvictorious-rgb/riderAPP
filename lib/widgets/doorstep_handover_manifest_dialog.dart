@@ -1,11 +1,18 @@
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../models/delivery_assignment_model.dart';
 import '../models/order_item_manifest_model.dart';
+import 'live_camera_proof_card.dart';
 
 class DoorstepHandoverManifestDialog extends StatefulWidget {
   final DeliveryAssignmentModel assignment;
-  final Future<Map<String, dynamic>> Function(String otp, List<Map<String, dynamic>> manifestItems) onSubmit;
+  final Future<Map<String, dynamic>> Function(
+    String otp,
+    List<Map<String, dynamic>> manifestItems,
+    File? overallPhoto,
+    Map<int, File> itemDefectPhotos,
+  ) onSubmit;
 
   const DoorstepHandoverManifestDialog({
     super.key,
@@ -22,6 +29,8 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
   bool _isItemizedMode = false;
   bool _isSubmitting = false;
   String? _error;
+  File? _overallPhoto;
+  final Map<int, File> _itemDefectPhotos = {};
   late List<OrderItemManifestModel> _manifest;
 
   @override
@@ -68,7 +77,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
     if (_hasRejections) {
       for (final item in _manifest) {
         if (item.rejectedQuantity > 0 && item.rejectionCategory == null) {
-          setState(() => _error = 'Please select a return reason for "${item.productName}".');
+          setState(() => _error = 'Please select a return reason for "".');
           return;
         }
       }
@@ -80,7 +89,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
     });
 
     final manifestPayload = _manifest.map((i) => i.toManifestJson()).toList();
-    final result = await widget.onSubmit(otp, manifestPayload);
+    final result = await widget.onSubmit(otp, manifestPayload, _overallPhoto, _itemDefectPhotos);
 
     if (mounted) {
       if (result['success'] == true) {
@@ -104,7 +113,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
       ),
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
+        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -138,7 +147,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
               ),
               const SizedBox(height: 12),
               Text(
-                'Handover: ${widget.assignment.customerName}',
+                'Handover: ',
                 style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
               ),
               Text(
@@ -223,6 +232,15 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                 ..._manifest.map((item) => _buildManifestItemCard(item)),
                 const SizedBox(height: 12),
               ],
+
+              // Overall Doorstep Proof
+              LiveCameraProofCard(
+                photo: _overallPhoto,
+                onPhotoChanged: (f) => setState(() => _overallPhoto = f),
+                title: 'Doorstep Handover Overall Proof',
+                hint: 'Snap live picture of parcel handover at doorstep.',
+              ),
+              const SizedBox(height: 16),
 
               // Customer Security OTP Input
               const Text('CUSTOMER 6-DIGIT DELIVERY PIN', style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w800)),
@@ -335,7 +353,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                 ),
               ),
               Text(
-                'Total: ${item.orderedQuantity}',
+                'Total: ',
                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w700),
               ),
             ],
@@ -345,7 +363,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Accepted: ${item.acceptedQuantity}',
+                'Accepted: ',
                 style: const TextStyle(color: AppColors.dispatchEmerald, fontSize: 11, fontWeight: FontWeight.w800),
               ),
               Row(
@@ -359,13 +377,16 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                             setState(() {
                               item.rejectedQuantity--;
                               item.acceptedQuantity++;
-                              if (item.rejectedQuantity == 0) item.rejectionCategory = null;
+                              if (item.rejectedQuantity == 0) {
+                                item.rejectionCategory = null;
+                                _itemDefectPhotos.remove(item.orderItemId);
+                              }
                             });
                           }
                         : null,
                   ),
                   Text(
-                    '${item.rejectedQuantity}',
+                    '',
                     style: TextStyle(
                       color: item.rejectedQuantity > 0 ? AppColors.urgentRed : Colors.white,
                       fontWeight: FontWeight.w900,
@@ -409,6 +430,20 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                 DropdownMenuItem(value: 'customer_change_of_mind', child: Text('Customer Doorstep Change of Mind')),
               ],
               onChanged: (val) => setState(() => item.rejectionCategory = val),
+            ),
+            const SizedBox(height: 8),
+            LiveCameraProofCard(
+              photo: _itemDefectPhotos[item.orderItemId],
+              onPhotoChanged: (f) => setState(() {
+                if (f != null) {
+                  _itemDefectPhotos[item.orderItemId] = f;
+                } else {
+                  _itemDefectPhotos.remove(item.orderItemId);
+                }
+              }),
+              title: 'Live Defect Photo: ',
+              hint: 'Snap live picture of damaged item/broken seal.',
+              isRequired: false,
             ),
           ],
         ],

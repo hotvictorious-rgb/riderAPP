@@ -1,4 +1,4 @@
-import 'order_item_manifest_model.dart';
+﻿import 'order_item_manifest_model.dart';
 
 class DeliveryAssignmentModel {
   final int id;
@@ -20,6 +20,10 @@ class DeliveryAssignmentModel {
   final String? riderArrivedAt;
   final bool isDeliveryLocked;
   final String timestamp;
+  final String? pickupProofImage;
+  final String? deliveryProofImage;
+  final String? deliveryAttemptPhoto;
+  final List<String> rejectionPhotos;
 
   DeliveryAssignmentModel({
     required this.id,
@@ -41,6 +45,10 @@ class DeliveryAssignmentModel {
     this.riderArrivedAt,
     this.isDeliveryLocked = false,
     required this.timestamp,
+    this.pickupProofImage,
+    this.deliveryProofImage,
+    this.deliveryAttemptPhoto,
+    this.rejectionPhotos = const [],
   });
 
   factory DeliveryAssignmentModel.fromJson(Map<String, dynamic> json) {
@@ -79,6 +87,13 @@ class DeliveryAssignmentModel {
     final lgaName = destLga?['name'] as String? ?? '';
     final addressText = json['delivery_address'] as String? ?? (lgaName.isNotEmpty ? '$lgaName, Lagos' : 'Customer Address');
 
+    final rejPhotos = <String>[];
+    if (json['doorstep_rejection_photos'] is List) {
+      for (final p in json['doorstep_rejection_photos']) {
+        if (p != null) rejPhotos.add(p.toString());
+      }
+    }
+
     return DeliveryAssignmentModel(
       id: json['id'] as int? ?? 0,
       orderNumber: json['order_number'] as String? ?? '#${json['id']}',
@@ -99,6 +114,10 @@ class DeliveryAssignmentModel {
       riderArrivedAt: arrivedAt,
       isDeliveryLocked: locked,
       timestamp: json['created_at'] != null ? _formatTimestamp(json['created_at'].toString()) : 'Recent',
+      pickupProofImage: json['pickup_proof_image'] as String?,
+      deliveryProofImage: json['proof_of_delivery_image'] as String?,
+      deliveryAttemptPhoto: json['delivery_attempt_photo_path'] as String?,
+      rejectionPhotos: rejPhotos,
     );
   }
 
@@ -117,6 +136,7 @@ class DeliveryAssignmentModel {
   bool get isReadyForPickup => orderStatus == 'ready_for_pickup' || orderStatus == 'processing' || orderStatus == 'confirmed';
   bool get isOutForDelivery => orderStatus == 'out_for_delivery';
   bool get isDelivered => orderStatus == 'delivered';
+  bool get hasAuditProofs => pickupProofImage != null || deliveryProofImage != null || deliveryAttemptPhoto != null || rejectionPhotos.isNotEmpty || manifestItems.any((m) => m.defectPhotoUrl != null);
 
   DeliveryAssignmentModel copyWith({
     int? id,
@@ -138,6 +158,10 @@ class DeliveryAssignmentModel {
     String? riderArrivedAt,
     bool? isDeliveryLocked,
     String? timestamp,
+    String? pickupProofImage,
+    String? deliveryProofImage,
+    String? deliveryAttemptPhoto,
+    List<String>? rejectionPhotos,
   }) {
     return DeliveryAssignmentModel(
       id: id ?? this.id,
@@ -159,6 +183,10 @@ class DeliveryAssignmentModel {
       riderArrivedAt: riderArrivedAt ?? this.riderArrivedAt,
       isDeliveryLocked: isDeliveryLocked ?? this.isDeliveryLocked,
       timestamp: timestamp ?? this.timestamp,
+      pickupProofImage: pickupProofImage ?? this.pickupProofImage,
+      deliveryProofImage: deliveryProofImage ?? this.deliveryProofImage,
+      deliveryAttemptPhoto: deliveryAttemptPhoto ?? this.deliveryAttemptPhoto,
+      rejectionPhotos: rejectionPhotos ?? this.rejectionPhotos,
     );
   }
 }

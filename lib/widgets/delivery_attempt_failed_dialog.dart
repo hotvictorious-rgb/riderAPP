@@ -1,10 +1,12 @@
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
+import 'live_camera_proof_card.dart';
 
 class DeliveryAttemptFailedDialog extends StatefulWidget {
   final String orderNumber;
   final String customerName;
-  final Future<Map<String, dynamic>> Function(String reason, String? notes) onSubmit;
+  final Future<Map<String, dynamic>> Function(String reason, String? notes, File? livePhoto) onSubmit;
 
   const DeliveryAttemptFailedDialog({
     super.key,
@@ -20,6 +22,7 @@ class DeliveryAttemptFailedDialog extends StatefulWidget {
 class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialog> {
   String _selectedReason = 'customer_unreachable';
   final TextEditingController _notesController = TextEditingController();
+  File? _livePhoto;
   bool _isSubmitting = false;
   String? _error;
 
@@ -44,7 +47,7 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
     });
 
     final notes = _notesController.text.trim();
-    final result = await widget.onSubmit(_selectedReason, notes.isNotEmpty ? notes : null);
+    final result = await widget.onSubmit(_selectedReason, notes.isNotEmpty ? notes : null, _livePhoto);
 
     if (mounted) {
       if (result['success'] == true) {
@@ -87,19 +90,29 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
             const SizedBox(height: 14),
 
             Center(
-              child: Text(
+              child: const Text(
                 'Report Delivery Issue',
-                style: const TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900),
+                style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900),
               ),
             ),
             const SizedBox(height: 3),
             Center(
               child: Text(
-                'Order ${widget.orderNumber} • ${widget.customerName}',
+                'Order  • ',
                 style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600),
               ),
             ),
             const SizedBox(height: 16),
+
+            // Live Camera Proof
+            LiveCameraProofCard(
+              photo: _livePhoto,
+              onPhotoChanged: (f) => setState(() => _livePhoto = f),
+              title: 'Estate Gate / Premises Proof Snap',
+              hint: 'Snap live photo of closed gate or premises. Visible to Customer and Admin to verify physical presence.',
+              isRequired: false,
+            ),
+            const SizedBox(height: 14),
 
             const Text(
               'REASON FOR FAILED ATTEMPT',

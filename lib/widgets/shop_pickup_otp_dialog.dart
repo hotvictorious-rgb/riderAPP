@@ -1,10 +1,12 @@
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
+import 'live_camera_proof_card.dart';
 
 class ShopPickupOtpDialog extends StatefulWidget {
   final String orderNumber;
   final String shopName;
-  final Future<bool> Function(String otp) onVerify;
+  final Future<bool> Function(String otp, File? livePhoto) onVerify;
 
   const ShopPickupOtpDialog({
     super.key,
@@ -19,6 +21,7 @@ class ShopPickupOtpDialog extends StatefulWidget {
 
 class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
   final TextEditingController _pinController = TextEditingController();
+  File? _livePhoto;
   bool _isLoading = false;
   String? _error;
 
@@ -40,7 +43,7 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
       _error = null;
     });
 
-    final success = await widget.onVerify(pin);
+    final success = await widget.onVerify(pin, _livePhoto);
     if (mounted) {
       if (success) {
         Navigator.pop(context, true);
@@ -61,7 +64,7 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
         borderRadius: BorderRadius.circular(24),
         side: BorderSide(color: AppColors.dispatchAmber.withOpacity(0.5), width: 1.5),
       ),
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(22),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -85,7 +88,7 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Order ${widget.orderNumber}',
+              'Order ',
               style: const TextStyle(color: AppColors.dispatchAmber, fontSize: 12, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 12),
@@ -98,12 +101,21 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
                 border: Border.all(color: Colors.white.withOpacity(0.06)),
               ),
               child: Text(
-                'Collect package at ${widget.shopName}. Ask merchant staff for their 6-digit Pickup Handover PIN to certify collection.',
+                'Collect package at . Ask merchant staff for their 6-digit Pickup Handover PIN to certify collection.',
                 textAlign: TextAlign.center,
                 style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, height: 1.45),
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
+
+            // Live Camera Proof
+            LiveCameraProofCard(
+              photo: _livePhoto,
+              onPhotoChanged: (f) => setState(() => _livePhoto = f),
+              title: 'Merchant Counter Parcel Snap',
+              hint: 'Snap live photo of package at merchant counter. Live proof permanently protects you from transit damage claims.',
+            ),
+            const SizedBox(height: 16),
 
             // 6-digit PIN Input
             TextField(

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/delivery_assignment_model.dart';
@@ -131,7 +131,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               phone: _current.shopPhone,
               icon: Icons.store,
               accentColor: AppColors.dispatchAmber,
-              pinLabel: isPickup ? 'Courier PIN: ${_current.pickupPin ?? "Required"}' : 'Handover Certified ✓',
+              pinLabel: isPickup ? 'Courier PIN: ${_current.pickupPin ?? "Required"}' : 'Handover Certified âœ“',
             ),
             const SizedBox(height: 14),
 
@@ -143,7 +143,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               phone: _current.customerPhone,
               icon: Icons.location_on,
               accentColor: AppColors.dispatchEmerald,
-              pinLabel: isDelivered ? 'Delivery PIN Verified ✓' : (hasArrived ? 'Doorstep Alert Sent • Request PIN' : 'Pending Arrival'),
+              pinLabel: isDelivered ? 'Delivery PIN Verified âœ“' : (hasArrived ? 'Doorstep Alert Sent â€¢ Request PIN' : 'Pending Arrival'),
             ),
             const SizedBox(height: 16),
 
@@ -201,6 +201,10 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                 ],
               ),
             ),
+            if (_current.hasAuditProofs) ...[
+              const SizedBox(height: 16),
+              _buildAuditTrailCard(),
+            ],
             const SizedBox(height: 24),
 
             // Primary Action Buttons
@@ -214,7 +218,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                       builder: (_) => ShopPickupOtpDialog(
                         orderNumber: _current.orderNumber,
                         shopName: _current.shopName,
-                        onVerify: (otp) => deliv.verifyPickupOtp(_current.id, otp),
+                        onVerify: (otp, livePhoto) => deliv.verifyPickupOtp(_current.id, otp, livePhoto: livePhoto),
                       ),
                     );
                     if (success == true) {
@@ -240,13 +244,13 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                     onPressed: () async {
                       final success = await deliv.markArrived(_current.id);
                       _showSnack(
-                        success ? '📍 Doorstep Arrival Logged! Customer notified.' : (deliv.errorMessage ?? 'Failed to log arrival.'),
+                        success ? 'ðŸ“ Doorstep Arrival Logged! Customer notified.' : (deliv.errorMessage ?? 'Failed to log arrival.'),
                         isSuccess: success,
                       );
                       if (success && mounted) setState(() {});
                     },
                     icon: const Icon(Icons.location_on, size: 18),
-                    label: const Text("📍 I'm Here • Notify Doorstep Arrival"),
+                    label: const Text("ðŸ“ I'm Here â€¢ Notify Doorstep Arrival"),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primaryPurple,
                       foregroundColor: Colors.white,
@@ -265,11 +269,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                       context: context,
                       builder: (_) => DoorstepHandoverManifestDialog(
                         assignment: _current,
-                        onSubmit: (otp, manifest) => deliv.submitDoorstepHandover(
-                          orderId: _current.id,
-                          otp: otp,
-                          manifestItems: manifest,
-                        ),
+                        onSubmit: (otp, manifest, overallPhoto, itemDefectPhotos) => deliv.submitDoorstepHandover(orderId: _current.id, otp: otp, manifestItems: manifest, overallPhoto: overallPhoto, itemDefectPhotos: itemDefectPhotos),
                       ),
                     );
                     if (result == true) {
@@ -297,11 +297,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                       builder: (_) => DeliveryAttemptFailedDialog(
                         orderNumber: _current.orderNumber,
                         customerName: _current.customerName,
-                        onSubmit: (reason, notes) => deliv.recordDeliveryAttemptFailed(
-                          orderId: _current.id,
-                          reason: reason,
-                          notes: notes,
-                        ),
+                        onSubmit: (reason, notes, livePhoto) => deliv.recordDeliveryAttemptFailed(orderId: _current.id, reason: reason, notes: notes, livePhoto: livePhoto),
                       ),
                     );
                     if (res != null && res['success'] == true) {
@@ -497,4 +493,157 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
       ),
     );
   }
+
+  Widget _buildAuditTrailCard() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.obsidianCard,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.4)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Row(
+                children: [
+                  Icon(Icons.shield_outlined, color: AppColors.dispatchEmerald, size: 16),
+                  SizedBox(width: 6),
+                  Text(
+                    'IMMUTABLE AUDIT PROOFS',
+                    style: TextStyle(color: AppColors.dispatchEmerald, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.dispatchEmerald.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text('SEALED', style: TextStyle(color: AppColors.dispatchEmerald, fontSize: 9, fontWeight: FontWeight.w900)),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              if (_current.pickupProofImage != null)
+                _buildAuditThumbnail('Leg 0: Shop Pickup', _current.pickupProofImage!),
+              if (_current.deliveryProofImage != null)
+                _buildAuditThumbnail('Leg 1: Doorstep Proof', _current.deliveryProofImage!),
+              if (_current.deliveryAttemptPhoto != null)
+                _buildAuditThumbnail('Attempt Failure', _current.deliveryAttemptPhoto!, isWarning: true),
+              ..._current.rejectionPhotos.map((p) => _buildAuditThumbnail('Rejection Defect', p, isDanger: true)),
+              ..._current.manifestItems.where((m) => m.defectPhotoUrl != null).map((m) => _buildAuditThumbnail('Defect: ', m.defectPhotoUrl!, isDanger: true)),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAuditThumbnail(String label, String url, {bool isWarning = false, bool isDanger = false}) {
+    final borderColor = isDanger ? AppColors.urgentRed : (isWarning ? AppColors.dispatchAmber : AppColors.dispatchEmerald);
+    return InkWell(
+      onTap: () => _openImageDialog(url, label),
+      child: Container(
+        width: 100,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          border: Border.all(color: borderColor.withOpacity(0.6)),
+          color: Colors.black26,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
+              child: Image.network(
+                url,
+                height: 70,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => Container(
+                  height: 70,
+                  color: Colors.white10,
+                  child: const Icon(Icons.broken_image, color: Colors.white38, size: 24),
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+              child: Text(
+                label,
+                textAlign: TextAlign.center,
+                style: TextStyle(color: borderColor, fontSize: 9, fontWeight: FontWeight.w800),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _openImageDialog(String url, String title) {
+    showDialog(
+      context: context,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.all(16),
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.obsidianCard,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: AppColors.obsidianBorder),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(14),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        title,
+                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                      onPressed: () => Navigator.pop(ctx),
+                    ),
+                  ],
+                ),
+              ),
+              InteractiveViewer(
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                  child: Image.network(
+                    url,
+                    fit: BoxFit.contain,
+                    errorBuilder: (_, __, ___) => const Padding(
+                      padding: EdgeInsets.all(32),
+                      child: Center(child: Text('Unable to load photo', style: TextStyle(color: Colors.white54))),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
+

@@ -1,3 +1,4 @@
+﻿import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../core/constants/api_endpoints.dart';
@@ -97,15 +98,29 @@ class RiderDeliveryProvider with ChangeNotifier {
     return false;
   }
 
-  Future<bool> verifyPickupOtp(int orderId, String otp) async {
+  Future<bool> verifyPickupOtp(int orderId, String otp, {File? livePhoto}) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
+      dynamic payload;
+      if (livePhoto != null) {
+        payload = FormData.fromMap({
+          'order_id': orderId,
+          'otp': otp.trim(),
+          'proof_photo': await MultipartFile.fromFile(
+            livePhoto.path,
+            filename: 'pickup__.jpg',
+          ),
+        });
+      } else {
+        payload = {'order_id': orderId, 'otp': otp.trim()};
+      }
+
       final response = await _apiClient.post(
         ApiEndpoints.riderVerifyPickupOtp,
-        data: {'order_id': orderId, 'otp': otp.trim()},
+        data: payload,
       );
 
       if (response.statusCode == 200 && response.data['status'] == true) {
@@ -128,15 +143,29 @@ class RiderDeliveryProvider with ChangeNotifier {
     return false;
   }
 
-  Future<bool> verifyCustomerDeliveryOtp(int orderId, String otp) async {
+  Future<bool> verifyCustomerDeliveryOtp(int orderId, String otp, {File? livePhoto}) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
+      dynamic payload;
+      if (livePhoto != null) {
+        payload = FormData.fromMap({
+          'order_id': orderId,
+          'otp': otp.trim(),
+          'proof_photo': await MultipartFile.fromFile(
+            livePhoto.path,
+            filename: 'delivery__.jpg',
+          ),
+        });
+      } else {
+        payload = {'order_id': orderId, 'otp': otp.trim()};
+      }
+
       final response = await _apiClient.post(
         ApiEndpoints.riderVerifyDeliveryOtp,
-        data: {'order_id': orderId, 'otp': otp.trim()},
+        data: payload,
       );
 
       if (response.statusCode == 200 && response.data['status'] == true) {
@@ -176,19 +205,47 @@ class RiderDeliveryProvider with ChangeNotifier {
     required int orderId,
     required String otp,
     required List<Map<String, dynamic>> manifestItems,
+    File? overallPhoto,
+    Map<int, File>? itemDefectPhotos,
   }) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final response = await _apiClient.post(
-        ApiEndpoints.riderDoorstepHandover,
-        data: {
+      dynamic payload;
+      if (overallPhoto != null || (itemDefectPhotos != null && itemDefectPhotos.isNotEmpty)) {
+        final map = <String, dynamic>{
           'order_id': orderId,
           'otp': otp.trim(),
           'manifest_items': manifestItems,
-        },
+        };
+        if (overallPhoto != null) {
+          map['proof_photo'] = await MultipartFile.fromFile(
+            overallPhoto.path,
+            filename: 'doorstep__.jpg',
+          );
+        }
+        if (itemDefectPhotos != null) {
+          for (final entry in itemDefectPhotos.entries) {
+            map['item_photo_'] = await MultipartFile.fromFile(
+              entry.value.path,
+              filename: 'defect__.jpg',
+            );
+          }
+        }
+        payload = FormData.fromMap(map);
+      } else {
+        payload = {
+          'order_id': orderId,
+          'otp': otp.trim(),
+          'manifest_items': manifestItems,
+        };
+      }
+
+      final response = await _apiClient.post(
+        ApiEndpoints.riderDoorstepHandover,
+        data: payload,
       );
 
       if (response.statusCode == 200 && response.data['status'] == true) {
@@ -221,18 +278,33 @@ class RiderDeliveryProvider with ChangeNotifier {
   Future<bool> verifyVendorReturnOtp({
     required int returnCaseId,
     required String otp,
+    File? livePhoto,
   }) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final response = await _apiClient.post(
-        ApiEndpoints.riderVerifyVendorReturnOtp,
-        data: {
+      dynamic payload;
+      if (livePhoto != null) {
+        payload = FormData.fromMap({
           'return_case_id': returnCaseId,
           'otp': otp.trim(),
-        },
+          'proof_photo': await MultipartFile.fromFile(
+            livePhoto.path,
+            filename: 'vendor_return__.jpg',
+          ),
+        });
+      } else {
+        payload = {
+          'return_case_id': returnCaseId,
+          'otp': otp.trim(),
+        };
+      }
+
+      final response = await _apiClient.post(
+        ApiEndpoints.riderVerifyVendorReturnOtp,
+        data: payload,
       );
 
       if (response.statusCode == 200 && response.data['status'] == true) {
@@ -259,19 +331,36 @@ class RiderDeliveryProvider with ChangeNotifier {
     required int orderId,
     required String reason,
     String? notes,
+    File? livePhoto,
   }) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final response = await _apiClient.post(
-        ApiEndpoints.riderDeliveryAttemptFailed,
-        data: {
+      dynamic payload;
+      if (livePhoto != null) {
+        final map = <String, dynamic>{
           'order_id': orderId,
           'reason': reason,
           if (notes != null && notes.isNotEmpty) 'notes': notes.trim(),
-        },
+          'proof_photo': await MultipartFile.fromFile(
+            livePhoto.path,
+            filename: 'attempt__.jpg',
+          ),
+        };
+        payload = FormData.fromMap(map);
+      } else {
+        payload = {
+          'order_id': orderId,
+          'reason': reason,
+          if (notes != null && notes.isNotEmpty) 'notes': notes.trim(),
+        };
+      }
+
+      final response = await _apiClient.post(
+        ApiEndpoints.riderDeliveryAttemptFailed,
+        data: payload,
       );
 
       if (response.statusCode == 200 && response.data['status'] == true) {

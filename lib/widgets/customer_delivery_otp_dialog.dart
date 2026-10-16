@@ -1,10 +1,12 @@
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
+import 'live_camera_proof_card.dart';
 
 class CustomerDeliveryOtpDialog extends StatefulWidget {
   final String orderNumber;
   final String customerName;
-  final Function(String otp) onVerify;
+  final Function(String otp, File? livePhoto) onVerify;
 
   const CustomerDeliveryOtpDialog({
     super.key,
@@ -19,6 +21,7 @@ class CustomerDeliveryOtpDialog extends StatefulWidget {
 
 class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
   final TextEditingController _otpController = TextEditingController();
+  File? _livePhoto;
 
   @override
   void dispose() {
@@ -34,8 +37,8 @@ class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
         borderRadius: BorderRadius.circular(24),
         side: const BorderSide(color: AppColors.primaryPurple, width: 1.5),
       ),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.all(22),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -55,11 +58,21 @@ class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
             ),
             const SizedBox(height: 6),
             Text(
-              'Ask ${widget.customerName} for their 6-digit delivery security PIN to confirm handover.',
+              'Ask  for their 6-digit delivery security PIN to confirm handover.',
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 16),
+
+            // Live Camera Proof
+            LiveCameraProofCard(
+              photo: _livePhoto,
+              onPhotoChanged: (f) => setState(() => _livePhoto = f),
+              title: 'Doorstep Delivery Proof Snap',
+              hint: 'Snap live picture of parcel at doorstep or customer handoff. Sealed permanently.',
+            ),
+            const SizedBox(height: 16),
+
             TextField(
               controller: _otpController,
               keyboardType: TextInputType.number,
@@ -101,7 +114,7 @@ class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
                   child: ElevatedButton(
                     onPressed: () {
                       if (_otpController.text.length == 6) {
-                        widget.onVerify(_otpController.text.trim());
+                        widget.onVerify(_otpController.text.trim(), _livePhoto);
                         Navigator.pop(context);
                       }
                     },

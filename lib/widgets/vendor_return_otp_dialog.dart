@@ -1,10 +1,12 @@
+﻿import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../models/return_case_model.dart';
+import 'live_camera_proof_card.dart';
 
 class VendorReturnOtpDialog extends StatefulWidget {
   final ReturnCaseModel returnCase;
-  final Future<bool> Function(String otp) onVerify;
+  final Future<bool> Function(String otp, File? livePhoto) onVerify;
 
   const VendorReturnOtpDialog({
     super.key,
@@ -18,6 +20,7 @@ class VendorReturnOtpDialog extends StatefulWidget {
 
 class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
   final TextEditingController _otpController = TextEditingController();
+  File? _livePhoto;
   bool _isSubmitting = false;
   String? _error;
 
@@ -39,7 +42,7 @@ class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
       _error = null;
     });
 
-    final success = await widget.onVerify(otp);
+    final success = await widget.onVerify(otp, _livePhoto);
 
     if (mounted) {
       if (success) {
@@ -61,7 +64,7 @@ class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
         borderRadius: BorderRadius.circular(24),
         side: const BorderSide(color: AppColors.richGold, width: 1.5),
       ),
-      child: Padding(
+      child: SingleChildScrollView(
         padding: const EdgeInsets.all(22),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -82,16 +85,27 @@ class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
             ),
             const SizedBox(height: 4),
             Text(
-              'Case: ${widget.returnCase.caseNumber}',
+              'Case: ',
               style: const TextStyle(color: AppColors.richGold, fontSize: 12, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 8),
             Text(
-              'Drop-off at ${widget.returnCase.shopName}.\nAsk the merchant for their 6-digit Return Confirmation PIN.',
+              'Drop-off at .\nAsk the merchant for their 6-digit Return Confirmation PIN.',
               textAlign: TextAlign.center,
               style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, height: 1.4),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: 16),
+
+            // Live Camera Proof
+            LiveCameraProofCard(
+              photo: _livePhoto,
+              onPhotoChanged: (f) => setState(() => _livePhoto = f),
+              title: 'Merchant Return Counter Snap',
+              hint: 'Snap live picture of parcel placed on merchant counter.',
+              isRequired: false,
+            ),
+            const SizedBox(height: 16),
+
             TextField(
               controller: _otpController,
               keyboardType: TextInputType.number,

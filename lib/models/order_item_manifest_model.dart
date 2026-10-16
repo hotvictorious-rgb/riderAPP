@@ -1,4 +1,4 @@
-class OrderItemManifestModel {
+﻿class OrderItemManifestModel {
   final int orderItemId;
   final String productName;
   final int orderedQuantity;
@@ -6,6 +6,7 @@ class OrderItemManifestModel {
   int rejectedQuantity;
   String? rejectionCategory; // 'vendor_issue', 'transit_damage', 'customer_change_of_mind'
   String? rejectionNotes;
+  final String? defectPhotoUrl;
 
   OrderItemManifestModel({
     required this.orderItemId,
@@ -15,6 +16,7 @@ class OrderItemManifestModel {
     this.rejectedQuantity = 0,
     this.rejectionCategory,
     this.rejectionNotes,
+    this.defectPhotoUrl,
   });
 
   factory OrderItemManifestModel.fromJson(Map<String, dynamic> json) {
@@ -23,8 +25,10 @@ class OrderItemManifestModel {
       orderItemId: json['id'] as int? ?? 0,
       productName: json['product_name'] as String? ?? 'Product Item',
       orderedQuantity: qty,
-      acceptedQuantity: qty,
-      rejectedQuantity: 0,
+      acceptedQuantity: json['accepted_quantity'] as int? ?? qty,
+      rejectedQuantity: json['rejected_quantity'] as int? ?? 0,
+      rejectionCategory: json['rejection_category'] as String?,
+      defectPhotoUrl: json['defect_photo_path'] as String?,
     );
   }
 

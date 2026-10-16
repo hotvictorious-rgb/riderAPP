@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../models/return_case_model.dart';
@@ -182,17 +182,14 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
                   context: context,
                   builder: (_) => VendorReturnOtpDialog(
                     returnCase: item,
-                    onVerify: (otp) => deliv.verifyVendorReturnOtp(
-                      returnCaseId: item.id,
-                      otp: otp,
-                    ),
+                    onVerify: (otp, livePhoto) => deliv.verifyVendorReturnOtp(returnCaseId: item.id, otp: otp, livePhoto: livePhoto),
                   ),
                 ).then((success) {
                   if (success == true && context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         backgroundColor: AppColors.dispatchEmerald,
-                        content: Text('✓ Return Handover Certified! Parcel returned to vendor shop.'),
+                        content: Text('âœ“ Return Handover Certified! Parcel returned to vendor shop.'),
                       ),
                     );
                   }
@@ -213,3 +210,4 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
     );
   }
 }
+

@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Victorious MARKET — Rider Dispatch Terminal Simulator</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="icon" type="image/jpeg" href="assets/vm_icon.jpg">
+</head>
+<body>
+
+  <!-- Studio Header -->
+  <header class="studio-header">
+    <div class="brand-tag">
+      <i class="fa-solid fa-motorcycle"></i> OFFICIAL DISPATCH COURIER TERMINAL
+    </div>
+    <h1><span style="color: #ffd700;">Victorious</span> <span style="color: #ffffff;">MARKET</span> Rider Terminal</h1>
+    <p>FinTech-Grade Sovereign Courier Handshake &amp; Doorstep OTP Verification Operating System</p>
+  </header>
+
+  <!-- Studio Controls -->
+  <div class="studio-controls">
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      <span id="backend-status-text">Backend Synchronized (127.0.0.1:8080)</span>
+    </div>
+    <div class="quick-nav-pills">
+      <button class="nav-pill-btn active" onclick="switchTab('dashboard')">Dispatch Radar</button>
+      <button class="nav-pill-btn" onclick="switchTab('deliveries')">Active Trips</button>
+      <button class="nav-pill-btn" onclick="switchTab('history')">Completed History</button>
+      <button class="nav-pill-btn" onclick="switchTab('wallet')">Rider Wallet &amp; Payout</button>
+      <button class="nav-pill-btn" onclick="openDoorstepModal('VM-ORD-9081', 'Chidi Okafor', 2500)">Verify Doorstep OTP</button>
+      <button class="nav-pill-btn" style="border-color: #ef4444; color: #ef4444; font-weight: 800;" onclick="openSecurityProofModal()"><i class="fa-solid fa-shield-halved"></i> Proof: Only Riders Allowed</button>
+    </div>
+  </div>
+
+  <!-- Smartphone Frame -->
+  <div class="phone-wrapper">
+    <div class="phone-screen">
+
+      <!-- Dynamic Island & Status Bar -->
+      <div class="phone-notch-area">
+        <span class="status-time">9:41</span>
+        <div class="dynamic-island">
+          <div class="island-camera"></div>
+          <div class="island-sensor"></div>
+        </div>
+        <div class="status-icons">
+          <i class="fa-solid fa-signal"></i>
+          <i class="fa-solid fa-wifi"></i>
+          <i class="fa-solid fa-battery-full"></i>
+        </div>
+      </div>
+
+      <!-- Scrollable Viewport -->
+      <main class="screen-viewport" id="viewport">
+
+        <!-- 1. DASHBOARD VIEW -->
+        <section class="screen-view active" id="view-dashboard">
+          <div class="brand-app-bar">
+            <div class="bar-store-info">
+              <div class="store-badge-row">
+                <span class="store-title">Musa Haruna</span>
+                <span class="verified-pill">ONLINE</span>
+              </div>
+              <span class="store-loc">Speedy Parcel Express • Motorbike (KJA-104-XY)</span>
+            </div>
+            <button class="icon-round-btn" onclick="switchTab('profile')"><i class="fa-solid fa-sliders"></i></button>
+          </div>
+
+          <div class="screen-content">
+            <!-- Radar Duty Switch Card -->
+            <div class="radar-card" id="radar-duty-card">
+              <div class="radar-top-row">
+                <div class="radar-icon-box" id="radar-pulse-icon">
+                  <i class="fa-solid fa-satellite-dish"></i>
+                </div>
+                <div class="radar-status-info">
+                  <div class="radar-status-title" id="radar-status-text">DUTY ACTIVE • ONLINE</div>
+                  <div class="radar-fleet-sub">Speedy Parcel Express (#LAG-042)</div>
+                </div>
+                <button class="radar-toggle-btn" id="duty-toggle-btn" onclick="toggleDuty()">
+                  <i class="fa-solid fa-power-off"></i>
+                </button>
+              </div>
+              <div class="radar-meta-row">
+                <span><i class="fa-solid fa-motorcycle"></i> Bajaj Boxer 150cc</span>
+                <span class="plate-tag">KJA-104-XY</span>
+                <span><i class="fa-solid fa-star" style="color: #ffd700;"></i> 4.92 Rating</span>
+              </div>
+            </div>
+
+            <!-- Rider Earnings Obsidian Card -->
+            <div class="fintech-card">
+              <div class="card-glow"></div>
+              <div class="card-header-row">
+                <span class="escrow-badge"><i class="fa-solid fa-wallet"></i> DISPATCH SETTLED WALLET</span>
+                <span class="trip-count-pill" id="completed-count-pill">48 Trips Completed</span>
+              </div>
+              <div class="merchant-name-label">Available Payout Balance</div>
+              <div class="balance-figure" id="wallet-balance-text">₦ 14,500.00</div>
+              <div class="escrow-subtext">
+                <span class="green-dot"></span> Today's Delivery Earnings: <strong id="today-earnings-text">₦ 6,200.00</strong>
+              </div>
+              <div class="card-action-row">
+                <button class="gold-action-btn" onclick="requestPayout()">
+                  <i class="fa-solid fa-arrow-up-right-from-square"></i> Instant Withdrawal
+                </button>
+                <button class="outline-action-btn" onclick="switchTab('deliveries')">
+                  <i class="fa-solid fa-route"></i> Live Routes
+                </button>
+              </div>
+            </div>
+
+            <!-- Active Assignments List -->
+            <div class="section-heading-row">
+              <span class="section-heading">ACTIVE DISPATCH TRIPS</span>
+              <span class="badge-count" id="active-trips-badge">2 Active</span>
+            </div>
+
+            <div id="dashboard-assignments-list">
+              <!-- Dynamically Injected -->
+            </div>
+          </div>
+        </section>
+
+        <!-- 2. DELIVERIES VIEW -->
+        <section class="screen-view" id="view-deliveries">
+          <div class="brand-app-bar">
+            <span class="bar-title">Active Dispatch Trips</span>
+          </div>
+          <div class="screen-content" id="deliveries-full-list">
+            <!-- Dynamically Injected -->
+          </div>
+        </section>
+
+        <!-- 3. HISTORY VIEW -->
+        <section class="screen-view" id="view-history">
+          <div class="brand-app-bar">
+            <span class="bar-title">Delivery Trip History</span>
+          </div>
+          <div class="screen-content" id="history-full-list">
+            <!-- Dynamically Injected -->
+          </div>
+        </section>
+
+        <!-- 4. WALLET VIEW -->
+        <section class="screen-view" id="view-wallet">
+          <div class="brand-app-bar">
+            <span class="bar-title">Rider Wallet &amp; Payout</span>
+          </div>
+          <div class="screen-content">
+            <div class="white-card">
+              <div class="card-header-row">
+                <span class="mini-label">LINKED DISBURSEMENT ACCOUNT</span>
+              </div>
+              <div class="bank-name-large">Zenith Bank PLC</div>
+              <div class="account-number-display">******4756</div>
+              <div class="beneficiary-name">MUSA HARUNA (DISPATCH COURIER)</div>
+              <hr class="thin-divider">
+              <div class="cooldown-status-row">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>48-Hour Cooldown Protection: Earnings disbursed directly to verified NUBAN.</span>
+              </div>
+            </div>
+
+            <div class="sums-row">
+              <div class="sum-box">
+                <div class="mini-label">Available Balance</div>
+                <div class="sum-val green" id="wallet-balance-val2">₦ 14,500.00</div>
+              </div>
+              <div class="sum-box">
+                <div class="mini-label">Today's Pay</div>
+                <div class="sum-val purple" id="today-pay-val2">₦ 6,200.00</div>
+              </div>
+            </div>
+
+            <button class="btn-primary" style="width: 100%; margin-top: 14px;" onclick="requestPayout()">
+              <i class="fa-solid fa-paper-plane"></i> Request Instant Disbursement
+            </button>
+          </div>
+        </section>
+
+        <!-- 5. PROFILE VIEW -->
+        <section class="screen-view" id="view-profile">
+          <div class="brand-app-bar">
+            <span class="bar-title">Courier Settings</span>
+          </div>
+          <div class="screen-content">
+            <div class="white-card">
+              <div class="user-row">
+                <div class="user-avatar-circle" style="background: #10B981;"><i class="fa-solid fa-motorcycle"></i></div>
+                <div>
+                  <div class="user-name-title">Musa Haruna</div>
+                  <div class="user-sub">musa@speedyfleet.ng</div>
+                  <span class="role-pill" style="background: #DCFCE7; color: #15803D;">SPEEDY PARCEL EXPRESS</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="white-card" style="margin-top: 14px;">
+              <div class="mini-label">API SERVER ENDPOINT</div>
+              <div class="server-input-row">
+                <input type="text" id="api-server-url" value="http://127.0.0.1:8080" class="styled-input">
+                <button class="btn-save-sm" onclick="saveApiUrl()">Save</button>
+              </div>
+            </div>
+
+            <button class="btn-logout" onclick="switchTab('dashboard')">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i> End Shift
+            </button>
+          </div>
+        </section>
+
+      </main>
+
+      <!-- Persistent Bottom Navigation Bar -->
+      <nav class="bottom-nav-bar">
+        <button class="nav-tab active" onclick="switchTab('dashboard')">
+          <i class="fa-solid fa-satellite-dish"></i>
+          <span>Radar</span>
+        </button>
+        <button class="nav-tab" onclick="switchTab('deliveries')">
+          <i class="fa-solid fa-box"></i>
+          <span>Trips</span>
+        </button>
+        <button class="nav-tab" onclick="switchTab('history')">
+          <i class="fa-solid fa-history"></i>
+          <span>History</span>
+        </button>
+        <button class="nav-tab" onclick="switchTab('wallet')">
+          <i class="fa-solid fa-wallet"></i>
+          <span>Wallet</span>
+        </button>
+      </nav>
+
+    </div>
+  </div>
+
+  <!-- MODALS -->
+
+  <!-- 1. Doorstep Customer OTP Modal -->
+  <div class="modal-backdrop" id="modal-doorstep-otp">
+    <div class="modal-card">
+      <div class="modal-icon-header emerald"><i class="fa-solid fa-qrcode"></i></div>
+      <div class="modal-title">Doorstep Delivery Completion</div>
+      <div class="modal-subtitle" id="modal-doorstep-order-num">Order #VM-ORD-9081</div>
+      <div class="modal-prompt">
+        Ask customer <strong id="modal-doorstep-cust-name">Chidi Okafor</strong> for their 6-digit delivery security PIN.
+      </div>
+      <input type="text" id="doorstep-pin-input" maxlength="6" placeholder="883921" class="pin-input">
+      <div class="modal-btn-row">
+        <button class="btn-cancel" onclick="closeModals()">Cancel</button>
+        <button class="btn-confirm emerald" onclick="submitDoorstepPin()">Verify &amp; Unlock Fee</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Security Barrier & Role Invariant Proof Modal -->
+  <div class="modal-backdrop" id="modal-security-proof">
+    <div class="modal-card" style="max-width: 440px;">
+      <div class="modal-icon-header" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">
+        <i class="fa-solid fa-shield-halved"></i>
+      </div>
+      <div class="modal-title" style="color: #ffffff;">Rider Role Invariant Engine</div>
+      <div class="modal-subtitle" style="color: #ef4444; font-weight: 800;">ZERO-TRUST ACCESS ENFORCEMENT</div>
+      <div class="modal-prompt" style="font-size: 11px; text-align: left; line-height: 1.6; color: #9ca3af;">
+        <p><strong style="color: #ffd700;">Rule 1:</strong> Only accounts with <code style="color: #10b981;">user_type === 'rider'</code> can authenticate. Logistics companies, vendors, and customers are mathematically blocked.</p>
+        <p><strong style="color: #ffd700;">Rule 2:</strong> All riders must belong to an active, verified <strong style="color: #ffffff;">Logistics Company</strong> (<code style="color: #3b82f6;">logistics_company_id</code>). Independent rogue couriers are strictly prohibited.</p>
+      </div>
+
+      <div style="background: rgba(0,0,0,0.4); border-radius: 12px; padding: 12px; margin: 12px 0; border: 1px solid rgba(255,255,255,0.08); text-align: left;">
+        <div style="font-size: 10px; color: #9ca3af; font-weight: 800; margin-bottom: 6px;">TEST LOGIN SIMULATION:</div>
+        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+          <button style="flex: 1; padding: 6px; font-size: 10px; border-radius: 6px; border: 1px solid #ef4444; background: rgba(239,68,68,0.1); color: #ef4444; cursor: pointer; font-weight: 800;" onclick="simulateBlockedRole('logistics_company')">
+            Test Logistics Co (Blocked)
+          </button>
+          <button style="flex: 1; padding: 6px; font-size: 10px; border-radius: 6px; border: 1px solid #ef4444; background: rgba(239,68,68,0.1); color: #ef4444; cursor: pointer; font-weight: 800;" onclick="simulateBlockedRole('vendor')">
+            Test Merchant (Blocked)
+          </button>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button style="flex: 1; padding: 6px; font-size: 10px; border-radius: 6px; border: 1px solid #10b981; background: rgba(16,185,129,0.1); color: #10b981; cursor: pointer; font-weight: 800;" onclick="simulateValidRider('musa')">
+            Musa (Speedy Fleet Rider)
+          </button>
+          <button style="flex: 1; padding: 6px; font-size: 10px; border-radius: 6px; border: 1px solid #ffd700; background: rgba(255,215,0,0.1); color: #ffd700; cursor: pointer; font-weight: 800;" onclick="simulateValidRider('ubong')">
+            Ubong (Van Logistics Rider)
+          </button>
+        </div>
+        <div id="sim-result-box" style="margin-top: 10px; font-size: 11px; padding: 8px; border-radius: 6px; display: none;"></div>
+      </div>
+
+      <div class="modal-btn-row">
+        <button class="btn-cancel" onclick="closeModals()">Close Inspector</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

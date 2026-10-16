@@ -37,48 +37,8 @@ class RiderDeliveryProvider with ChangeNotifier {
         final list = response.data['data'] as List;
         _activeDeliveries = list.map((e) => DeliveryAssignmentModel.fromJson(e as Map<String, dynamic>)).toList();
       }
-    } catch (_) {
-      // Seed rich mock deliveries if backend returns empty or offline
-      if (_activeDeliveries.isEmpty) {
-        _activeDeliveries = [
-          DeliveryAssignmentModel(
-            id: 101,
-            orderNumber: 'VM-ORD-9081',
-            shopName: 'Apex Retail Plaza (Hub #04)',
-            shopAddress: 'Computer Village, Ikeja, Lagos',
-            shopPhone: '+234 801 234 5678',
-            customerName: 'Chidi Okafor',
-            customerPhone: '+234 803 111 2233',
-            deliveryAddress: '14 Admiralty Way, Lekki Phase 1, Lagos',
-            destinationLga: 'Lekki Phase 1',
-            itemsSummary: '1x iPhone 14 Pro Case, 1x Anker 65W GaN Charger',
-            itemsCount: 2,
-            dispatchCategory: 'EXPRESS COURIER',
-            orderStatus: 'ready_for_pickup',
-            pickupPin: '482910',
-            hasRiderArrived: false,
-            timestamp: '11:20 AM',
-          ),
-          DeliveryAssignmentModel(
-            id: 102,
-            orderNumber: 'VM-ORD-9077',
-            shopName: 'Vic Tech & Electronics HQ',
-            shopAddress: 'Shop 12, Ikeja City Mall, Alausa',
-            shopPhone: '+234 802 333 4455',
-            customerName: 'Amina Bello',
-            customerPhone: '+234 802 555 9900',
-            deliveryAddress: 'Plot 8, Victoria Island Financial Strip, Lagos',
-            destinationLga: 'Victoria Island',
-            itemsSummary: '1x Sony WH-1000XM5 Wireless Headphones',
-            itemsCount: 1,
-            dispatchCategory: 'FRAGILE DISPATCH',
-            orderStatus: 'out_for_delivery',
-            pickupPin: 'Verified',
-            hasRiderArrived: false,
-            timestamp: '09:45 AM',
-          ),
-        ];
-      }
+    } catch (e) {
+      _errorMessage = 'Unable to refresh active assignments from dispatch.';
     }
 
     _isLoading = false;
@@ -95,28 +55,8 @@ class RiderDeliveryProvider with ChangeNotifier {
         final list = response.data['data'] as List;
         _history = list.map((e) => DeliveryAssignmentModel.fromJson(e as Map<String, dynamic>)).toList();
       }
-    } catch (_) {
-      if (_history.isEmpty) {
-        _history = [
-          DeliveryAssignmentModel(
-            id: 99,
-            orderNumber: 'VM-ORD-9064',
-            shopName: 'Vic Gadgets Store',
-            shopAddress: 'Computer Village, Ikeja',
-            shopPhone: '+234 801 234 5678',
-            customerName: 'Babajide Adeleke',
-            customerPhone: '+234 814 333 4455',
-            deliveryAddress: 'Block 4, Surulere Estate, Lagos',
-            destinationLga: 'Surulere',
-            itemsSummary: '1x Samsung T7 Shield SSD 1TB',
-            itemsCount: 1,
-            dispatchCategory: 'STANDARD DISPATCH',
-            orderStatus: 'delivered',
-            hasRiderArrived: true,
-            timestamp: 'Yesterday, 04:12 PM',
-          ),
-        ];
-      }
+    } catch (e) {
+      _errorMessage = 'Unable to refresh trip logs from dispatch.';
     }
 
     _isLoading = false;
@@ -145,11 +85,7 @@ class RiderDeliveryProvider with ChangeNotifier {
       if (e is DioException && e.response != null) {
         _errorMessage = e.response?.data['message'] ?? 'Failed to mark doorstep arrival.';
       } else {
-        // Local state update for offline/demo
-        _updateLocalArrivedStatus(orderId);
-        _isLoading = false;
-        notifyListeners();
-        return true;
+        _errorMessage = 'Network connection failed. Could not mark doorstep arrival.';
       }
     }
 
@@ -179,13 +115,8 @@ class RiderDeliveryProvider with ChangeNotifier {
     } catch (e) {
       if (e is DioException && e.response != null) {
         _errorMessage = e.response?.data['message'] ?? 'Pickup verification failed.';
-      } else if (otp == '482910' || otp.length == 6) {
-        _updateLocalOrderStatus(orderId, 'out_for_delivery');
-        _isLoading = false;
-        notifyListeners();
-        return true;
       } else {
-        _errorMessage = e.toString();
+        _errorMessage = 'Network connection failed. Could not verify pickup.';
       }
     }
 
@@ -215,13 +146,8 @@ class RiderDeliveryProvider with ChangeNotifier {
     } catch (e) {
       if (e is DioException && e.response != null) {
         _errorMessage = e.response?.data['message'] ?? 'Customer delivery code invalid.';
-      } else if (otp.length == 6) {
-        _updateLocalOrderStatus(orderId, 'delivered');
-        _isLoading = false;
-        notifyListeners();
-        return true;
       } else {
-        _errorMessage = e.toString();
+        _errorMessage = 'Network connection failed. Could not verify delivery OTP.';
       }
     }
 

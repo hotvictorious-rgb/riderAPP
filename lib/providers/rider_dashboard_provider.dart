@@ -49,33 +49,18 @@ class RiderDashboardProvider with ChangeNotifier {
         _isDutyOnline = _profile?.isOnline ?? true;
         await _storageService.setDutyOnline(_isDutyOnline);
       }
-    } catch (_) {
-      // Offline fallback state with realistic operational telemetry
+    } catch (e) {
+      _errorMessage = 'Unable to sync telemetry with dispatch server.';
       final cachedUser = _storageService.getUserData();
-      final cachedFleet = cachedUser?['fleet_company'] as String? ?? 'Speedy Parcel Express';
-      final cachedName = cachedUser?['name'] as String? ?? 'Musa Haruna';
-      final cachedEmail = cachedUser?['email'] as String? ?? 'musa@speedyfleet.ng';
-      final cachedVehicle = cachedUser?['vehicle_type'] as String? ?? 'Motorbike (Bajaj Boxer 150cc)';
-      final cachedPlate = cachedUser?['license_plate'] as String? ?? 'KJA-104-XY';
-
-      _profile = RiderProfileModel(
-        id: cachedUser?['id'] ?? 1,
-        name: cachedName,
-        email: cachedEmail,
-        phone: cachedUser?['phone'] ?? '+234 805 555 6677',
-        fleetCompany: cachedFleet,
-        vehicleType: cachedVehicle,
-        licensePlate: cachedPlate,
-        rating: 4.92,
-        isActive: true,
-        isOnline: _isDutyOnline,
-      );
-      _dashboardMetrics = RiderDashboardModel(
-        activeAssignmentsCount: 2,
-        completedTripsCount: 48,
+      if (cachedUser != null) {
+        _profile = RiderProfileModel.fromJson(cachedUser);
+      }
+      _dashboardMetrics ??= RiderDashboardModel(
+        activeAssignmentsCount: 0,
+        completedTripsCount: 0,
         shiftStatus: _isDutyOnline ? 'ON DUTY' : 'OFF DUTY',
-        assignedCorridor: 'Ikeja - Lekki Express Corridor',
-        onTimeRatePercent: 99.4,
+        assignedCorridor: '',
+        onTimeRatePercent: 100.0,
       );
     }
 

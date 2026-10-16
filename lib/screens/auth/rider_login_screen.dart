@@ -12,9 +12,16 @@ class RiderLoginScreen extends StatefulWidget {
 }
 
 class _RiderLoginScreenState extends State<RiderLoginScreen> {
-  final _emailController = TextEditingController(text: 'musa@speedyfleet.ng');
-  final _passwordController = TextEditingController(text: 'Password123!');
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
   bool _obscure = true;
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -83,6 +90,8 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                       controller: _emailController,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
+                        hintText: 'courier@fleet.ng',
+                        hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
                         filled: true,
                         fillColor: Colors.black26,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.obsidianBorder)),
@@ -97,6 +106,8 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                       obscureText: _obscure,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
+                        hintText: '••••••••',
+                        hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
                         filled: true,
                         fillColor: Colors.black26,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.obsidianBorder)),
@@ -129,7 +140,7 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              const Text('VERIFIED RIDERS (BELONGING TO FLEETS)', style: TextStyle(color: AppColors.richGold, fontSize: 11, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
+              const Text('TEST FLEET ACCOUNTS (DEVELOPMENT QUICK FILL)', style: TextStyle(color: AppColors.richGold, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5)),
               const SizedBox(height: 10),
               Row(
                 children: [

@@ -1,4 +1,4 @@
-﻿import 'package:dio/dio.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../core/constants/api_endpoints.dart';
 import '../core/constants/app_constants.dart';
@@ -65,18 +65,7 @@ class RiderAuthProvider with ChangeNotifier {
         await _storageService.setToken(token);
         await _storageService.setUserData(userData);
 
-        _currentRider = RiderProfileModel(
-          id: userData['id'] ?? 1,
-          name: userData['name'] ?? 'Courier',
-          email: userData['email'] ?? email,
-          phone: userData['phone'] ?? '+234 800 000 0000',
-          fleetCompany: fleetCompany,
-          vehicleType: userData['vehicle_type'] ?? 'Motorbike (Bajaj Boxer)',
-          licensePlate: userData['license_plate'] ?? 'VM-RDR-042',
-          rating: 4.92,
-          isActive: true,
-          isOnline: true,
-        );
+        _currentRider = RiderProfileModel.fromJson(userData);
 
         _isLoading = false;
         notifyListeners();

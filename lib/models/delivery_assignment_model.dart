@@ -70,28 +70,28 @@ class DeliveryAssignmentModel {
       } catch (_) {}
     }
 
-    final lgaName = destLga?['name'] ?? 'Metropolitan Zone';
-    final addressText = json['delivery_address'] ?? '$lgaName, Lagos';
+    final lgaName = destLga?['name'] as String? ?? '';
+    final addressText = json['delivery_address'] as String? ?? (lgaName.isNotEmpty ? '$lgaName, Lagos' : 'Customer Address');
 
     return DeliveryAssignmentModel(
-      id: json['id'] ?? 0,
-      orderNumber: json['order_number'] ?? json['id']?.toString() ?? 'VM-ORD-9081',
-      shopName: shop?['name'] ?? 'Apex Retail Plaza (Hub #04)',
-      shopAddress: shop?['address'] ?? 'Computer Village, Ikeja, Lagos',
-      shopPhone: shop?['phone'] ?? '+234 801 234 5678',
-      customerName: customer?['name'] ?? 'Chidi Okafor',
-      customerPhone: customer?['phone'] ?? '+234 803 111 2233',
+      id: json['id'] as int? ?? 0,
+      orderNumber: json['order_number'] as String? ?? '#${json['id']}',
+      shopName: shop?['name'] as String? ?? 'Merchant Shop',
+      shopAddress: shop?['address'] as String? ?? 'Shop Address',
+      shopPhone: shop?['phone'] as String? ?? '',
+      customerName: customer?['name'] as String? ?? 'Customer',
+      customerPhone: customer?['phone'] as String? ?? '',
       deliveryAddress: addressText,
-      destinationLga: lgaName,
+      destinationLga: lgaName.isNotEmpty ? lgaName : 'Metropolitan Zone',
       itemsSummary: summary,
       itemsCount: count,
-      dispatchCategory: json['dispatch_category'] ?? 'EXPRESS COURIER',
-      orderStatus: json['order_status'] ?? 'ready_for_pickup',
-      pickupPin: json['pickup_verification_code'] ?? '482910',
+      dispatchCategory: json['dispatch_category'] as String? ?? 'EXPRESS COURIER',
+      orderStatus: json['order_status'] as String? ?? 'ready_for_pickup',
+      pickupPin: json['pickup_verification_code'] as String?,
       hasRiderArrived: arrivedAt != null,
       riderArrivedAt: arrivedAt,
       isDeliveryLocked: locked,
-      timestamp: json['created_at'] != null ? _formatTimestamp(json['created_at'].toString()) : 'Today, 11:30 AM',
+      timestamp: json['created_at'] != null ? _formatTimestamp(json['created_at'].toString()) : 'Recent',
     );
   }
 

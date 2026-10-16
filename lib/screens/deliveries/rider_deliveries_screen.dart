@@ -46,7 +46,7 @@ class RiderDeliveriesScreen extends StatelessWidget {
                     return ActiveDeliveryCard(
                       assignment: item,
                       onPickupAction: () async {
-                        final success = await deliv.verifyPickupOtp(item.id, item.pickupPin ?? '482910');
+                        final success = await deliv.verifyPickupOtp(item.id, item.pickupPin ?? '');
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(

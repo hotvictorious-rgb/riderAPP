@@ -58,20 +58,22 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
               // Duty Status Switch Card
               RiderDutySwitchCard(
                 isOnline: dash.isDutyOnline,
-                fleetName: dash.profile?.fleetCompany ?? 'Speedy Parcel Express',
-                vehicleType: dash.profile?.vehicleType ?? 'Motorbike (Bajaj Boxer 150cc)',
-                licensePlate: dash.profile?.licensePlate ?? 'KJA-104-XY',
+                fleetName: dash.profile?.fleetCompany ?? '--',
+                vehicleType: dash.profile?.vehicleType.isNotEmpty == true ? dash.profile!.vehicleType : 'Fleet Vehicle',
+                licensePlate: dash.profile?.licensePlate.isNotEmpty == true ? dash.profile!.licensePlate : '--',
                 onToggle: () => dash.toggleDuty(),
               ),
               const SizedBox(height: 16),
 
               // Operational Telemetry HUD Card
               RiderTelemetryCard(
-                completedTrips: dash.dashboardMetrics?.completedTripsCount ?? 48,
+                completedTrips: dash.dashboardMetrics?.completedTripsCount ?? 0,
                 activeMissions: deliv.activeDeliveries.length,
-                assignedCorridor: dash.dashboardMetrics?.assignedCorridor ?? 'Ikeja - Lekki Express Corridor',
-                fleetName: dash.profile?.fleetCompany ?? 'Speedy Parcel Express',
-                onTimeRate: dash.dashboardMetrics?.onTimeRatePercent ?? 99.4,
+                assignedCorridor: dash.dashboardMetrics?.assignedCorridor.isNotEmpty == true
+                    ? dash.dashboardMetrics!.assignedCorridor
+                    : (dash.profile?.fleetCompany ?? 'Metropolitan Dispatch Zone'),
+                fleetName: dash.profile?.fleetCompany ?? '--',
+                onTimeRate: dash.dashboardMetrics?.onTimeRatePercent ?? 100.0,
               ),
               const SizedBox(height: 24),
 
@@ -115,7 +117,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                   (a) => ActiveDeliveryCard(
                     assignment: a,
                     onPickupAction: () async {
-                      final success = await deliv.verifyPickupOtp(a.id, a.pickupPin ?? '482910');
+                      final success = await deliv.verifyPickupOtp(a.id, a.pickupPin ?? '');
                       if (context.mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(

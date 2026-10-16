@@ -13,14 +13,16 @@ class RiderProfileScreen extends StatelessWidget {
     final auth = Provider.of<RiderAuthProvider>(context);
     final dash = Provider.of<RiderDashboardProvider>(context);
 
-    final rider = auth.currentRider;
-    final riderName = rider?.name ?? 'Musa Haruna';
-    final riderEmail = rider?.email ?? 'musa.haruna@speedyfleet.ng';
-    final riderPhone = rider?.phone ?? '+234 805 555 6677';
-    final fleetName = rider?.fleetCompany ?? 'Speedy Parcel Express';
-    final vehicleType = rider?.vehicleType ?? 'Motorbike (Bajaj Boxer 150cc)';
-    final licensePlate = rider?.licensePlate ?? 'KJA-104-XY';
-    final corridor = dash.dashboardMetrics?.assignedCorridor ?? 'Metropolitan Dispatch Zone';
+    final rider = auth.currentRider ?? dash.profile;
+    final riderName = (rider != null && rider.name.isNotEmpty) ? rider.name : 'Rider Courier';
+    final riderEmail = (rider != null && rider.email.isNotEmpty) ? rider.email : '--';
+    final riderPhone = (rider != null && rider.phone.isNotEmpty) ? rider.phone : '--';
+    final fleetName = (rider != null && rider.fleetCompany.isNotEmpty) ? rider.fleetCompany : 'Unassigned Fleet';
+    final vehicleType = (rider != null && rider.vehicleType.isNotEmpty) ? rider.vehicleType : 'Fleet Vehicle';
+    final licensePlate = (rider != null && rider.licensePlate.isNotEmpty) ? rider.licensePlate : '--';
+    final corridor = dash.dashboardMetrics?.assignedCorridor.isNotEmpty == true
+        ? dash.dashboardMetrics!.assignedCorridor
+        : (fleetName.isNotEmpty ? '$fleetName Dispatch Area' : 'Metropolitan Dispatch Zone');
 
     return Scaffold(
       backgroundColor: AppColors.obsidianBg,
@@ -101,13 +103,13 @@ class RiderProfileScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Row(
+                            Row(
                               children: [
-                                Icon(Icons.star, color: AppColors.richGold, size: 13),
-                                SizedBox(width: 3),
+                                const Icon(Icons.star, color: AppColors.richGold, size: 13),
+                                const SizedBox(width: 3),
                                 Text(
-                                  '4.92 Rating',
-                                  style: TextStyle(
+                                  '${(rider?.rating ?? 5.0).toStringAsFixed(1)} Rating',
+                                  style: const TextStyle(
                                     color: AppColors.richGold,
                                     fontSize: 11,
                                     fontWeight: FontWeight.w800,

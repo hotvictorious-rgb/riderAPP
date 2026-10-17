@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -218,7 +219,7 @@ class RiderDeliveryProvider with ChangeNotifier {
         final map = <String, dynamic>{
           'order_id': orderId,
           'otp': otp.trim(),
-          'manifest_items': manifestItems,
+          'manifest_items': jsonEncode(manifestItems),
         };
         if (overallPhoto != null) {
           map['proof_photo'] = await MultipartFile.fromFile(

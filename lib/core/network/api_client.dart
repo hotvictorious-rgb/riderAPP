@@ -1,4 +1,4 @@
-﻿// lib/core/network/api_client.dart
+// lib/core/network/api_client.dart
 import 'package:dio/dio.dart';
 import '../constants/api_endpoints.dart';
 import '../constants/app_constants.dart';
@@ -68,7 +68,7 @@ class ApiClient {
     return await _dio.put(path, data: data);
   }
 
-  Future<Response> delete(String path) async {
-    return await _dio.delete(path);
+  Future<Response> delete(String path, {dynamic data, Map<String, dynamic>? queryParameters}) async {
+    return await _dio.delete(path, data: data, queryParameters: queryParameters);
   }
 }

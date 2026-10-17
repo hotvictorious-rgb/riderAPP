@@ -245,7 +245,7 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         backgroundColor: AppColors.dispatchEmerald,
-                        content: Text('✓ Return Handover Certified! Parcel returned to vendor shop.'),
+                        content: const Text('✓ Return Handover Certified! Parcel returned to vendor shop.'),
                       ),
                     );
                   }

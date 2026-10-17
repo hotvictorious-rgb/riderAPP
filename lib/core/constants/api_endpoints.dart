@@ -1,6 +1,9 @@
 // lib/core/constants/api_endpoints.dart
 class ApiEndpoints {
-  static const String baseUrl = 'http://127.0.0.1:8080/api/v1';
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://127.0.0.1:8080/api/v1',
+  );
 
   // Auth Endpoints
   static const String login = '/auth/login';

@@ -6,6 +6,7 @@ import 'core/theme/app_theme.dart';
 import 'providers/rider_auth_provider.dart';
 import 'providers/rider_dashboard_provider.dart';
 import 'providers/rider_delivery_provider.dart';
+import 'providers/rider_notification_provider.dart';
 import 'screens/auth/rider_login_screen.dart';
 import 'screens/shell/rider_shell_screen.dart';
 
@@ -20,6 +21,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => RiderAuthProvider(apiClient, storageService)),
         ChangeNotifierProvider(create: (_) => RiderDashboardProvider(apiClient, storageService)),
         ChangeNotifierProvider(create: (_) => RiderDeliveryProvider(apiClient)),
+        ChangeNotifierProvider(create: (_) => RiderNotificationProvider(apiClient)),
       ],
       child: const RiderTerminalApp(),
     ),

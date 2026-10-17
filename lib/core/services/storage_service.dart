@@ -59,6 +59,19 @@ class StorageService {
     }
   }
 
+  // Device Push Notification Token Caching
+  Future<bool> setDeviceToken(String token) async {
+    return await _prefs.setString('courier_fcm_device_token', token);
+  }
+
+  String? getDeviceToken() {
+    return _prefs.getString('courier_fcm_device_token');
+  }
+
+  Future<bool> clearDeviceToken() async {
+    return await _prefs.remove('courier_fcm_device_token');
+  }
+
   Future<void> clearAll() async {
     await _prefs.clear();
   }

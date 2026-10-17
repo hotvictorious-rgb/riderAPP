@@ -1,14 +1,16 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/rider_dashboard_provider.dart';
 import '../../providers/rider_delivery_provider.dart';
+import '../../providers/rider_notification_provider.dart';
 import '../../widgets/active_delivery_card.dart';
 import '../../widgets/doorstep_handover_manifest_dialog.dart';
 import '../../widgets/shop_pickup_otp_dialog.dart';
 import '../../widgets/delivery_attempt_failed_dialog.dart';
 import '../../widgets/rider_duty_switch_card.dart';
 import '../../widgets/rider_telemetry_card.dart';
+import '../notifications/rider_notifications_screen.dart';
 import '../profile/rider_profile_screen.dart';
 
 class RiderDashboardScreen extends StatefulWidget {
@@ -26,6 +28,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
       Provider.of<RiderDashboardProvider>(context, listen: false).fetchDashboard();
       Provider.of<RiderDeliveryProvider>(context, listen: false).fetchActiveDeliveries();
       Provider.of<RiderDeliveryProvider>(context, listen: false).fetchActiveReturns();
+      Provider.of<RiderNotificationProvider>(context, listen: false).fetchNotifications(silent: true);
     });
   }
 
@@ -39,6 +42,50 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
       appBar: AppBar(
         title: const Text('DISPATCH RADAR'),
         actions: [
+          Consumer<RiderNotificationProvider>(
+            builder: (context, notifProv, _) {
+              return Stack(
+                alignment: Alignment.center,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.notifications_outlined),
+                    tooltip: 'Dispatch Alerts',
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const RiderNotificationsScreen()),
+                      );
+                    },
+                  ),
+                  if (notifProv.unreadCount > 0)
+                    Positioned(
+                      top: 10,
+                      right: 10,
+                      child: Container(
+                        padding: const EdgeInsets.all(3),
+                        decoration: const BoxDecoration(
+                          color: AppColors.crimsonReject,
+                          shape: BoxShape.circle,
+                        ),
+                        constraints: const BoxConstraints(
+                          minWidth: 16,
+                          minHeight: 16,
+                        ),
+                        child: Text(
+                          notifProv.unreadCount > 9 ? '9+' : '${notifProv.unreadCount}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           IconButton(
             icon: const Icon(Icons.person_outline),
             tooltip: 'Courier Profile',
@@ -50,9 +97,12 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
       ),
       body: RefreshIndicator(
         onRefresh: () async {
-          await dash.fetchDashboard();
-          await deliv.fetchActiveDeliveries();
-          await deliv.fetchActiveReturns();
+          await Future.wait([
+            dash.fetchDashboard(),
+            deliv.fetchActiveDeliveries(),
+            deliv.fetchActiveReturns(),
+            Provider.of<RiderNotificationProvider>(context, listen: false).fetchNotifications(silent: true),
+          ]);
         },
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(16),

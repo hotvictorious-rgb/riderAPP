@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/rider_auth_provider.dart';
 import '../../providers/rider_dashboard_provider.dart';
+import '../../providers/rider_notification_provider.dart';
 import '../auth/rider_login_screen.dart';
 import '../earnings/rider_earnings_screen.dart';
+import '../notifications/rider_notifications_screen.dart';
 
 class RiderProfileScreen extends StatelessWidget {
   const RiderProfileScreen({super.key});
@@ -262,6 +264,89 @@ class RiderProfileScreen extends StatelessWidget {
                   ],
                 ),
               ),
+            ),
+            const SizedBox(height: 14),
+
+            // Dispatch Alerts & Push Notifications Tile
+            Consumer<RiderNotificationProvider>(
+              builder: (context, notifProv, _) {
+                final unread = notifProv.unreadCount;
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const RiderNotificationsScreen()),
+                    );
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.obsidianCard,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(
+                        color: unread > 0 ? AppColors.richGold.withOpacity(0.5) : AppColors.obsidianBorder,
+                        width: unread > 0 ? 1.2 : 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: unread > 0 ? AppColors.richGold.withOpacity(0.15) : Colors.white.withOpacity(0.06),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: unread > 0 ? AppColors.richGold.withOpacity(0.3) : Colors.white.withOpacity(0.08),
+                            ),
+                          ),
+                          child: Icon(
+                            Icons.notifications_active_outlined,
+                            color: unread > 0 ? AppColors.richGold : AppColors.textSecondary,
+                            size: 22,
+                          ),
+                        ),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  const Text(
+                                    'Dispatch Alerts & Push Feed',
+                                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 14),
+                                  ),
+                                  if (unread > 0) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.urgentRed,
+                                        borderRadius: BorderRadius.circular(999),
+                                      ),
+                                      child: Text(
+                                        '$unread New',
+                                        style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w800),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              const SizedBox(height: 2),
+                              const Text(
+                                'Manage FCM device link & view mission dispatch logs',
+                                style: TextStyle(color: AppColors.textSecondary, fontSize: 11),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.arrow_forward_ios, color: AppColors.textMuted, size: 14),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
             const SizedBox(height: 16),
 

@@ -22,4 +22,10 @@ class ApiEndpoints {
   static const String riderVerifyVendorReturnOtp = '/rider/orders/verify-vendor-return-otp';
   static const String riderActiveReturns = '/rider/returns/active';
   static const String riderDeliveryAttemptFailed = '/rider/orders/delivery-attempt-failed';
+
+  // Notification & Device Token Endpoints
+  static const String registerDeviceToken = '/rider/device-token';
+  static const String revokeDeviceToken = '/notifications/device-token';
+  static const String inAppNotifications = '/notifications/in-app';
+  static const String markNotificationRead = '/notifications/mark-read';
 }

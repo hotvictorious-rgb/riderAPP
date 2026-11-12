@@ -23,7 +23,7 @@
   <div class="studio-controls">
     <div class="status-indicator">
       <div class="status-dot"></div>
-      <span id="backend-status-text">Backend Synchronized (127.0.0.1:8080)</span>
+      <span id="backend-status-text">Backend Synchronized (127.0.0.1:8000)</span>
     </div>
     <div class="quick-nav-pills">
       <button class="nav-pill-btn active" onclick="switchTab('dashboard')">Dispatch Radar</button>
@@ -62,10 +62,10 @@
           <div class="brand-app-bar">
             <div class="bar-store-info">
               <div class="store-badge-row">
-                <span class="store-title">Musa Haruna</span>
+                <span class="store-title">Victor Bassey</span>
                 <span class="verified-pill">ONLINE</span>
               </div>
-              <span class="store-loc">Speedy Parcel Express • Motorbike (KJA-104-XY)</span>
+              <span class="store-loc">Victorious Express Fleet • Motorbike (UYO-804-VM)</span>
             </div>
             <button class="icon-round-btn" onclick="switchTab('profile')"><i class="fa-solid fa-sliders"></i></button>
           </div>
@@ -79,7 +79,7 @@
                 </div>
                 <div class="radar-status-info">
                   <div class="radar-status-title" id="radar-status-text">DUTY ACTIVE • ONLINE</div>
-                  <div class="radar-fleet-sub">Speedy Parcel Express (#LAG-042)</div>
+                  <div class="radar-fleet-sub">Victorious Express Fleet (#UYO-011)</div>
                 </div>
                 <button class="radar-toggle-btn" id="duty-toggle-btn" onclick="toggleDuty()">
                   <i class="fa-solid fa-power-off"></i>
@@ -87,8 +87,8 @@
               </div>
               <div class="radar-meta-row">
                 <span><i class="fa-solid fa-motorcycle"></i> Bajaj Boxer 150cc</span>
-                <span class="plate-tag">KJA-104-XY</span>
-                <span><i class="fa-solid fa-star" style="color: #ffd700;"></i> 4.92 Rating</span>
+                <span class="plate-tag">UYO-804-VM</span>
+                <span><i class="fa-solid fa-star" style="color: #ffd700;"></i> 4.98 Rating</span>
               </div>
             </div>
 
@@ -110,7 +110,7 @@
               
               <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 10px; margin-top: 12px; font-size: 10.5px; color: #9ca3af; line-height: 1.45;">
                 <i class="fa-solid fa-building" style="color: #ffd700; margin-right: 4px;"></i>
-                <strong>Corporate Fleet Employment:</strong> All courier compensation is disbursed directly by <strong>Speedy Parcel Express</strong>. No escrow wallet required.
+                <strong>Corporate Fleet Employment:</strong> All courier compensation is disbursed directly by <strong>Victorious Express Fleet (Uyo Corridor)</strong>. No escrow wallet required.
               </div>
 
               <div class="card-action-row" style="margin-top: 12px;">
@@ -177,8 +177,8 @@
               <div class="user-row">
                 <div class="user-avatar-circle" style="background: #10B981;"><i class="fa-solid fa-motorcycle"></i></div>
                 <div>
-                  <div class="user-name-title">Musa Haruna</div>
-                  <div class="user-sub">musa@speedyfleet.ng • +234 805 555 6677</div>
+                  <div class="user-name-title">Victor Bassey</div>
+                  <div class="user-sub">victor@victoriousmarket.com.ng • +234 911 894 9035</div>
                   <span class="role-pill" style="background: #DCFCE7; color: #15803D; font-weight: 800;">VERIFIED FLEET COURIER</span>
                 </div>
               </div>
@@ -187,7 +187,7 @@
             <!-- Corporate Fleet Affiliation & Payroll Action -->
             <div class="white-card" style="margin-top: 12px; border-left: 4px solid #ffd700;">
               <div class="mini-label" style="color: #92400e; font-weight: 800;">EMPLOYING LOGISTICS FLEET</div>
-              <div style="font-size: 15px; font-weight: 900; color: #1e1b4b; margin: 4px 0;">Speedy Parcel Express</div>
+              <div style="font-size: 15px; font-weight: 900; color: #1e1b4b; margin: 4px 0;">Victorious Express Fleet (Uyo Corridor)</div>
               <div style="font-size: 11px; color: #6b7280; line-height: 1.45;">
                 Couriers operate under corporate employment. All trip commissions, bonuses, and driver salaries are settled directly by your logistics company.
               </div>
@@ -201,8 +201,8 @@
               <div class="mini-label">DISPATCH EQUIPMENT &amp; CORRIDOR</div>
               <div style="margin-top: 8px; font-size: 11.5px; color: #1e1b4b; line-height: 1.7;">
                 <div><i class="fa-solid fa-motorcycle" style="color: #5e17eb; width: 18px;"></i> <strong>Vehicle:</strong> Bajaj Boxer 150cc Cargo</div>
-                <div><i class="fa-solid fa-id-card" style="color: #5e17eb; width: 18px;"></i> <strong>Plate Number:</strong> KJA-104-XY</div>
-                <div><i class="fa-solid fa-map-location-dot" style="color: #5e17eb; width: 18px;"></i> <strong>Assigned Hub:</strong> Ikeja - Lekki Express Corridor</div>
+                <div><i class="fa-solid fa-id-card" style="color: #5e17eb; width: 18px;"></i> <strong>Plate Number:</strong> UYO-804-VM</div>
+                <div><i class="fa-solid fa-map-location-dot" style="color: #5e17eb; width: 18px;"></i> <strong>Assigned Hub:</strong> Oron Rd - Aka Rd - Nwaniba Corridor (Uyo)</div>
                 <div><i class="fa-solid fa-shield-halved" style="color: #10b981; width: 18px;"></i> <strong>Safety Inspection:</strong> Accredited &amp; Insured</div>
               </div>
             </div>
@@ -211,7 +211,7 @@
             <div class="white-card" style="margin-top: 12px;">
               <div class="mini-label">DISPATCH API GATEWAY</div>
               <div class="server-input-row" style="margin-top: 6px;">
-                <input type="text" id="api-server-url" value="http://127.0.0.1:8080" class="styled-input">
+                <input type="text" id="api-server-url" value="http://127.0.0.1:8000" class="styled-input">
                 <button class="btn-save-sm" onclick="saveApiUrl()">Save</button>
               </div>
             </div>
@@ -301,12 +301,12 @@
       <div class="modal-title">Fleet Remuneration Console</div>
       <div class="modal-subtitle" style="color: #ffd700;">CORPORATE PAYROLL &amp; AUDIT</div>
       <div style="text-align: left; margin: 12px 0; background: rgba(0,0,0,0.3); border-radius: 12px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); font-size: 11.5px; line-height: 1.6;">
-        <div style="color: #9ca3af;">Employing Fleet: <strong style="color: #fff;">Speedy Parcel Express</strong></div>
+        <div style="color: #9ca3af;">Employing Fleet: <strong style="color: #fff;">Victorious Express Fleet (Uyo Corridor)</strong></div>
         <div style="color: #9ca3af;">Remuneration Model: <strong style="color: #10b981;">Direct Employer Remuneration (Zero-Wallet)</strong></div>
         <div style="color: #9ca3af;">Shift Completed Trips: <strong style="color: #ffd700;">48 Trips</strong></div>
-        <div style="color: #9ca3af;">On-Time SLA Compliance: <strong style="color: #10b981;">99.4%</strong></div>
+        <div style="color: #9ca3af;">On-Time SLA Compliance: <strong style="color: #10b981;">99.8%</strong></div>
         <div style="margin-top: 8px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.08); font-size: 10.5px; color: #9ca3af;">
-          ✓ All courier payments, bonuses, and fuel allowances are disbursed bi-weekly by Speedy Parcel Express. Couriers never hold escrow customer balances.
+          ✓ All courier payments, bonuses, and fuel allowances are disbursed bi-weekly by Victorious Express Fleet. Couriers never hold escrow customer balances.
         </div>
       </div>
       <div class="modal-btn-row">
@@ -339,8 +339,8 @@
           </button>
         </div>
         <div style="display: flex; gap: 8px;">
-          <button style="flex: 1; padding: 6px; font-size: 10px; border-radius: 6px; border: 1px solid #10b981; background: rgba(16,185,129,0.1); color: #10b981; cursor: pointer; font-weight: 800;" onclick="simulateValidRider('musa')">
-            Musa (Speedy Fleet Rider)
+          <button style="flex: 1; padding: 6px; font-size: 10px; border-radius: 6px; border: 1px solid #10b981; background: rgba(16,185,129,0.1); color: #10b981; cursor: pointer; font-weight: 800;" onclick="simulateValidRider('victor')">
+            Victor (Victorious Fleet)
           </button>
           <button style="flex: 1; padding: 6px; font-size: 10px; border-radius: 6px; border: 1px solid #ffd700; background: rgba(255,215,0,0.1); color: #ffd700; cursor: pointer; font-weight: 800;" onclick="simulateValidRider('ubong')">
             Ubong (Van Logistics Rider)

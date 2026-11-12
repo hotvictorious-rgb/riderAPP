@@ -85,7 +85,7 @@ class DeliveryAssignmentModel {
     }
 
     final lgaName = destLga?['name'] as String? ?? '';
-    final addressText = json['delivery_address'] as String? ?? (lgaName.isNotEmpty ? '$lgaName, Lagos' : 'Customer Address');
+    final addressText = json['delivery_address'] as String? ?? (lgaName.isNotEmpty ? '$lgaName, Uyo' : 'Customer Address');
 
     final rejPhotos = <String>[];
     if (json['doorstep_rejection_photos'] is List) {

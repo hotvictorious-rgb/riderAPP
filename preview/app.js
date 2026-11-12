@@ -7,20 +7,20 @@
   window.state = {
     isOnline: true,
     completedTrips: 48,
-    onTimeRate: 99.4,
-    corridor: 'Ikeja - Lekki Express Corridor',
+    onTimeRate: 99.8,
+    corridor: 'Oron Rd - Aka Rd - Nwaniba Corridors (Uyo)',
     activeDeliveries: [
       {
         id: 101,
         orderNumber: 'VM-ORD-9081',
-        shopName: 'Apex Retail Plaza (Hub #04)',
-        shopAddress: 'Computer Village, Ikeja, Lagos',
-        shopPhone: '+234 801 234 5678',
-        customerName: 'Chidi Okafor',
-        customerPhone: '+234 803 111 2233',
-        deliveryAddress: '14 Admiralty Way, Lekki Phase 1, Lagos',
-        destinationLga: 'Lekki Phase 1',
-        itemsSummary: '1x iPhone 14 Pro Case, 1x Anker 65W GaN Charger',
+        shopName: 'Apex Electronics Plaza',
+        shopAddress: '42 Oron Road, Near Plaza, Uyo',
+        shopPhone: '+234 911 894 9035',
+        customerName: 'Bassey Okon',
+        customerPhone: '+234 803 456 7890',
+        deliveryAddress: '18 Aka Road, Near Plaza Roundabout, Uyo',
+        destinationLga: 'Uyo Urban (Aka Rd)',
+        itemsSummary: '1x Anker 65W GaN Fast Charger, 1x Baseus USB-C Braided Cable',
         itemsCount: 2,
         category: 'EXPRESS COURIER',
         status: 'ready_for_pickup', // 'ready_for_pickup', 'out_for_delivery', 'delivered'
@@ -28,20 +28,20 @@
         hasArrived: false,
         customerOtp: '883921',
         manifestItems: [
-          { id: 1, name: 'iPhone 14 Pro Heavy Duty Case', orderedQty: 1 },
-          { id: 2, name: 'Anker 65W GaN Compact Charger', orderedQty: 1 }
+          { id: 1, name: 'Anker 65W GaN Fast Charger', orderedQty: 1 },
+          { id: 2, name: 'Baseus USB-C Braided Cable 2M', orderedQty: 1 }
         ]
       },
       {
         id: 102,
         orderNumber: 'VM-ORD-9077',
-        shopName: 'Vic Tech & Electronics HQ',
-        shopAddress: 'Shop 12, Ikeja City Mall, Alausa',
-        shopPhone: '+234 802 333 4455',
-        customerName: 'Amina Bello',
-        customerPhone: '+234 802 555 9900',
-        deliveryAddress: 'Plot 8, Victoria Island Financial Strip, Lagos',
-        destinationLga: 'Victoria Island',
+        shopName: 'Victorious Central Hub',
+        shopAddress: '8 Ekpo Obot Street, Off Ikot Ekpene Road, Uyo',
+        shopPhone: '+234 812 345 6789',
+        customerName: 'Aniefiok Udoh',
+        customerPhone: '+234 802 987 6543',
+        deliveryAddress: '105 Nwaniba Road, Near Uniuyo Main Gate, Uyo',
+        destinationLga: 'Uyo Urban (Nwaniba)',
         itemsSummary: '1x Sony WH-1000XM5 Wireless Headphones',
         itemsCount: 1,
         category: 'FRAGILE DISPATCH',
@@ -59,13 +59,13 @@
         id: 401,
         caseNumber: 'RET-9071',
         orderNumber: 'VM-ORD-9071',
-        shopName: 'Apex Retail Plaza (Hub #04)',
-        shopAddress: 'Computer Village, Ikeja, Lagos',
-        shopPhone: '+234 801 234 5678',
+        shopName: 'Apex Electronics Plaza',
+        shopAddress: '42 Oron Road, Near Plaza, Uyo',
+        shopPhone: '+234 911 894 9035',
         rejectionCategory: 'vendor_issue',
         rejectionCategoryLabel: 'Vendor Fault / Wrong Item',
-        rejectionNotes: 'Wrong color sent by vendor, customer declined',
-        itemsSummary: '1x iPhone 14 Pro Case (Matte Black)',
+        rejectionNotes: 'Wrong charger model sent by vendor, customer declined at doorstep',
+        itemsSummary: '1x Fast Charger 30W (White)',
         status: 'in_transit_back_to_vendor',
         vendorOtp: '654321'
       }
@@ -74,26 +74,26 @@
       {
         id: 99,
         orderNumber: 'VM-ORD-9064',
-        customerName: 'Babajide Adeleke',
-        destinationLga: 'Surulere',
+        customerName: 'Idongesit Akpan',
+        destinationLga: 'Oron Road Corridor',
         itemsSummary: '1x Samsung T7 Shield SSD 1TB',
         category: 'STANDARD DISPATCH',
-        timestamp: 'Yesterday, 04:12 PM'
+        timestamp: 'Today, 02:15 PM'
       },
       {
         id: 98,
         orderNumber: 'VM-ORD-9052',
         customerName: 'Grace Danjuma',
-        destinationLga: 'Ikeja GRA',
+        destinationLga: 'Abak Road Corridor',
         itemsSummary: '2x Baseus USB-C Braided Cables',
         category: 'EXPRESS COURIER',
-        timestamp: 'Oct 14, 2026'
+        timestamp: 'Yesterday, 04:12 PM'
       },
       {
         id: 97,
         orderNumber: 'VM-ORD-9031',
-        customerName: 'Tariq Hassan',
-        destinationLga: 'Yaba Tech Corridor',
+        customerName: 'Edidiong Essien',
+        destinationLga: 'Wellington Bassey Way',
         itemsSummary: '1x Logitech MX Master 3S Mouse',
         category: 'PRIORITY CARGO',
         timestamp: 'Oct 12, 2026'
@@ -547,10 +547,10 @@
     box.style.border = '1px solid #10b981';
     box.style.color = '#10b981';
 
-    if (rider === 'musa') {
-      box.innerHTML = `<strong>✓ AUTHENTICATED:</strong> Musa Haruna<br><strong>Fleet:</strong> Speedy Parcel Express (Active)<br><strong>Vehicle:</strong> Bajaj Boxer 150cc (KJA-104-XY)<br><strong>Status:</strong> All logistics company invariants satisfied!`;
+    if (rider === 'musa' || rider === 'victor') {
+      box.innerHTML = `<strong>✓ AUTHENTICATED:</strong> Victor Bassey<br><strong>Fleet:</strong> Victorious Express Fleet (Uyo Corridor)<br><strong>Vehicle:</strong> Bajaj Boxer 150cc (UYO-804-VM)<br><strong>Status:</strong> All logistics company invariants satisfied!`;
     } else {
-      box.innerHTML = `<strong>✓ AUTHENTICATED:</strong> Ubong Etim<br><strong>Fleet:</strong> Van Logistics Ltd (Active)<br><strong>Vehicle:</strong> Transit Cargo Van (IKT-789-AK)<br><strong>Status:</strong> All logistics company invariants satisfied!`;
+      box.innerHTML = `<strong>✓ AUTHENTICATED:</strong> Ubong Etim<br><strong>Fleet:</strong> Victorious Van Logistics (Active)<br><strong>Vehicle:</strong> Transit Cargo Van (UYO-312-VM)<br><strong>Status:</strong> All logistics company invariants satisfied!`;
     }
   };
 

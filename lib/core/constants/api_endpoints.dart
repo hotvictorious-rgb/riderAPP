@@ -16,6 +16,13 @@ class ApiEndpoints {
     return 'https://shop.victoriousmarket.com.ng/api/v1';
   }
 
+  // Phone-Native & WhatsApp Passwordless Authentication (Storefront Parity)
+  static const String whatsappInitiate = '/auth/whatsapp/initiate';
+  static const String whatsappStatus = '/auth/whatsapp/status/'; // + {sessionToken}
+  static const String whatsappCancel = '/auth/whatsapp/cancel/'; // + {sessionToken}
+  static const String sendSmsOtp = '/auth/phone/send-sms-otp';
+  static const String verifySmsOtp = '/auth/phone/verify-sms-otp';
+
   // Auth Endpoints
   static const String login = '/auth/login';
   static const String logout = '/auth/logout';

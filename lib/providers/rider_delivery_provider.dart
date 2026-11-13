@@ -31,6 +31,11 @@ class RiderDeliveryProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  bool _isSuccess(dynamic data) {
+    if (data == null || data is! Map) return false;
+    return data['status'] == true || data['status'] == 'success' || data['success'] == true;
+  }
+
   Future<void> fetchActiveDeliveries() async {
     _isLoading = true;
     _errorMessage = null;
@@ -79,7 +84,7 @@ class RiderDeliveryProvider with ChangeNotifier {
         data: {'order_id': orderId},
       );
 
-      if (response.statusCode == 200 && response.data['status'] == true) {
+      if (response.statusCode == 200 && _isSuccess(response.data)) {
         _updateLocalArrivedStatus(orderId);
         _isLoading = false;
         notifyListeners();
@@ -124,7 +129,7 @@ class RiderDeliveryProvider with ChangeNotifier {
         data: payload,
       );
 
-      if (response.statusCode == 200 && response.data['status'] == true) {
+      if (response.statusCode == 200 && _isSuccess(response.data)) {
         _updateLocalOrderStatus(orderId, 'out_for_delivery');
         _isLoading = false;
         notifyListeners();
@@ -169,7 +174,7 @@ class RiderDeliveryProvider with ChangeNotifier {
         data: payload,
       );
 
-      if (response.statusCode == 200 && response.data['status'] == true) {
+      if (response.statusCode == 200 && _isSuccess(response.data)) {
         _updateLocalOrderStatus(orderId, 'delivered');
         _isLoading = false;
         notifyListeners();
@@ -249,7 +254,7 @@ class RiderDeliveryProvider with ChangeNotifier {
         data: payload,
       );
 
-      if (response.statusCode == 200 && response.data['status'] == true) {
+      if (response.statusCode == 200 && _isSuccess(response.data)) {
         _updateLocalOrderStatus(orderId, 'delivered');
         await fetchActiveReturns();
         _isLoading = false;
@@ -308,7 +313,7 @@ class RiderDeliveryProvider with ChangeNotifier {
         data: payload,
       );
 
-      if (response.statusCode == 200 && response.data['status'] == true) {
+      if (response.statusCode == 200 && _isSuccess(response.data)) {
         _activeReturns.removeWhere((c) => c.id == returnCaseId);
         _isLoading = false;
         notifyListeners();
@@ -364,7 +369,7 @@ class RiderDeliveryProvider with ChangeNotifier {
         data: payload,
       );
 
-      if (response.statusCode == 200 && response.data['status'] == true) {
+      if (response.statusCode == 200 && _isSuccess(response.data)) {
         final data = response.data['data'] as Map<String, dynamic>?;
         final maxAttemptsReached = data?['max_attempts_reached'] == true;
 

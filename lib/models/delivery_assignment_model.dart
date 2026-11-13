@@ -1,4 +1,4 @@
-﻿import 'order_item_manifest_model.dart';
+import 'order_item_manifest_model.dart';
 
 class DeliveryAssignmentModel {
   final int id;

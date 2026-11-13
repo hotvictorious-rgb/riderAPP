@@ -37,7 +37,7 @@ class RiderNotificationProvider with ChangeNotifier {
 
     try {
       final response = await _apiClient.get(ApiEndpoints.inAppNotifications);
-      if (response.statusCode == 200 && response.data['status'] == true) {
+      if (response.statusCode == 200 && (response.data['status'] == true || response.data['status'] == 'success' || response.data['success'] == true)) {
         _unreadCount = response.data['unread_count'] as int? ?? 0;
         final rawList = response.data['notifications'] as List? ?? [];
         _notifications = rawList

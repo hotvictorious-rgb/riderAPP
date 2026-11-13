@@ -84,18 +84,18 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text('COURIER EMAIL', style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w800)),
+                    const Text('COURIER PHONE OR EMAIL', style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w800)),
                     const SizedBox(height: 6),
                     TextField(
                       controller: _emailController,
                       style: const TextStyle(color: Colors.white),
                       decoration: InputDecoration(
-                        hintText: 'courier@fleet.ng',
+                        hintText: 'e.g. 08012345678 or courier@fleet.ng',
                         hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
                         filled: true,
                         fillColor: Colors.black26,
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.obsidianBorder)),
-                        prefixIcon: const Icon(Icons.email, color: AppColors.primaryPurple, size: 20),
+                        prefixIcon: const Icon(Icons.person, color: AppColors.primaryPurple, size: 20),
                       ),
                     ),
                     const SizedBox(height: 16),

@@ -1,9 +1,20 @@
 // lib/core/constants/api_endpoints.dart
+import 'package:flutter/foundation.dart';
+
 class ApiEndpoints {
-  static const String baseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://127.0.0.1:8000/api/v1',
-  );
+  static String get baseUrl {
+    const envUrl = String.fromEnvironment('API_BASE_URL');
+    if (envUrl.isNotEmpty) return envUrl;
+    if (kIsWeb) {
+      final host = Uri.base.host;
+      if (host.isNotEmpty && host != 'localhost' && host != '127.0.0.1') {
+        return '${Uri.base.scheme}://$host:8000/api/v1';
+      }
+      return 'http://127.0.0.1:8000/api/v1';
+    }
+    // Native Mobile (Android APK / AAB & iOS) targets official production backend
+    return 'https://shop.victoriousmarket.com.ng/api/v1';
+  }
 
   // Auth Endpoints
   static const String login = '/auth/login';

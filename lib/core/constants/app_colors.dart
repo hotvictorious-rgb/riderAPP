@@ -6,12 +6,15 @@ class AppColors {
   static const Color primaryPurple = Color(0xFF5E17EB);
   static const Color darkPurple = Color(0xFF3B0B99);
   static const Color richGold = Color(0xFFFFD700);
+  static const Color cyberGold = Color(0xFFFFD700);
   static const Color goldAccent = Color(0xFFFFA000);
 
   // Dispatch & Logistics Accents
   static const Color dispatchEmerald = Color(0xFF10B981);
+  static const Color emeraldVerified = Color(0xFF10B981);
   static const Color dispatchAmber = Color(0xFFF59E0B);
   static const Color urgentRed = Color(0xFFEF4444);
+  static const Color crimsonReject = Color(0xFFEF4444);
   static const Color radarBlue = Color(0xFF3B82F6);
 
   // FinTech Obsidian Dark Theme
@@ -24,6 +27,7 @@ class AppColors {
   static const Color textPrimary = Color(0xFFF9FAFB);
   static const Color textSecondary = Color(0xFF9CA3AF);
   static const Color textMuted = Color(0xFF6B7280);
+  static const Color slateMuted = Color(0xFF6B7280);
 
   // Gradient Accents
   static const LinearGradient purpleGradient = LinearGradient(

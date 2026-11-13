@@ -212,14 +212,14 @@ class ActiveDeliveryCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(color: AppColors.dispatchAmber.withOpacity(0.3)),
               ),
-              child: Row(
+              child: const Row(
                 children: [
-                  const Icon(Icons.key, size: 16, color: AppColors.dispatchAmber),
-                  const SizedBox(width: 8),
+                  Icon(Icons.shield_outlined, size: 16, color: AppColors.dispatchAmber),
+                  SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Courier PIN: ${assignment.pickupPin} (Present to Shop Staff)',
-                      style: const TextStyle(color: AppColors.dispatchAmber, fontSize: 11.5, fontWeight: FontWeight.w800),
+                      'Request 6-digit Handover PIN from Shop Staff at Counter',
+                      style: TextStyle(color: AppColors.dispatchAmber, fontSize: 11.5, fontWeight: FontWeight.w800),
                     ),
                   ),
                 ],

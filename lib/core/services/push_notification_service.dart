@@ -17,7 +17,8 @@ class PushNotificationService {
   factory PushNotificationService() => _instance;
   PushNotificationService._internal();
 
-  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  FirebaseMessaging? _fcmInstance;
+  FirebaseMessaging get _fcm => _fcmInstance ?? FirebaseMessaging.instance;
   final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
 
   static const AndroidNotificationChannel _channel = AndroidNotificationChannel(
@@ -38,6 +39,7 @@ class PushNotificationService {
 
     try {
       await Firebase.initializeApp();
+      _fcmInstance = FirebaseMessaging.instance;
       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
       final settings = await _fcm.requestPermission(

@@ -18,8 +18,12 @@ void main() async {
   final authProvider = RiderAuthProvider(apiClient, storageService);
   apiClient.onUnauthorizedCallback = () => authProvider.handleUnauthorized();
 
-  // Initialize Firebase Cloud Messaging Push Engine
-  await PushNotificationService().initialize(apiClient);
+  // Initialize Firebase Cloud Messaging Push Engine (Fail-safe)
+  try {
+    await PushNotificationService().initialize(apiClient);
+  } catch (e) {
+    debugPrint("Failed to initialize push notifications: $e");
+  }
 
   runApp(
     MultiProvider(

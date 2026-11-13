@@ -21,6 +21,7 @@ class ApiClient {
           'X-Terminal-Type': AppConstants.terminalType,
           'X-Terminal-Client': 'rider_mobile_terminal',
           'X-Required-Role': 'rider',
+          'X-App-Version': AppConstants.appVersion,
         },
       ),
     );
@@ -31,6 +32,7 @@ class ApiClient {
           options.baseUrl = _storageService.getApiBaseUrl() ?? ApiEndpoints.baseUrl;
           options.headers['X-Terminal-Client'] = 'rider_mobile_terminal';
           options.headers['X-Required-Role'] = 'rider';
+          options.headers['X-App-Version'] = AppConstants.appVersion;
           final token = _storageService.getToken();
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';

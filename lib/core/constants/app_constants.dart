@@ -1,6 +1,8 @@
 // lib/core/constants/app_constants.dart
 class AppConstants {
   static const String appName = 'Victorious Rider';
+  static const String appVersion = '1.0.1';
+  static const int buildNumber = 2;
   static const String appTagline = 'Sovereign Courier Dispatch Terminal';
 
   // Storage Keys

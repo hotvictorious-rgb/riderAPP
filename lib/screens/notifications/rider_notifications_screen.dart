@@ -75,8 +75,9 @@ class _RiderNotificationsScreenState extends State<RiderNotificationsScreen> {
                   decoration: BoxDecoration(
                     color: AppColors.cyberGold.withOpacity(0.08),
                     shape: BoxShape.circle,
-                    border: Border.pad(
-                      EdgeInsets.all(1),
+                    border: Border.all(
+                      color: AppColors.cyberGold.withValues(alpha: 0.3),
+                      width: 1,
                     ),
                   ),
                   child: const Icon(

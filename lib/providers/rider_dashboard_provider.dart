@@ -32,21 +32,22 @@ class RiderDashboardProvider with ChangeNotifier {
 
     try {
       final response = await _apiClient.get(ApiEndpoints.riderDashboard);
-      if (response.statusCode == 200 && response.data['data'] != null) {
-        final data = response.data['data'];
-        if (data['rider'] != null) {
-          _profile = RiderProfileModel.fromJson(data['rider']);
+      if (response.statusCode == 200 && response.data != null) {
+        final Map<String, dynamic> data = (response.data is Map<String, dynamic>)
+            ? ((response.data['data'] is Map<String, dynamic>)
+                ? response.data['data'] as Map<String, dynamic>
+                : response.data as Map<String, dynamic>)
+            : <String, dynamic>{};
+
+        if (data['rider'] != null && data['rider'] is Map<String, dynamic>) {
+          _profile = RiderProfileModel.fromJson(data['rider'] as Map<String, dynamic>);
         }
-        if (data['operational_telemetry'] != null) {
-          _dashboardMetrics = RiderDashboardModel.fromJson(data['operational_telemetry']);
+        if (data['operational_telemetry'] != null && data['operational_telemetry'] is Map<String, dynamic>) {
+          _dashboardMetrics = RiderDashboardModel.fromJson(data['operational_telemetry'] as Map<String, dynamic>);
         } else {
-          _dashboardMetrics = RiderDashboardModel(
-            activeAssignmentsCount: 0,
-            completedTripsCount: 0,
-            shiftStatus: _profile?.isOnline == true ? 'ON DUTY' : 'OFF DUTY',
-          );
+          _dashboardMetrics = RiderDashboardModel.fromJson(data);
         }
-        _isDutyOnline = _profile?.isOnline ?? true;
+        _isDutyOnline = _profile?.isOnline ?? (_dashboardMetrics?.shiftStatus == 'ON_DUTY');
         await _storageService.setDutyOnline(_isDutyOnline);
       }
     } catch (e) {

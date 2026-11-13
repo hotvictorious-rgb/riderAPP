@@ -257,62 +257,28 @@ class RiderAuthProvider with ChangeNotifier {
       if (e is DioException && e.response != null) {
         final statusCode = e.response?.statusCode;
         if (statusCode == 401 || statusCode == 403) {
-          _errorMessage = 'Invalid courier credentials or unauthorized terminal access.';
+          _errorMessage = e.response?.data?['message'] ?? 'Invalid courier credentials or unauthorized terminal access.';
           _isLoading = false;
           notifyListeners();
           return false;
         }
       }
-
-      // Offline mock fallback for local zero-dependency testing
-      final lower = loginIdentifier.toLowerCase().trim();
-      if (lower == 'musa@speedyfleet.ng' ||
-          lower == 'ubong.rider@vanlogistics.ng' ||
-          lower.contains('rider') ||
-          lower.contains('courier') ||
-          lower == '08077776601' ||
-          lower == '08077776602') {
-        final isVan = lower.contains('van') || lower.contains('ubong');
-        final fleet = isVan ? 'Van Logistics Ltd' : 'Victorious Express Fleet';
-        final name = isVan ? 'Ubong Etim' : 'Musa Haruna';
-        final vehicle = isVan ? 'Transit Cargo Van' : 'Motorbike (Bajaj Boxer)';
-        final plate = isVan ? 'IKT-789-AK' : 'AKW-VM-01';
-
-        await _storageService.setToken('demo_rider_sanctum_token_88921');
-        _currentRider = RiderProfileModel(
-          id: isVan ? 3 : 1,
-          name: name,
-          email: loginIdentifier.contains('@') ? loginIdentifier : '$lower@victoriousmarket.com.ng',
-          phone: lower.startsWith('0') ? lower : '+234 807 777 6601',
-          fleetCompany: fleet,
-          vehicleType: vehicle,
-          licensePlate: plate,
-          rating: 4.98,
-          isActive: true,
-          isOnline: true,
-        );
-
-        await _storageService.setUserData({
-          'name': name,
-          'email': _currentRider!.email,
-          'phone': _currentRider!.phone,
-          'user_type': 'rider',
-          'fleet_company': fleet,
-          'vehicle_type': vehicle,
-          'license_plate': plate,
-        });
-
-        _isLoading = false;
-        notifyListeners();
-        return true;
-      }
-
-      _errorMessage = 'Invalid courier credentials or unauthorized terminal access.';
+      _errorMessage = e.toString().contains('SocketException')
+          ? 'Network connection error. Check your internet connection.'
+          : 'Invalid courier credentials or server unreachable.';
     }
 
     _isLoading = false;
     notifyListeners();
     return false;
+  }
+
+  /// Handle 401 Unauthorized session expiry
+  void handleUnauthorized() {
+    _storageService.clearToken();
+    _currentRider = null;
+    _errorMessage = 'Session expired. Please log in again.';
+    notifyListeners();
   }
 
   Future<void> logout() async {

@@ -1,0 +1,97 @@
+{
+  "project_info": {
+    "project_number": "979105513696",
+    "project_id": "victorious-market-117e1",
+    "storage_bucket": "victorious-market-117e1.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:979105513696:android:b9577b967ae08f45971085",
+        "android_client_info": {
+          "package_name": "com.victoriousmarket.customer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "979105513696-31rl4238t6g25rq14vknn9rnb013c2ej.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApEEJbgcwZSrCO92l-I23MOiEJ9tGNZFI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "979105513696-31rl4238t6g25rq14vknn9rnb013c2ej.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:979105513696:android:fb53b2937fe72d74971085",
+        "android_client_info": {
+          "package_name": "com.victoriousmarket.delivery"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "979105513696-31rl4238t6g25rq14vknn9rnb013c2ej.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApEEJbgcwZSrCO92l-I23MOiEJ9tGNZFI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "979105513696-31rl4238t6g25rq14vknn9rnb013c2ej.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:979105513696:android:9936ccaf58be5ed2971085",
+        "android_client_info": {
+          "package_name": "com.victoriousmarket.seller"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "979105513696-31rl4238t6g25rq14vknn9rnb013c2ej.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyApEEJbgcwZSrCO92l-I23MOiEJ9tGNZFI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "979105513696-31rl4238t6g25rq14vknn9rnb013c2ej.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -64,7 +64,7 @@ class RiderProfileScreen extends StatelessWidget {
                           offset: const Offset(0, 4),
                         ),
                       ],
-                    ],
+                    ),
                     child: const Icon(Icons.two_wheeler, color: Colors.white, size: 30),
                   ),
                   const SizedBox(width: 16),

@@ -122,10 +122,17 @@ class _CustomerDeliveryOtpDialogState extends State<CustomerDeliveryOtpDialog> {
                         );
                         return;
                       }
-                      if (_otpController.text.length == 6) {
-                        widget.onVerify(_otpController.text.trim(), _livePhoto);
-                        Navigator.pop(context);
+                      if (_otpController.text.trim().length != 6) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            backgroundColor: AppColors.urgentRed,
+                            content: Text('Please enter the full 6-digit Customer Security PIN.'),
+                          ),
+                        );
+                        return;
                       }
+                      widget.onVerify(_otpController.text.trim(), _livePhoto);
+                      Navigator.pop(context);
                     },
                     style: ElevatedButton.styleFrom(backgroundColor: AppColors.dispatchEmerald),
                     child: const Text('Verify Handover'),

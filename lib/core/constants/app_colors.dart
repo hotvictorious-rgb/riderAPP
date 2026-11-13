@@ -11,6 +11,7 @@ class AppColors {
 
   // Dispatch & Logistics Accents
   static const Color dispatchEmerald = Color(0xFF10B981);
+  static const Color brandEmerald = Color(0xFF10B981);
   static const Color emeraldVerified = Color(0xFF10B981);
   static const Color dispatchAmber = Color(0xFFF59E0B);
   static const Color urgentRed = Color(0xFFEF4444);
@@ -20,11 +21,14 @@ class AppColors {
   // FinTech Obsidian Dark Theme
   static const Color obsidianBg = Color(0xFF080414);
   static const Color obsidianCard = Color(0xFF13092A);
+  static const Color carbonSurface = Color(0xFF13092A);
   static const Color obsidianCardElevated = Color(0xFF1B0E3B);
   static const Color obsidianBorder = Color(0xFF2A1654);
+  static const Color steelBorder = Color(0xFF2A1654);
 
   // Surface & Text
   static const Color textPrimary = Color(0xFFF9FAFB);
+  static const Color frostWhite = Color(0xFFF9FAFB);
   static const Color textSecondary = Color(0xFF9CA3AF);
   static const Color textMuted = Color(0xFF6B7280);
   static const Color slateMuted = Color(0xFF6B7280);

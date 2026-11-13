@@ -8,6 +8,7 @@ import 'api_exceptions.dart';
 class ApiClient {
   late final Dio _dio;
   final StorageService _storageService;
+  Function()? onUnauthorizedCallback;
 
   ApiClient(this._storageService) {
     _dio = Dio(
@@ -39,7 +40,13 @@ class ApiClient {
           }
           return handler.next(options);
         },
-        onError: (DioException error, handler) {
+        onError: (DioException error, handler) async {
+          if (error.response?.statusCode == 401) {
+            await _storageService.clearToken();
+            if (onUnauthorizedCallback != null) {
+              onUnauthorizedCallback!();
+            }
+          }
           final parsed = ApiException.fromDioError(error);
           return handler.reject(
             DioException(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'core/network/api_client.dart';
+import 'core/services/push_notification_service.dart';
 import 'core/services/storage_service.dart';
 import 'core/theme/app_theme.dart';
 import 'providers/rider_auth_provider.dart';
@@ -14,11 +15,16 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final storageService = await StorageService.init();
   final apiClient = ApiClient(storageService);
+  final authProvider = RiderAuthProvider(apiClient, storageService);
+  apiClient.onUnauthorizedCallback = () => authProvider.handleUnauthorized();
+
+  // Initialize Firebase Cloud Messaging Push Engine
+  await PushNotificationService().initialize(apiClient);
 
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => RiderAuthProvider(apiClient, storageService)),
+        ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(create: (_) => RiderDashboardProvider(apiClient, storageService)),
         ChangeNotifierProvider(create: (_) => RiderDeliveryProvider(apiClient)),
         ChangeNotifierProvider(create: (_) => RiderNotificationProvider(apiClient)),

@@ -4,6 +4,7 @@ import '../core/constants/api_endpoints.dart';
 import '../core/constants/app_constants.dart';
 import '../core/network/api_client.dart';
 import '../core/services/firebase_notification_service.dart';
+import '../core/services/push_notification_service.dart';
 import '../core/services/storage_service.dart';
 import '../models/rider_profile_model.dart';
 
@@ -91,6 +92,7 @@ class RiderAuthProvider with ChangeNotifier {
       apiClient: _apiClient,
       storage: _storageService,
     );
+    PushNotificationService().syncTokenWithBackend(_apiClient);
 
     _whatsappSessionToken = null;
     _whatsappChallengeCode = null;

@@ -270,14 +270,17 @@ class RiderDeliveryProvider with ChangeNotifier {
       notifyListeners();
       return {'success': false, 'message': _errorMessage!};
     } catch (e) {
+      bool isLocked = false;
       if (e is DioException && e.response != null) {
-        _errorMessage = e.response?.data['message'] ?? 'Doorstep handover failed.';
+        final resData = e.response?.data;
+        isLocked = e.response?.statusCode == 423 || (resData is Map && (resData['locked'] == true || resData['is_locked'] == true));
+        _errorMessage = (resData is Map ? resData['message'] as String? : null) ?? 'Doorstep handover failed.';
       } else {
         _errorMessage = 'Network connection failed. Could not verify doorstep handover.';
       }
       _isLoading = false;
       notifyListeners();
-      return {'success': false, 'message': _errorMessage!};
+      return {'success': false, 'locked': isLocked, 'message': _errorMessage!};
     }
   }
 

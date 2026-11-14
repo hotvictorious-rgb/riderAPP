@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:math';
-import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../constants/api_endpoints.dart';
 import '../network/api_client.dart';

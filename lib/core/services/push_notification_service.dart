@@ -96,12 +96,18 @@ class PushNotificationService {
         if (kDebugMode) {
           debugPrint('📲 [Rider FCM Token]: $_cachedToken');
         }
-        await _syncTokenWithBackend(apiClient, _cachedToken!);
+        final token = apiClient.storageService.getToken();
+        if (token != null && token.isNotEmpty) {
+          await _syncTokenWithBackend(apiClient, _cachedToken!);
+        }
       }
 
       _fcm.onTokenRefresh.listen((newToken) async {
         _cachedToken = newToken;
-        await _syncTokenWithBackend(apiClient, newToken);
+        final token = apiClient.storageService.getToken();
+        if (token != null && token.isNotEmpty) {
+          await _syncTokenWithBackend(apiClient, newToken);
+        }
       });
 
       _isInitialized = true;
@@ -139,6 +145,19 @@ class PushNotificationService {
         ),
         payload: message.data.toString(),
       );
+    }
+  }
+
+  Future<void> syncTokenWithBackend(ApiClient apiClient) async {
+    try {
+      _cachedToken ??= await _fcm.getToken();
+      if (_cachedToken != null && _cachedToken!.isNotEmpty) {
+        await _syncTokenWithBackend(apiClient, _cachedToken!);
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        debugPrint('⚠️ [Rider FCM Sync Warning]: $e');
+      }
     }
   }
 

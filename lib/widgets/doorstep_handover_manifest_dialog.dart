@@ -28,6 +28,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
   final TextEditingController _otpController = TextEditingController();
   bool _isItemizedMode = false;
   bool _isSubmitting = false;
+  bool _isLocked = false;
   String? _error;
   File? _overallPhoto;
   final Map<int, File> _itemDefectPhotos = {};
@@ -68,6 +69,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
   bool get _hasRejections => _manifest.any((i) => i.rejectedQuantity > 0);
 
   Future<void> _handleConfirm() async {
+    if (_isLocked) return;
     final otp = _otpController.text.trim();
     if (otp.length != 6) {
       setState(() => _error = 'Please enter the full 6-digit Customer Security PIN.');
@@ -110,6 +112,9 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
         setState(() {
           _isSubmitting = false;
           _error = result['message'] as String? ?? 'Handover certification failed.';
+          if (result['locked'] == true) {
+            _isLocked = true;
+          }
         });
       }
     }
@@ -298,7 +303,31 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                 ),
               ],
 
-              if (_error != null) ...[
+              if (_isLocked) ...[
+                const SizedBox(height: 12),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: AppColors.urgentRed.withOpacity(0.18),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.urgentRed, width: 1.5),
+                  ),
+                  child: const Row(
+                    children: [
+                      Icon(Icons.lock, color: AppColors.urgentRed, size: 22),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          'SECURITY LOCKOUT: Maximum PIN attempts exceeded. Contact Fleet Operations & Dispatch immediately.',
+                          style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              if (_error != null && !_isLocked) ...[
                 const SizedBox(height: 10),
                 Text(_error!, style: const TextStyle(color: AppColors.urgentRed, fontSize: 11, fontWeight: FontWeight.w600)),
               ],
@@ -318,7 +347,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                   Expanded(
                     flex: 2,
                     child: ElevatedButton(
-                      onPressed: _isSubmitting ? null : _handleConfirm,
+                      onPressed: (_isSubmitting || _isLocked) ? null : _handleConfirm,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: _hasRejections ? AppColors.urgentRed : AppColors.dispatchEmerald,
                         padding: const EdgeInsets.symmetric(vertical: 13),

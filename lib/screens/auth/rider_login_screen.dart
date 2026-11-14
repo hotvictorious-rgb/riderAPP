@@ -94,10 +94,14 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
 
   void _showWhatsAppWaitingDialog(String sessionToken, String challengeCode) {
     _whatsappRemainingSeconds = 120;
+    void Function(void Function())? sheetSetState;
+
     _whatsappCountdownTimer?.cancel();
     _whatsappCountdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_whatsappRemainingSeconds > 0) {
-        if (mounted) setState(() => _whatsappRemainingSeconds--);
+        _whatsappRemainingSeconds--;
+        if (mounted) setState(() {});
+        sheetSetState?.call(() {});
       } else {
         timer.cancel();
       }
@@ -138,6 +142,7 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
       builder: (sheetContext) {
         return StatefulBuilder(
           builder: (ctx, setSheetState) {
+            sheetSetState = setSheetState;
             final min = (_whatsappRemainingSeconds ~/ 60).toString().padLeft(2, '0');
             final sec = (_whatsappRemainingSeconds % 60).toString().padLeft(2, '0');
 
@@ -715,61 +720,6 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 20),
-
-              // SEEDED COURIER QUICK SELECT (DEVELOPMENT & TEST MATCHING STOREFRONT)
-              const Text(
-                'TEST COURIER PHONE QUICK SELECT',
-                style: TextStyle(color: AppColors.richGold, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
-              ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        setState(() {
-                          _phoneController.text = '08077776601';
-                        });
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.primaryPurple),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                      ),
-                      child: const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('08077776601', style: TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w700)),
-                          Text('Musa (Speedy Fleet)', style: TextStyle(color: AppColors.textMuted, fontSize: 9)),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        setState(() {
-                          _phoneController.text = '08077776602';
-                        });
-                      },
-                      style: OutlinedButton.styleFrom(
-                        side: const BorderSide(color: AppColors.richGold),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                      ),
-                      child: const Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text('08077776602', style: TextStyle(color: AppColors.richGold, fontSize: 12, fontWeight: FontWeight.w700)),
-                          Text('Ubong (Van Fleet)', style: TextStyle(color: AppColors.textMuted, fontSize: 9)),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 16),
             ],
           ),

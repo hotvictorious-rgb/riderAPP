@@ -42,9 +42,12 @@ class ApiClient {
         },
         onError: (DioException error, handler) async {
           if (error.response?.statusCode == 401) {
-            await _storageService.clearToken();
-            if (onUnauthorizedCallback != null) {
-              onUnauthorizedCallback!();
+            final hadToken = _storageService.getToken();
+            if (hadToken != null && hadToken.isNotEmpty) {
+              await _storageService.clearToken();
+              if (onUnauthorizedCallback != null) {
+                onUnauthorizedCallback!();
+              }
             }
           }
           final parsed = ApiException.fromDioError(error);
@@ -60,6 +63,8 @@ class ApiClient {
       ),
     );
   }
+
+  StorageService get storageService => _storageService;
 
   void updateBaseUrl(String newUrl) {
     _dio.options.baseUrl = newUrl;

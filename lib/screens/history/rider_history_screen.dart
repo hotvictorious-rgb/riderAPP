@@ -25,7 +25,7 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
     final deliv = Provider.of<RiderDeliveryProvider>(context);
 
     return Scaffold(
-      backgroundColor: AppColors.obsidianBg,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('DISPATCH TRIP LOG'),
         actions: [
@@ -34,33 +34,55 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
             tooltip: 'Refresh Trip Log',
             onPressed: () => deliv.fetchHistory(),
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
+        color: AppColors.primaryGold,
+        backgroundColor: AppColors.surface,
         onRefresh: () => deliv.fetchHistory(),
         child: deliv.isLoading && deliv.history.isEmpty
-            ? const Center(child: CircularProgressIndicator(color: AppColors.dispatchEmerald))
+            ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGold))
             : deliv.history.isEmpty
                 ? ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
-                    children: const [
-                      SizedBox(height: 120),
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                       Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.history_toggle_off, size: 48, color: AppColors.textMuted),
-                            SizedBox(height: 14),
-                            Text(
-                              'No completed deliveries yet for this shift.',
-                              style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 15),
-                            ),
-                            SizedBox(height: 4),
-                            Text(
-                              'Pull down or tap refresh to sync with dispatch server.',
-                              style: TextStyle(color: AppColors.textMuted, fontSize: 12),
-                            ),
-                          ],
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 24),
+                          padding: const EdgeInsets.all(28),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceElevated,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
+                                ),
+                                child: const Icon(Icons.history_toggle_off, size: 28, color: AppColors.textMuted),
+                              ),
+                              const SizedBox(height: 14),
+                              const Text(
+                                'No Completed Deliveries Yet',
+                                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 16),
+                              ),
+                              const SizedBox(height: 6),
+                              const Text(
+                                'Deliveries completed during your shift will appear here with certified audit logs.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: AppColors.textMuted, fontSize: 12, height: 1.4),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -72,11 +94,11 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
                     itemBuilder: (context, idx) {
                       final item = deliv.history[idx];
                       return Container(
-                        margin: const EdgeInsets.only(bottom: 12),
+                        margin: const EdgeInsets.only(bottom: 10),
                         decoration: BoxDecoration(
-                          color: AppColors.obsidianCard,
+                          color: AppColors.surface,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.obsidianBorder),
+                          border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
                         ),
                         child: Material(
                           color: Colors.transparent,
@@ -104,34 +126,35 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
                                             Text(
                                               item.orderNumber,
                                               style: const TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.w800,
-                                                fontSize: 14,
+                                                color: AppColors.textPrimary,
+                                                fontWeight: FontWeight.w900,
+                                                fontSize: 14.5,
                                               ),
                                             ),
                                             const SizedBox(width: 8),
                                             Container(
-                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1.5),
+                                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                               decoration: BoxDecoration(
-                                                color: Colors.white.withOpacity(0.06),
+                                                color: AppColors.surfaceElevated,
                                                 borderRadius: BorderRadius.circular(4),
+                                                border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
                                               ),
                                               child: Text(
                                                 item.dispatchCategory,
-                                                style: const TextStyle(color: AppColors.richGold, fontSize: 9, fontWeight: FontWeight.w700),
+                                                style: const TextStyle(color: AppColors.primaryGold, fontSize: 9.5, fontWeight: FontWeight.w800),
                                               ),
                                             ),
                                           ],
                                         ),
-                                        const SizedBox(height: 4),
+                                        const SizedBox(height: 5),
                                         Text(
                                           'Recipient: ${item.customerName}',
                                           style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
                                         ),
-                                        const SizedBox(height: 2),
+                                        const SizedBox(height: 3),
                                         Text(
                                           '${item.destinationLga} • ${item.timestamp}',
-                                          style: const TextStyle(color: AppColors.textMuted, fontSize: 10),
+                                          style: const TextStyle(color: AppColors.textMuted, fontSize: 10.5),
                                         ),
                                       ],
                                     ),
@@ -142,20 +165,20 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
                                       Container(
                                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                                         decoration: BoxDecoration(
-                                          color: AppColors.dispatchEmerald.withOpacity(0.15),
+                                          color: AppColors.dispatchEmerald.withOpacity(0.12),
                                           borderRadius: BorderRadius.circular(6),
-                                          border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.3)),
+                                          border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.25), width: 1.0),
                                         ),
                                         child: const Row(
                                           mainAxisSize: MainAxisSize.min,
                                           children: [
-                                            Icon(Icons.check_circle, size: 12, color: AppColors.dispatchEmerald),
+                                            Icon(Icons.check_circle, size: 11, color: AppColors.dispatchEmerald),
                                             SizedBox(width: 4),
                                             Text(
                                               'VERIFIED',
                                               style: TextStyle(
                                                 color: AppColors.dispatchEmerald,
-                                                fontSize: 10,
+                                                fontSize: 9.5,
                                                 fontWeight: FontWeight.w900,
                                               ),
                                             ),
@@ -169,7 +192,7 @@ class _RiderHistoryScreenState extends State<RiderHistoryScreen> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: 6),
                                   const Icon(Icons.chevron_right, color: AppColors.textMuted, size: 20),
                                 ],
                               ),

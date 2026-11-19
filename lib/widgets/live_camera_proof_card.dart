@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 import '../core/services/live_camera_service.dart';
@@ -44,11 +44,11 @@ class _LiveCameraProofCardState extends State<LiveCameraProofCard> {
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.04),
+        color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: hasPhoto ? AppColors.brandEmerald.withOpacity(0.6) : Colors.white.withOpacity(0.09),
-          width: hasPhoto ? 1.5 : 1.0,
+          color: hasPhoto ? AppColors.dispatchEmerald.withOpacity(0.5) : AppColors.surfaceBorder,
+          width: 1.0,
         ),
       ),
       child: Column(
@@ -58,7 +58,7 @@ class _LiveCameraProofCardState extends State<LiveCameraProofCard> {
             children: [
               Icon(
                 hasPhoto ? Icons.check_circle : Icons.camera_alt_outlined,
-                color: hasPhoto ? AppColors.brandEmerald : AppColors.dispatchAmber,
+                color: hasPhoto ? AppColors.dispatchEmerald : AppColors.primaryGold,
                 size: 16,
               ),
               const SizedBox(width: 7),
@@ -66,7 +66,7 @@ class _LiveCameraProofCardState extends State<LiveCameraProofCard> {
                 child: Text(
                   widget.title + (widget.isRequired ? ' *' : ''),
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     fontSize: 11.5,
                     fontWeight: FontWeight.w800,
                   ),
@@ -75,7 +75,7 @@ class _LiveCameraProofCardState extends State<LiveCameraProofCard> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.urgentRed.withOpacity(0.15),
+                  color: AppColors.urgentRed.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: const Text(
@@ -124,7 +124,7 @@ class _LiveCameraProofCardState extends State<LiveCameraProofCard> {
                       child: const Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.verified, color: AppColors.brandEmerald, size: 13),
+                          Icon(Icons.verified, color: AppColors.dispatchEmerald, size: 13),
                           SizedBox(width: 4),
                           Text(
                             'Live Camera Capture',
@@ -160,16 +160,17 @@ class _LiveCameraProofCardState extends State<LiveCameraProofCard> {
                 icon: const Icon(Icons.refresh, size: 14),
                 label: const Text('Retake Live Photo', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w700)),
                 style: OutlinedButton.styleFrom(
-                  foregroundColor: AppColors.dispatchAmber,
-                  side: BorderSide(color: AppColors.dispatchAmber.withOpacity(0.5)),
+                  foregroundColor: AppColors.primaryGold,
+                  side: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
                   padding: const EdgeInsets.symmetric(vertical: 8),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),
             ),
           ] else ...[
             SizedBox(
               width: double.infinity,
+              height: 42,
               child: ElevatedButton.icon(
                 onPressed: _isOpening ? null : _snapLive,
                 icon: _isOpening
@@ -180,9 +181,9 @@ class _LiveCameraProofCardState extends State<LiveCameraProofCard> {
                   style: const TextStyle(fontSize: 11.5, fontWeight: FontWeight.w800),
                 ),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.dispatchAmber,
+                  backgroundColor: AppColors.primaryGold,
                   foregroundColor: Colors.black,
-                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  elevation: 0,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                 ),
               ),

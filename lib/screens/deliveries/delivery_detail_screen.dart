@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/courier_contact_helper.dart';
 import '../../models/delivery_assignment_model.dart';
 import '../../providers/rider_delivery_provider.dart';
 import '../../widgets/doorstep_handover_manifest_dialog.dart';
@@ -51,10 +52,18 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
     final hasArrived = _current.hasRiderArrived;
 
     return Scaffold(
-      backgroundColor: AppColors.obsidianBg,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: Text('MISSION ${_current.orderNumber}'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.support_agent, color: AppColors.primaryGold),
+            tooltip: 'Call Central Dispatch Hotline',
+            onPressed: () => CourierContactHelper.callDispatchHotline(),
+          ),
+          const SizedBox(width: 4),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -63,15 +72,11 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
           children: [
             // Status HUD Header
             Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1E0E45), Color(0xFF100726)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(color: AppColors.primaryPurple.withOpacity(0.4)),
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -81,12 +86,18 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                     children: [
                       Text(
                         _current.orderNumber,
-                        style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+                        style: const TextStyle(color: AppColors.textPrimary, fontSize: 18, fontWeight: FontWeight.w900),
                       ),
                       const SizedBox(height: 3),
-                      Text(
-                        'Corridor: ${_current.destinationLga}',
-                        style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on, size: 12, color: AppColors.primaryGold),
+                          const SizedBox(width: 4),
+                          Text(
+                            'Corridor: ${_current.destinationLga}',
+                            style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w700),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -94,34 +105,36 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                     decoration: BoxDecoration(
                       color: isPickup
-                          ? AppColors.dispatchAmber.withOpacity(0.18)
-                          : (isDelivered ? AppColors.dispatchEmerald.withOpacity(0.18) : AppColors.primaryPurple.withOpacity(0.25)),
+                          ? AppColors.primaryGold.withOpacity(0.12)
+                          : (isDelivered ? AppColors.dispatchEmerald.withOpacity(0.12) : AppColors.radarBlue.withOpacity(0.12)),
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
                         color: isPickup
-                            ? AppColors.dispatchAmber
-                            : (isDelivered ? AppColors.dispatchEmerald : AppColors.primaryPurple),
+                            ? AppColors.primaryGold.withOpacity(0.3)
+                            : (isDelivered ? AppColors.dispatchEmerald.withOpacity(0.3) : AppColors.radarBlue.withOpacity(0.3)),
+                        width: 1.0,
                       ),
                     ),
                     child: Text(
                       isPickup ? 'READY FOR PICKUP' : (isDelivered ? 'DELIVERED' : (hasArrived ? 'AT DOORSTEP' : 'EN ROUTE')),
                       style: TextStyle(
                         color: isPickup
-                            ? AppColors.dispatchAmber
-                            : (isDelivered ? AppColors.dispatchEmerald : Colors.white),
+                            ? AppColors.primaryGold
+                            : (isDelivered ? AppColors.dispatchEmerald : AppColors.radarBlue),
                         fontSize: 10,
                         fontWeight: FontWeight.w900,
+                        letterSpacing: 0.3,
                       ),
                     ),
                   ),
                 ],
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // Milestone Tracker
             _buildMilestoneStepper(isPickup, isEnRoute, hasArrived, isDelivered),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // Origin: Vendor Shop Card
             _buildContactCard(
@@ -130,8 +143,8 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               address: _current.shopAddress,
               phone: _current.shopPhone,
               icon: Icons.store,
-              accentColor: AppColors.dispatchAmber,
-              pinLabel: isPickup ? 'Courier PIN: ${_current.pickupPin ?? "Required"}' : 'Handover Certified ✓',
+              accentColor: AppColors.primaryGold,
+              pinLabel: isPickup ? 'Shop PIN: ${_current.pickupPin ?? "Required"}' : 'Handover Certified ✓',
             ),
             const SizedBox(height: 14),
 
@@ -143,17 +156,17 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               phone: _current.customerPhone,
               icon: Icons.location_on,
               accentColor: AppColors.dispatchEmerald,
-              pinLabel: isDelivered ? 'Delivery PIN Verified ✓' : (hasArrived ? 'Doorstep Alert Sent • Request PIN' : 'Pending Arrival'),
+              pinLabel: isDelivered ? 'Delivery PIN Verified ✓' : (hasArrived ? 'Doorstep Alert Sent' : 'Pending Arrival'),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             // Manifest Items Breakdown
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: AppColors.obsidianCard,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: AppColors.obsidianBorder),
+                border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -165,9 +178,16 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                         'PACKAGE CONTENTS & MANIFEST',
                         style: TextStyle(color: AppColors.textSecondary, fontSize: 10, fontWeight: FontWeight.w900, letterSpacing: 0.5),
                       ),
-                      Text(
-                        '${_current.itemsCount} Items',
-                        style: const TextStyle(color: AppColors.richGold, fontSize: 11, fontWeight: FontWeight.w800),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppColors.surfaceElevated,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '${_current.itemsCount} Items',
+                          style: const TextStyle(color: AppColors.primaryGold, fontSize: 11, fontWeight: FontWeight.w800),
+                        ),
                       ),
                     ],
                   ),
@@ -182,7 +202,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                             Expanded(
                               child: Text(
                                 item.productName,
-                                style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700),
+                                style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, fontWeight: FontWeight.w700),
                               ),
                             ),
                             Text(
@@ -196,21 +216,22 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                   else
                     Text(
                       _current.itemsSummary,
-                      style: const TextStyle(color: Colors.white, fontSize: 12, height: 1.4),
+                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 12, height: 1.4),
                     ),
                 ],
               ),
             ),
             if (_current.hasAuditProofs) ...[
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
               _buildAuditTrailCard(),
             ],
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
             // Primary Action Buttons
             if (isPickup) ...[
               SizedBox(
                 width: double.infinity,
+                height: 48,
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     final success = await showDialog<bool>(
@@ -229,9 +250,9 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                   icon: const Icon(Icons.store, size: 18),
                   label: const Text('Enter Merchant Pickup PIN & Start Route'),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.dispatchAmber,
+                    backgroundColor: AppColors.primaryGold,
                     foregroundColor: Colors.black,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
@@ -240,21 +261,22 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               if (!hasArrived) ...[
                 SizedBox(
                   width: double.infinity,
+                  height: 48,
                   child: ElevatedButton.icon(
                     onPressed: () async {
                       final success = await deliv.markArrived(_current.id);
                       _showSnack(
-                        success ? '📍  Doorstep Arrival Logged! Customer notified.' : (deliv.errorMessage ?? 'Failed to log arrival.'),
+                        success ? '📍 Doorstep Arrival Logged! Customer notified.' : (deliv.errorMessage ?? 'Failed to log arrival.'),
                         isSuccess: success,
                       );
                       if (success && mounted) setState(() {});
                     },
                     icon: const Icon(Icons.location_on, size: 18),
-                    label: const Text("📍  I'm Here • Notify Doorstep Arrival"),
+                    label: const Text("📍 I'm Here • Notify Doorstep Arrival"),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primaryPurple,
+                      backgroundColor: AppColors.radarBlue,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      elevation: 0,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
                   ),
@@ -263,13 +285,20 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               ],
               SizedBox(
                 width: double.infinity,
+                height: 48,
                 child: ElevatedButton.icon(
                   onPressed: () async {
                     final result = await showDialog<bool>(
                       context: context,
                       builder: (_) => DoorstepHandoverManifestDialog(
                         assignment: _current,
-                        onSubmit: (otp, manifest, overallPhoto, itemDefectPhotos) => deliv.submitDoorstepHandover(orderId: _current.id, otp: otp, manifestItems: manifest, overallPhoto: overallPhoto, itemDefectPhotos: itemDefectPhotos),
+                        onSubmit: (otp, manifest, overallPhoto, itemDefectPhotos) => deliv.submitDoorstepHandover(
+                          orderId: _current.id,
+                          otp: otp,
+                          manifestItems: manifest,
+                          overallPhoto: overallPhoto,
+                          itemDefectPhotos: itemDefectPhotos,
+                        ),
                       ),
                     );
                     if (result == true) {
@@ -282,7 +311,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.dispatchEmerald,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
@@ -297,7 +326,12 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                       builder: (_) => DeliveryAttemptFailedDialog(
                         orderNumber: _current.orderNumber,
                         customerName: _current.customerName,
-                        onSubmit: (reason, notes, livePhoto) => deliv.recordDeliveryAttemptFailed(orderId: _current.id, reason: reason, notes: notes, livePhoto: livePhoto),
+                        onSubmit: (reason, notes, livePhoto) => deliv.recordDeliveryAttemptFailed(
+                          orderId: _current.id,
+                          reason: reason,
+                          notes: notes,
+                          livePhoto: livePhoto,
+                        ),
                       ),
                     );
                     if (res != null && res['success'] == true) {
@@ -317,8 +351,8 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                     style: TextStyle(color: AppColors.urgentRed, fontWeight: FontWeight.w800, fontSize: 12),
                   ),
                   style: OutlinedButton.styleFrom(
-                    side: BorderSide(color: AppColors.urgentRed.withOpacity(0.4)),
-                    padding: const EdgeInsets.symmetric(vertical: 13),
+                    side: BorderSide(color: AppColors.urgentRed.withOpacity(0.35)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                 ),
@@ -328,9 +362,9 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                 width: double.infinity,
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
-                  color: AppColors.dispatchEmerald.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.3)),
+                  color: AppColors.dispatchEmerald.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.3), width: 1.0),
                 ),
                 alignment: Alignment.center,
                 child: const Row(
@@ -356,9 +390,9 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.obsidianCard,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.obsidianBorder),
+        border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -385,22 +419,25 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
             shape: BoxShape.circle,
             color: isCompleted
                 ? AppColors.dispatchEmerald
-                : (isCurrent ? AppColors.primaryPurple : Colors.white.withOpacity(0.06)),
+                : (isCurrent ? AppColors.primaryGold : AppColors.surfaceElevated),
             border: Border.all(
-              color: isCurrent ? AppColors.primaryPurple : (isCompleted ? AppColors.dispatchEmerald : AppColors.obsidianBorder),
+              color: isCurrent
+                  ? AppColors.primaryGold
+                  : (isCompleted ? AppColors.dispatchEmerald : AppColors.surfaceBorder),
+              width: 1.0,
             ),
           ),
           child: Icon(
             isCompleted ? Icons.check : (isCurrent ? Icons.circle : Icons.circle_outlined),
-            size: isCompleted ? 16 : 10,
-            color: Colors.white,
+            size: isCompleted ? 16 : 9,
+            color: isCurrent ? Colors.black : Colors.white,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: 5),
         Text(
           label,
           style: TextStyle(
-            color: isCompleted || isCurrent ? Colors.white : AppColors.textMuted,
+            color: isCompleted || isCurrent ? AppColors.textPrimary : AppColors.textMuted,
             fontSize: 9.5,
             fontWeight: FontWeight.w800,
           ),
@@ -413,7 +450,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
     return Expanded(
       child: Container(
         height: 2,
-        color: isPassed ? AppColors.dispatchEmerald : AppColors.obsidianBorder,
+        color: isPassed ? AppColors.dispatchEmerald : AppColors.surfaceBorder,
         margin: const EdgeInsets.only(bottom: 14),
       ),
     );
@@ -431,9 +468,9 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.obsidianCard,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: accentColor.withOpacity(0.3)),
+        border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -462,7 +499,16 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(icon, color: accentColor, size: 22),
+              Container(
+                width: 38,
+                height: 38,
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: accentColor.withOpacity(0.25), width: 1.0),
+                ),
+                child: Icon(icon, color: accentColor, size: 20),
+              ),
               const SizedBox(width: 12),
               Expanded(
                 child: Column(
@@ -470,7 +516,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                   children: [
                     Text(
                       name,
-                      style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900),
+                      style: const TextStyle(color: AppColors.textPrimary, fontSize: 14, fontWeight: FontWeight.w900),
                     ),
                     const SizedBox(height: 3),
                     Text(
@@ -478,10 +524,63 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                       style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, height: 1.3),
                     ),
                     if (phone.isNotEmpty) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        'Contact: $phone',
-                        style: TextStyle(color: accentColor, fontSize: 11.5, fontWeight: FontWeight.w700),
+                      const SizedBox(height: 10),
+                      Wrap(
+                        spacing: 8,
+                        runSpacing: 6,
+                        children: [
+                          InkWell(
+                            onTap: () => CourierContactHelper.callPhone(phone),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.surfaceElevated,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.phone, size: 13, color: accentColor),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    phone,
+                                    style: TextStyle(color: accentColor, fontSize: 11.5, fontWeight: FontWeight.w800),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          InkWell(
+                            onTap: () => CourierContactHelper.openWhatsApp(
+                              phone,
+                              orderNumber: _current.orderNumber,
+                              recipientName: name,
+                              isShop: icon == Icons.store,
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: AppColors.dispatchEmerald.withOpacity(0.12),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.3), width: 1.0),
+                              ),
+                              child: const Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.chat_bubble_outline, size: 13, color: AppColors.dispatchEmerald),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    'WhatsApp',
+                                    style: TextStyle(color: AppColors.dispatchEmerald, fontSize: 11.5, fontWeight: FontWeight.w800),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ],
@@ -498,9 +597,9 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.obsidianCard,
+        color: AppColors.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.4)),
+        border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -521,7 +620,7 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppColors.dispatchEmerald.withOpacity(0.15),
+                  color: AppColors.dispatchEmerald.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: const Text('SEALED', style: TextStyle(color: AppColors.dispatchEmerald, fontSize: 9, fontWeight: FontWeight.w900)),
@@ -549,29 +648,29 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
   }
 
   Widget _buildAuditThumbnail(String label, String url, {bool isWarning = false, bool isDanger = false}) {
-    final borderColor = isDanger ? AppColors.urgentRed : (isWarning ? AppColors.dispatchAmber : AppColors.dispatchEmerald);
+    final borderColor = isDanger ? AppColors.urgentRed : (isWarning ? AppColors.primaryGold : AppColors.dispatchEmerald);
     return InkWell(
       onTap: () => _openImageDialog(url, label),
       child: Container(
         width: 100,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          border: Border.all(color: borderColor.withOpacity(0.6)),
-          color: Colors.black26,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: borderColor.withOpacity(0.4), width: 1.0),
+          color: AppColors.surfaceElevated,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(9)),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
               child: Image.network(
                 url,
                 height: 70,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) => Container(
                   height: 70,
-                  color: Colors.white10,
-                  child: const Icon(Icons.broken_image, color: Colors.white38, size: 24),
+                  color: AppColors.surfaceElevated,
+                  child: const Icon(Icons.broken_image, color: AppColors.textMuted, size: 24),
                 ),
               ),
             ),
@@ -599,9 +698,9 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
         insetPadding: const EdgeInsets.all(16),
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.obsidianCard,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.obsidianBorder),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -615,26 +714,28 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
+                        style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 13),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                      icon: const Icon(Icons.close, color: AppColors.textMuted, size: 20),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
                 ),
               ),
               InteractiveViewer(
+                minScale: 1.0,
+                maxScale: 4.5,
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(18)),
                   child: Image.network(
                     url,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => const Padding(
                       padding: EdgeInsets.all(32),
-                      child: Center(child: Text('Unable to load photo', style: TextStyle(color: Colors.white54))),
+                      child: Center(child: Text('Unable to load photo', style: TextStyle(color: AppColors.textMuted))),
                     ),
                   ),
                 ),
@@ -646,4 +747,3 @@ class _DeliveryDetailScreenState extends State<DeliveryDetailScreen> {
     );
   }
 }
-

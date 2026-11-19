@@ -4,11 +4,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import '../core/constants/api_endpoints.dart';
 import '../core/network/api_client.dart';
+import '../core/services/storage_service.dart';
 import '../models/delivery_assignment_model.dart';
 import '../models/return_case_model.dart';
 
 class RiderDeliveryProvider with ChangeNotifier {
   final ApiClient _apiClient;
+  final StorageService? _storageService;
 
   bool _isLoading = false;
   String? _errorMessage;
@@ -17,7 +19,7 @@ class RiderDeliveryProvider with ChangeNotifier {
   List<ReturnCaseModel> _activeReturns = [];
   DeliveryAssignmentModel? _selectedDelivery;
 
-  RiderDeliveryProvider(this._apiClient);
+  RiderDeliveryProvider(this._apiClient, [this._storageService]);
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -46,9 +48,18 @@ class RiderDeliveryProvider with ChangeNotifier {
       if (response.statusCode == 200 && response.data['data'] != null) {
         final list = response.data['data'] as List;
         _activeDeliveries = list.map((e) => DeliveryAssignmentModel.fromJson(e as Map<String, dynamic>)).toList();
+        // Persist offline cache
+        _storageService?.setCachedActiveDeliveries(list);
       }
     } catch (e) {
-      _errorMessage = 'Unable to refresh active assignments from dispatch.';
+      // Graceful offline fallback to avoid blank screen in dead zones
+      final cached = _storageService?.getCachedActiveDeliveries();
+      if (cached != null && cached.isNotEmpty) {
+        _activeDeliveries = cached.map((e) => DeliveryAssignmentModel.fromJson(e as Map<String, dynamic>)).toList();
+        _errorMessage = null;
+      } else {
+        _errorMessage = 'Unable to refresh active assignments from dispatch.';
+      }
     }
 
     _isLoading = false;

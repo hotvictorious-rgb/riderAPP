@@ -36,46 +36,121 @@ class _RiderShellScreenState extends State<RiderShellScreen> {
       body: IndexedStack(index: _currentIndex, children: _pages),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
-          color: AppColors.obsidianCard,
-          border: Border(top: BorderSide(color: AppColors.obsidianBorder, width: 1.2)),
+          color: AppColors.surface,
+          border: Border(
+            top: BorderSide(color: AppColors.surfaceBorder, width: 1.0),
+          ),
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentIndex,
-          onTap: (idx) => setState(() => _currentIndex = idx),
-          backgroundColor: Colors.transparent,
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: AppColors.richGold,
-          unselectedItemColor: AppColors.textMuted,
-          selectedFontSize: 11,
-          unselectedFontSize: 11,
-          elevation: 0,
-          items: [
-            const BottomNavigationBarItem(icon: Icon(Icons.radar), label: 'Radar'),
-            BottomNavigationBarItem(
-              icon: activeMissionsCount > 0
-                  ? Badge.count(
-                      count: activeMissionsCount,
-                      backgroundColor: AppColors.primaryPurple,
-                      textColor: Colors.white,
-                      child: const Icon(Icons.local_shipping),
-                    )
-                  : const Icon(Icons.local_shipping),
-              label: 'Missions',
+        child: SafeArea(
+          child: SizedBox(
+            height: 60,
+            child: BottomNavigationBar(
+              currentIndex: _currentIndex,
+              onTap: (idx) => setState(() => _currentIndex = idx),
+              backgroundColor: Colors.transparent,
+              type: BottomNavigationBarType.fixed,
+              selectedItemColor: AppColors.primaryGold,
+              unselectedItemColor: AppColors.textMuted,
+              selectedFontSize: 11,
+              unselectedFontSize: 11,
+              selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w800, letterSpacing: 0.2),
+              unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
+              elevation: 0,
+              items: [
+                const BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: EdgeInsets.only(bottom: 2),
+                    child: Icon(Icons.radar_outlined, size: 22),
+                  ),
+                  activeIcon: Padding(
+                    padding: EdgeInsets.only(bottom: 2),
+                    child: Icon(Icons.radar, size: 22),
+                  ),
+                  label: 'Radar',
+                ),
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: activeMissionsCount > 0
+                        ? Badge(
+                            label: Text(
+                              activeMissionsCount > 9 ? '9+' : '$activeMissionsCount',
+                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 9.5),
+                            ),
+                            backgroundColor: AppColors.primaryGold,
+                            child: const Icon(Icons.local_shipping_outlined, size: 22),
+                          )
+                        : const Icon(Icons.local_shipping_outlined, size: 22),
+                  ),
+                  activeIcon: Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: activeMissionsCount > 0
+                        ? Badge(
+                            label: Text(
+                              activeMissionsCount > 9 ? '9+' : '$activeMissionsCount',
+                              style: const TextStyle(color: Colors.black, fontWeight: FontWeight.w900, fontSize: 9.5),
+                            ),
+                            backgroundColor: AppColors.primaryGold,
+                            child: const Icon(Icons.local_shipping, size: 22),
+                          )
+                        : const Icon(Icons.local_shipping, size: 22),
+                  ),
+                  label: 'Missions',
+                ),
+                BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: activeReturnsCount > 0
+                        ? Badge(
+                            label: Text(
+                              activeReturnsCount > 9 ? '9+' : '$activeReturnsCount',
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 9.5),
+                            ),
+                            backgroundColor: AppColors.urgentRed,
+                            child: const Icon(Icons.assignment_return_outlined, size: 22),
+                          )
+                        : const Icon(Icons.assignment_return_outlined, size: 22),
+                  ),
+                  activeIcon: Padding(
+                    padding: const EdgeInsets.only(bottom: 2),
+                    child: activeReturnsCount > 0
+                        ? Badge(
+                            label: Text(
+                              activeReturnsCount > 9 ? '9+' : '$activeReturnsCount',
+                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 9.5),
+                            ),
+                            backgroundColor: AppColors.urgentRed,
+                            child: const Icon(Icons.assignment_return, size: 22),
+                          )
+                        : const Icon(Icons.assignment_return, size: 22),
+                  ),
+                  label: 'Returns',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: EdgeInsets.only(bottom: 2),
+                    child: Icon(Icons.history_outlined, size: 22),
+                  ),
+                  activeIcon: Padding(
+                    padding: EdgeInsets.only(bottom: 2),
+                    child: Icon(Icons.history, size: 22),
+                  ),
+                  label: 'Trip Log',
+                ),
+                const BottomNavigationBarItem(
+                  icon: Padding(
+                    padding: EdgeInsets.only(bottom: 2),
+                    child: Icon(Icons.badge_outlined, size: 22),
+                  ),
+                  activeIcon: Padding(
+                    padding: EdgeInsets.only(bottom: 2),
+                    child: Icon(Icons.badge, size: 22),
+                  ),
+                  label: 'Profile',
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: activeReturnsCount > 0
-                  ? Badge.count(
-                      count: activeReturnsCount,
-                      backgroundColor: AppColors.urgentRed,
-                      textColor: Colors.white,
-                      child: const Icon(Icons.assignment_return),
-                    )
-                  : const Icon(Icons.assignment_return),
-              label: 'Returns',
-            ),
-            const BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Trip Log'),
-            const BottomNavigationBarItem(icon: Icon(Icons.badge_outlined), label: 'Fleet Profile'),
-          ],
+          ),
         ),
       ),
     );

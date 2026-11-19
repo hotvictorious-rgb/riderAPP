@@ -10,6 +10,11 @@ class RiderProfileModel {
   final double rating;
   final bool isActive;
   final bool isOnline;
+  final String? bankName;
+  final String? bankCode;
+  final String? accountNumber;
+  final String? accountName;
+  final bool isBankLocked;
 
   RiderProfileModel({
     required this.id,
@@ -23,6 +28,11 @@ class RiderProfileModel {
     required this.rating,
     required this.isActive,
     required this.isOnline,
+    this.bankName,
+    this.bankCode,
+    this.accountNumber,
+    this.accountName,
+    this.isBankLocked = true,
   });
 
   /// Invariant: All riders must belong to an active Logistics Company.
@@ -31,7 +41,11 @@ class RiderProfileModel {
       fleetCompany.toLowerCase() != 'unassigned' &&
       fleetCompany.toLowerCase() != 'none';
 
+  bool get hasBankDetails => (accountNumber ?? '').isNotEmpty && (bankName ?? '').isNotEmpty;
+
   factory RiderProfileModel.fromJson(Map<String, dynamic> json) {
+    final payout = json['payout_bank'] as Map<String, dynamic>?;
+
     return RiderProfileModel(
       id: json['id'] as int? ?? 0,
       name: json['name'] as String? ?? 'Courier',
@@ -44,6 +58,11 @@ class RiderProfileModel {
       rating: (json['rating'] as num?)?.toDouble() ?? 5.0,
       isActive: json['is_active'] as bool? ?? true,
       isOnline: json['is_online'] as bool? ?? false,
+      bankName: (json['bank_name'] ?? payout?['bank_name']) as String?,
+      bankCode: (json['bank_code'] ?? payout?['bank_code']) as String?,
+      accountNumber: (json['account_number'] ?? payout?['account_number']) as String?,
+      accountName: (json['account_name'] ?? payout?['account_name']) as String?,
+      isBankLocked: true,
     );
   }
 
@@ -60,6 +79,11 @@ class RiderProfileModel {
       rating: rating,
       isActive: isActive,
       isOnline: isOnline ?? this.isOnline,
+      bankName: bankName,
+      bankCode: bankCode,
+      accountNumber: accountNumber,
+      accountName: accountName,
+      isBankLocked: isBankLocked,
     );
   }
 }

@@ -1,3 +1,4 @@
+// lib/widgets/rider_telemetry_card.dart
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 
@@ -22,38 +23,35 @@ class RiderTelemetryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF1E0E45), Color(0xFF100726)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: AppColors.primaryPurple.withOpacity(0.4), width: 1.5),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Top telemetry row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.dispatchEmerald.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.3)),
+                  color: AppColors.dispatchEmerald.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.25), width: 1.0),
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.radar, size: 13, color: AppColors.dispatchEmerald),
+                    Icon(Icons.radar, size: 12, color: AppColors.dispatchEmerald),
                     SizedBox(width: 5),
                     Text(
-                      'FLEET TELEMETRY • LIVE DISPATCH',
+                      'FLEET TELEMETRY • LIVE',
                       style: TextStyle(
                         color: AppColors.dispatchEmerald,
-                        fontSize: 10,
+                        fontSize: 9.5,
                         fontWeight: FontWeight.w900,
                         letterSpacing: 0.4,
                       ),
@@ -64,24 +62,34 @@ class RiderTelemetryCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.richGold.withOpacity(0.12),
+                  color: AppColors.primaryGold.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.primaryGold.withOpacity(0.25), width: 1.0),
                 ),
-                child: Text(
-                  '${onTimeRate.toStringAsFixed(1)}% On-Time',
-                  style: const TextStyle(
-                    color: AppColors.richGold,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                  ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star, size: 11, color: AppColors.primaryGold),
+                    const SizedBox(width: 4),
+                    Text(
+                      '${onTimeRate.toStringAsFixed(1)}% On-Time',
+                      style: const TextStyle(
+                        color: AppColors.primaryGold,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
+
+          // Main metric: Completed Trips
           const Text(
             'Shift Deliveries Fulfilled',
-            style: TextStyle(color: AppColors.textSecondary, fontSize: 12, fontWeight: FontWeight.w600),
+            style: TextStyle(color: AppColors.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 4),
           Row(
@@ -91,8 +99,8 @@ class RiderTelemetryCard extends StatelessWidget {
               Text(
                 '$completedTrips',
                 style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 32,
+                  color: AppColors.textPrimary,
+                  fontSize: 34,
                   fontWeight: FontWeight.w900,
                   letterSpacing: -0.5,
                 ),
@@ -100,20 +108,22 @@ class RiderTelemetryCard extends StatelessWidget {
               const SizedBox(width: 8),
               const Text(
                 'Trips Completed',
-                style: TextStyle(color: AppColors.dispatchEmerald, fontSize: 13, fontWeight: FontWeight.w700),
+                style: TextStyle(color: AppColors.dispatchEmerald, fontSize: 13, fontWeight: FontWeight.w800),
               ),
             ],
           ),
           const SizedBox(height: 16),
+
+          // Symmetrical 2-column metrics
           Row(
             children: [
               Expanded(
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.04),
+                    color: AppColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white.withOpacity(0.06)),
+                    border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -122,17 +132,17 @@ class RiderTelemetryCard extends StatelessWidget {
                         'Active Missions',
                         style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.w700),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: 5),
                       Row(
                         children: [
-                          const Icon(Icons.navigation, size: 13, color: AppColors.dispatchAmber),
-                          const SizedBox(width: 4),
+                          const Icon(Icons.navigation, size: 13, color: AppColors.primaryGold),
+                          const SizedBox(width: 5),
                           Text(
                             '$activeMissions En Route',
                             style: const TextStyle(
-                              color: AppColors.dispatchAmber,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w800,
+                              color: AppColors.primaryGold,
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w900,
                             ),
                           ),
                         ],
@@ -146,9 +156,9 @@ class RiderTelemetryCard extends StatelessWidget {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.04),
+                    color: AppColors.surfaceElevated,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: Colors.white.withOpacity(0.06)),
+                    border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -157,16 +167,24 @@ class RiderTelemetryCard extends StatelessWidget {
                         'Assigned Corridor',
                         style: TextStyle(color: AppColors.textMuted, fontSize: 10, fontWeight: FontWeight.w700),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        assignedCorridor,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
+                      const SizedBox(height: 5),
+                      Row(
+                        children: [
+                          const Icon(Icons.location_on, size: 13, color: AppColors.dispatchEmerald),
+                          const SizedBox(width: 4),
+                          Expanded(
+                            child: Text(
+                              assignedCorridor,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                color: AppColors.textPrimary,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -175,17 +193,18 @@ class RiderTelemetryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 14),
+
           // Corporate Remuneration notice
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: AppColors.primaryPurple.withOpacity(0.12),
+              color: AppColors.surfaceElevated,
               borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.primaryPurple.withOpacity(0.25)),
+              border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
             ),
             child: Row(
               children: [
-                const Icon(Icons.corporate_fare, size: 14, color: AppColors.richGold),
+                const Icon(Icons.corporate_fare, size: 14, color: AppColors.primaryGold),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(

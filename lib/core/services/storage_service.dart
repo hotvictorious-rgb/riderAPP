@@ -72,6 +72,21 @@ class StorageService {
     return await _prefs.remove('courier_fcm_device_token');
   }
 
+  // Active Missions Offline Cache (Zero Dead-Zone Blackout)
+  Future<bool> setCachedActiveDeliveries(List<dynamic> rawList) async {
+    return await _prefs.setString('courier_cached_active_deliveries', jsonEncode(rawList));
+  }
+
+  List<dynamic>? getCachedActiveDeliveries() {
+    final raw = _prefs.getString('courier_cached_active_deliveries');
+    if (raw == null) return null;
+    try {
+      return jsonDecode(raw) as List<dynamic>;
+    } catch (_) {
+      return null;
+    }
+  }
+
   Future<void> clearAll() async {
     await _prefs.clear();
   }

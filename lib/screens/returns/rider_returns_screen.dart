@@ -26,7 +26,7 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
     final deliv = Provider.of<RiderDeliveryProvider>(context);
 
     return Scaffold(
-      backgroundColor: AppColors.obsidianBg,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('REVERSE LOGISTICS DROPOFF'),
         actions: [
@@ -34,44 +34,61 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
             icon: const Icon(Icons.refresh),
             onPressed: () => deliv.fetchActiveReturns(),
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
+        color: AppColors.primaryGold,
+        backgroundColor: AppColors.surface,
         onRefresh: () => deliv.fetchActiveReturns(),
         child: deliv.isLoading && deliv.activeReturns.isEmpty
-            ? const Center(child: CircularProgressIndicator(color: AppColors.richGold))
+            ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGold))
             : deliv.activeReturns.isEmpty
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(28),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Container(
-                            width: 64,
-                            height: 64,
-                            decoration: BoxDecoration(
-                              color: AppColors.dispatchEmerald.withOpacity(0.12),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(Icons.check_circle_outline, size: 36, color: AppColors.dispatchEmerald),
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: [
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                      Center(
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 24),
+                          padding: const EdgeInsets.all(28),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
                           ),
-                          const SizedBox(height: 16),
-                          const Text(
-                            'No Pending Return Dropoffs',
-                            style: TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 17),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: AppColors.dispatchEmerald.withOpacity(0.12),
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.25), width: 1.0),
+                                ),
+                                child: const Icon(Icons.check_circle_outline, size: 28, color: AppColors.dispatchEmerald),
+                              ),
+                              const SizedBox(height: 14),
+                              const Text(
+                                'No Pending Return Dropoffs',
+                                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 16),
+                              ),
+                              const SizedBox(height: 6),
+                              const Text(
+                                'You have zero customer-rejected parcels in your courier custody. All returns are cleared.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: AppColors.textMuted, fontSize: 12, height: 1.4),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 6),
-                          const Text(
-                            'You have zero customer-rejected parcels in your courier custody. All returns are cleared.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(color: AppColors.textMuted, fontSize: 12, height: 1.4),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   )
                 : ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.all(16),
                     itemCount: deliv.activeReturns.length,
                     itemBuilder: (context, idx) {
@@ -85,12 +102,12 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
 
   Widget _buildReturnCaseCard(BuildContext context, ReturnCaseModel item, RiderDeliveryProvider deliv) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.obsidianCard,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: AppColors.richGold.withOpacity(0.4), width: 1.2),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.primaryGold.withOpacity(0.35), width: 1.0),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,20 +119,21 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: AppColors.richGold.withOpacity(0.15),
+                  color: AppColors.primaryGold.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.richGold.withOpacity(0.3)),
+                  border: Border.all(color: AppColors.primaryGold.withOpacity(0.25), width: 1.0),
                 ),
                 child: Text(
                   item.caseNumber,
-                  style: const TextStyle(color: AppColors.richGold, fontSize: 11, fontWeight: FontWeight.w900),
+                  style: const TextStyle(color: AppColors.primaryGold, fontSize: 11, fontWeight: FontWeight.w900),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                 decoration: BoxDecoration(
-                  color: AppColors.urgentRed.withOpacity(0.15),
+                  color: AppColors.urgentRed.withOpacity(0.12),
                   borderRadius: BorderRadius.circular(6),
+                  border: Border.all(color: AppColors.urgentRed.withOpacity(0.25), width: 1.0),
                 ),
                 child: Text(
                   item.rejectionCategoryLabel,
@@ -129,7 +147,7 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
           // Order Link & Items
           Text(
             item.orderNumber,
-            style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900),
+            style: const TextStyle(color: AppColors.textPrimary, fontSize: 15, fontWeight: FontWeight.w900),
           ),
           const SizedBox(height: 3),
           Text(
@@ -137,14 +155,23 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
             style: const TextStyle(color: AppColors.textSecondary, fontSize: 12),
           ),
           const SizedBox(height: 12),
-          const Divider(color: AppColors.obsidianBorder),
-          const SizedBox(height: 8),
+          const Divider(color: AppColors.surfaceBorder, height: 1),
+          const SizedBox(height: 12),
 
           // Vendor Dropoff Destination
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Icon(Icons.store, color: AppColors.richGold, size: 20),
+              Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryGold.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: AppColors.primaryGold.withOpacity(0.25), width: 1.0),
+                ),
+                child: const Icon(Icons.store, color: AppColors.primaryGold, size: 16),
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Column(
@@ -152,7 +179,7 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
                   children: [
                     Text(
                       'RETURN TO: ${item.shopName}',
-                      style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 13),
+                      style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, fontSize: 13),
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -163,7 +190,7 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
                       const SizedBox(height: 4),
                       Text(
                         'Shop Contact: ${item.shopPhone}',
-                        style: const TextStyle(color: AppColors.richGold, fontSize: 11, fontWeight: FontWeight.w700),
+                        style: const TextStyle(color: AppColors.primaryGold, fontSize: 11, fontWeight: FontWeight.w800),
                       ),
                     ],
                   ],
@@ -175,15 +202,15 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
             const SizedBox(height: 12),
             Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.04),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppColors.urgentRed.withOpacity(0.3)),
+                color: AppColors.surfaceElevated,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.urgentRed.withOpacity(0.3), width: 1.0),
               ),
               child: Material(
                 color: Colors.transparent,
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(12),
                 child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
+                  borderRadius: BorderRadius.circular(12),
                   onTap: () => _openImageDialog(
                     context,
                     item.doorstepPhotoPath!,
@@ -194,7 +221,7 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
                     child: Row(
                       children: [
                         ClipRRect(
-                          borderRadius: BorderRadius.circular(6),
+                          borderRadius: BorderRadius.circular(8),
                           child: Image.network(
                             item.doorstepPhotoPath!,
                             width: 48,
@@ -203,8 +230,8 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
                             errorBuilder: (_, __, ___) => Container(
                               width: 48,
                               height: 48,
-                              color: Colors.white10,
-                              child: const Icon(Icons.broken_image, size: 20, color: Colors.white38),
+                              color: AppColors.surfaceElevated,
+                              child: const Icon(Icons.broken_image, size: 20, color: AppColors.textMuted),
                             ),
                           ),
                         ),
@@ -213,13 +240,13 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Doorstep Defect Evidence', style: TextStyle(color: Colors.white, fontSize: 11, fontWeight: FontWeight.w800)),
+                              Text('Doorstep Defect Evidence', style: TextStyle(color: AppColors.textPrimary, fontSize: 11, fontWeight: FontWeight.w800)),
                               SizedBox(height: 2),
                               Text('Tap to inspect full audit photo before handover.', style: TextStyle(color: AppColors.textMuted, fontSize: 10)),
                             ],
                           ),
                         ),
-                        const Icon(Icons.fullscreen, color: AppColors.richGold, size: 18),
+                        const Icon(Icons.fullscreen, color: AppColors.primaryGold, size: 18),
                       ],
                     ),
                   ),
@@ -232,6 +259,7 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
           // Action Button to Open Vendor Return OTP Dialog
           SizedBox(
             width: double.infinity,
+            height: 46,
             child: ElevatedButton.icon(
               onPressed: () {
                 showDialog(
@@ -245,7 +273,7 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                         backgroundColor: AppColors.dispatchEmerald,
-                        content: const Text('✓ Return Handover Certified! Parcel returned to vendor shop.'),
+                        content: Text('✓ Return Handover Certified! Parcel returned to vendor shop.'),
                       ),
                     );
                   }
@@ -254,10 +282,10 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
               icon: const Icon(Icons.verified, size: 16),
               label: const Text('Handover Parcel at Shop & Enter Vendor PIN'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.richGold,
+                backgroundColor: AppColors.primaryGold,
                 foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 13),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 0,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
             ),
           ),
@@ -274,9 +302,9 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
         insetPadding: const EdgeInsets.all(16),
         child: Container(
           decoration: BoxDecoration(
-            color: AppColors.obsidianCard,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.urgentRed.withOpacity(0.5)),
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -290,26 +318,28 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
                     Expanded(
                       child: Text(
                         title,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
+                        style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 13),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.close, color: Colors.white70, size: 20),
+                      icon: const Icon(Icons.close, color: AppColors.textMuted, size: 20),
                       onPressed: () => Navigator.pop(ctx),
                     ),
                   ],
                 ),
               ),
               InteractiveViewer(
+                minScale: 1.0,
+                maxScale: 4.5,
                 child: ClipRRect(
-                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(16)),
+                  borderRadius: const BorderRadius.vertical(bottom: Radius.circular(18)),
                   child: Image.network(
                     url,
                     fit: BoxFit.contain,
                     errorBuilder: (_, __, ___) => const Padding(
                       padding: EdgeInsets.all(32),
-                      child: Center(child: Text('Unable to load photo', style: TextStyle(color: Colors.white54))),
+                      child: Center(child: Text('Unable to load photo', style: TextStyle(color: AppColors.textMuted))),
                     ),
                   ),
                 ),
@@ -321,4 +351,3 @@ class _RiderReturnsScreenState extends State<RiderReturnsScreen> {
     );
   }
 }
-

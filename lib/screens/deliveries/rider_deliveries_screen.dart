@@ -15,7 +15,7 @@ class RiderDeliveriesScreen extends StatelessWidget {
     final deliv = Provider.of<RiderDeliveryProvider>(context);
 
     return Scaffold(
-      backgroundColor: AppColors.obsidianBg,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('ACTIVE DISPATCH MISSIONS'),
         actions: [
@@ -27,30 +27,58 @@ class RiderDeliveriesScreen extends StatelessWidget {
               deliv.fetchActiveReturns();
             },
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
+        color: AppColors.primaryGold,
+        backgroundColor: AppColors.surface,
         onRefresh: () async {
           await deliv.fetchActiveDeliveries();
           await deliv.fetchActiveReturns();
         },
         child: deliv.isLoading && deliv.activeDeliveries.isEmpty
-            ? const Center(child: CircularProgressIndicator(color: AppColors.primaryPurple))
+            ? const Center(child: CircularProgressIndicator(color: AppColors.primaryGold))
             : deliv.activeDeliveries.isEmpty
                 ? ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     children: [
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.25),
+                      SizedBox(height: MediaQuery.of(context).size.height * 0.2),
                       Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.inbox_outlined, size: 48, color: AppColors.textMuted.withOpacity(0.5)),
-                            const SizedBox(height: 12),
-                            const Text('No active missions assigned', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w800, fontSize: 16)),
-                            const SizedBox(height: 4),
-                            const Text('Remain on duty to receive automatic dispatch alerts.', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
-                          ],
+                        child: Container(
+                          margin: const EdgeInsets.symmetric(horizontal: 24),
+                          padding: const EdgeInsets.all(28),
+                          decoration: BoxDecoration(
+                            color: AppColors.surface,
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
+                          ),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 56,
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: AppColors.surfaceElevated,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
+                                ),
+                                child: const Icon(Icons.inbox_outlined, size: 28, color: AppColors.textMuted),
+                              ),
+                              const SizedBox(height: 14),
+                              const Text(
+                                'No Active Missions Assigned',
+                                style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w900, fontSize: 16),
+                              ),
+                              const SizedBox(height: 6),
+                              const Text(
+                                'Remain on duty on the radar to receive automatic dispatch alerts.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: AppColors.textMuted, fontSize: 12, height: 1.4),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -141,7 +169,7 @@ class RiderDeliveriesScreen extends StatelessWidget {
                               final maxReached = res['max_attempts_reached'] == true;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  backgroundColor: maxReached ? AppColors.dispatchAmber : AppColors.dispatchEmerald,
+                                  backgroundColor: maxReached ? AppColors.primaryGold : AppColors.dispatchEmerald,
                                   content: Text(
                                     maxReached
                                         ? 'Max attempts reached! Parcel moved to Returns tab for shop return.'

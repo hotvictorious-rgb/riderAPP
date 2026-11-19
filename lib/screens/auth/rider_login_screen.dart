@@ -99,34 +99,38 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
     _whatsappCountdownTimer?.cancel();
     _whatsappCountdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_whatsappRemainingSeconds > 0) {
-        _whatsappRemainingSeconds--;
-        if (mounted) setState(() {});
-        sheetSetState?.call(() {});
+        if (mounted) {
+          setState(() => _whatsappRemainingSeconds--);
+          if (sheetSetState != null) {
+            sheetSetState!(() {});
+          }
+        }
       } else {
         timer.cancel();
+        _whatsappPollingTimer?.cancel();
+        if (mounted) {
+          Navigator.of(context).pop(); // Dismiss bottom sheet
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('WhatsApp authentication session timed out. Please try again or use direct SMS.'),
+              backgroundColor: AppColors.urgentRed,
+            ),
+          );
+        }
       }
     });
 
     _whatsappPollingTimer?.cancel();
-    _whatsappPollingTimer = Timer.periodic(const Duration(milliseconds: 2500), (timer) async {
-      final auth = context.read<RiderAuthProvider>();
-      final verified = await auth.pollWhatsAppStatus(sessionToken);
-      if (verified && mounted) {
+    _whatsappPollingTimer = Timer.periodic(const Duration(seconds: 2), (timer) async {
+      final authProv = context.read<RiderAuthProvider>();
+      final isDone = await authProv.pollWhatsAppStatus(sessionToken);
+
+      if (isDone && mounted) {
         timer.cancel();
         _whatsappCountdownTimer?.cancel();
-        Navigator.of(context, rootNavigator: true).pop(); // dismiss sheet
+        Navigator.of(context).pop(); // Dismiss sheet
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const RiderShellScreen()),
-        );
-      } else if (auth.errorMessage != null && mounted) {
-        timer.cancel();
-        _whatsappCountdownTimer?.cancel();
-        Navigator.of(context, rootNavigator: true).pop();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(auth.errorMessage!),
-            backgroundColor: AppColors.urgentRed,
-          ),
         );
       }
     });
@@ -135,9 +139,9 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
       context: context,
       isDismissible: false,
       enableDrag: false,
-      backgroundColor: AppColors.obsidianCard,
+      backgroundColor: AppColors.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (sheetContext) {
         return StatefulBuilder(
@@ -152,27 +156,27 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Container(
-                    width: 64,
-                    height: 64,
+                    width: 58,
+                    height: 58,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF25D366).withOpacity(0.15),
+                      color: const Color(0xFF25D366).withOpacity(0.12),
                       shape: BoxShape.circle,
                       border: Border.all(color: const Color(0xFF25D366), width: 1.5),
                     ),
                     child: const Center(
-                      child: Icon(Icons.mark_chat_read, color: Color(0xFF25D366), size: 36),
+                      child: Icon(Icons.mark_chat_read, color: Color(0xFF25D366), size: 30),
                     ),
                   ),
                   const SizedBox(height: 16),
                   const Text(
                     'Confirming Courier Shift',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w900, color: Colors.white),
+                    style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, color: AppColors.textPrimary),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 6),
                   const Text(
                     'Tap "Send" in WhatsApp with your pre-filled dispatch message. Your terminal will go on duty automatically.',
-                    style: TextStyle(fontSize: 13, color: AppColors.textSecondary, height: 1.4),
+                    style: TextStyle(fontSize: 12.5, color: AppColors.textSecondary, height: 1.4),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 18),
@@ -180,24 +184,24 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     decoration: BoxDecoration(
-                      color: Colors.black38,
+                      color: AppColors.surfaceElevated,
                       borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: AppColors.obsidianBorder, width: 1.5),
+                      border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const Text(
                           'Challenge Code: ',
-                          style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
+                          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: AppColors.textSecondary),
                         ),
                         Text(
                           challengeCode,
                           style: const TextStyle(
-                            fontSize: 22,
+                            fontSize: 20,
                             fontWeight: FontWeight.w900,
                             letterSpacing: 4,
-                            color: AppColors.richGold,
+                            color: AppColors.primaryGold,
                             fontFamily: 'monospace',
                           ),
                         ),
@@ -210,9 +214,9 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.richGold),
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryGold),
                       ),
                       const SizedBox(width: 10),
                       Text(
@@ -234,8 +238,8 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                             Navigator.of(sheetContext).pop();
                           },
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: AppColors.obsidianBorder),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            side: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             padding: const EdgeInsets.symmetric(vertical: 12),
                           ),
                           child: const Text('Cancel', style: TextStyle(color: AppColors.textSecondary, fontWeight: FontWeight.bold)),
@@ -243,33 +247,36 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            final authProv = context.read<RiderAuthProvider>();
-                            final done = await authProv.pollWhatsAppStatus(sessionToken);
-                            if (done && mounted) {
-                              _whatsappPollingTimer?.cancel();
-                              _whatsappCountdownTimer?.cancel();
-                              Navigator.of(sheetContext).pop();
-                              Navigator.of(context).pushReplacement(
-                                MaterialPageRoute(builder: (context) => const RiderShellScreen()),
-                              );
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('Not received yet. Please send the prefilled WhatsApp message.'),
-                                  duration: Duration(seconds: 2),
-                                ),
-                              );
-                            }
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF25D366),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            padding: const EdgeInsets.symmetric(vertical: 12),
+                        child: SizedBox(
+                          height: 46,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              final authProv = context.read<RiderAuthProvider>();
+                              final done = await authProv.pollWhatsAppStatus(sessionToken);
+                              if (done && mounted) {
+                                _whatsappPollingTimer?.cancel();
+                                _whatsappCountdownTimer?.cancel();
+                                Navigator.of(sheetContext).pop();
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(builder: (context) => const RiderShellScreen()),
+                                );
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Not received yet. Please send the prefilled WhatsApp message.'),
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: const Color(0xFF25D366),
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                            ),
+                            child: const Text('I Sent It ➔', style: TextStyle(fontWeight: FontWeight.w900)),
                           ),
-                          child: const Text('I Sent It ➔', style: TextStyle(fontWeight: FontWeight.w800)),
                         ),
                       ),
                     ],
@@ -359,7 +366,7 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
     final code = _smsCodeController.text.trim();
     if (code.length != 6) {
       setState(() {
-        _smsFeedbackMessage = 'Please enter the complete 6-digit SMS code.';
+        _smsFeedbackMessage = 'Please enter the complete 6-digit shift code.';
         _smsFeedbackIsError = true;
       });
       return;
@@ -367,7 +374,7 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
 
     if (_smsSessionToken == null) {
       setState(() {
-        _smsFeedbackMessage = 'Session expired. Please request a new SMS code.';
+        _smsFeedbackMessage = 'Session expired. Please request a new SMS shift code.';
         _smsFeedbackIsError = true;
       });
       return;
@@ -379,24 +386,33 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
     });
 
     final auth = context.read<RiderAuthProvider>();
-    final success = await auth.verifySmsOtp(
-      sessionToken: _smsSessionToken!,
-      code: code,
-    );
 
-    if (!mounted) return;
-
-    setState(() => _isVerifyingSms = false);
-
-    if (success) {
-      _smsExpiryTimer?.cancel();
-      _smsCooldownTimer?.cancel();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (context) => const RiderShellScreen()),
+    try {
+      final success = await auth.verifySmsOtp(
+        sessionToken: _smsSessionToken!,
+        code: code,
       );
-    } else {
+
+      if (!mounted) return;
+      setState(() => _isVerifyingSms = false);
+
+      if (success) {
+        _smsExpiryTimer?.cancel();
+        _smsCooldownTimer?.cancel();
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => const RiderShellScreen()),
+        );
+      } else {
+        setState(() {
+          _smsFeedbackMessage = auth.errorMessage ?? 'Invalid SMS code. Please verify.';
+          _smsFeedbackIsError = true;
+        });
+      }
+    } catch (e) {
+      if (!mounted) return;
       setState(() {
-        _smsFeedbackMessage = auth.errorMessage ?? 'Verification failed. Please check the code.';
+        _isVerifyingSms = false;
+        _smsFeedbackMessage = auth.errorMessage ?? e.toString();
         _smsFeedbackIsError = true;
       });
     }
@@ -410,24 +426,21 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
     final expirySec = (_smsExpirySeconds % 60).toString().padLeft(2, '0');
 
     return Scaffold(
-      backgroundColor: AppColors.obsidianBg,
+      backgroundColor: AppColors.background,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
               Center(
                 child: Container(
-                  width: 74,
-                  height: 74,
+                  width: 72,
+                  height: 72,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    border: Border.all(color: AppColors.richGold, width: 2),
-                    boxShadow: [
-                      BoxShadow(color: AppColors.primaryPurple.withOpacity(0.45), blurRadius: 22, spreadRadius: 3),
-                    ],
+                    border: Border.all(color: AppColors.primaryGold, width: 2),
                   ),
                   child: ClipOval(
                     child: Image.asset('assets/images/vm_icon.jpg', fit: BoxFit.cover),
@@ -439,18 +452,19 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                 child: Text(
                   'VICTORIOUS MARKET',
                   style: TextStyle(
-                    color: AppColors.richGold,
+                    color: AppColors.primaryGold,
                     fontSize: 12,
                     fontWeight: FontWeight.w900,
                     letterSpacing: 2,
                   ),
                 ),
               ),
+              const SizedBox(height: 2),
               const Center(
                 child: Text(
                   'Rider Dispatch Terminal',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: AppColors.textPrimary,
                     fontSize: 22,
                     fontWeight: FontWeight.w900,
                   ),
@@ -459,7 +473,7 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
               const SizedBox(height: 4),
               const Center(
                 child: Text(
-                  "Nigeria's 100% phone-native courier dispatch terminal.\nZero passwords required.",
+                  "Nigeria's phone-native courier dispatch terminal.\nZero passwords required.",
                   textAlign: TextAlign.center,
                   style: TextStyle(color: AppColors.textSecondary, fontSize: 12, height: 1.4),
                 ),
@@ -470,14 +484,14 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.35),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.obsidianBorder),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
                 ),
                 child: const Row(
                   children: [
-                    Icon(Icons.shield_outlined, color: AppColors.richGold, size: 20),
-                    const SizedBox(width: 10),
+                    Icon(Icons.shield_outlined, color: AppColors.primaryGold, size: 18),
+                    SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         'Courier Access Only: Customer and merchant accounts will be automatically rejected by the terminal.',
@@ -487,30 +501,30 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 22),
 
               // PRIMARY METHOD: WHATSAPP 1-TAP SHIFT LOGIN
               SizedBox(
                 width: double.infinity,
-                height: 52,
+                height: 50,
                 child: ElevatedButton(
                   onPressed: _isStartingWhatsApp ? null : _handleWhatsAppShiftLogin,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF25D366),
                     foregroundColor: Colors.white,
-                    elevation: 3,
+                    elevation: 0,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                   ),
                   child: _isStartingWhatsApp
-                      ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                       : const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.mark_chat_read, color: Colors.white, size: 22),
-                            const SizedBox(width: 10),
+                            Icon(Icons.mark_chat_read, color: Colors.white, size: 20),
+                            SizedBox(width: 10),
                             Text(
                               'Start Shift with WhatsApp (1-Tap)',
-                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+                              style: TextStyle(fontSize: 14.5, fontWeight: FontWeight.w900),
                             ),
                           ],
                         ),
@@ -522,15 +536,15 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
               // Divider
               Row(
                 children: [
-                  Expanded(child: Divider(color: AppColors.obsidianBorder, thickness: 1)),
+                  const Expanded(child: Divider(color: AppColors.surfaceBorder, thickness: 1)),
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       'OR IF WHATSAPP IS UNREACHABLE',
-                      style: TextStyle(fontSize: 10, fontWeight: FontWeight.w800, color: AppColors.textMuted, letterSpacing: 0.5),
+                      style: TextStyle(fontSize: 9.5, fontWeight: FontWeight.w800, color: AppColors.textMuted, letterSpacing: 0.5),
                     ),
                   ),
-                  Expanded(child: Divider(color: AppColors.obsidianBorder, thickness: 1)),
+                  const Expanded(child: Divider(color: AppColors.surfaceBorder, thickness: 1)),
                 ],
               ),
 
@@ -538,11 +552,11 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
 
               // FALLBACK METHOD: DIRECT CELLULAR SMS OTP BOX
               Container(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: AppColors.obsidianCard,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.obsidianBorder),
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
                 ),
                 child: Form(
                   key: _smsFormKey,
@@ -554,15 +568,15 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                           Container(
                             padding: const EdgeInsets.all(6),
                             decoration: BoxDecoration(
-                              color: AppColors.primaryPurple.withOpacity(0.2),
+                              color: AppColors.primaryGold.withOpacity(0.12),
                               borderRadius: BorderRadius.circular(8),
                             ),
-                            child: const Icon(Icons.sms_outlined, color: AppColors.richGold, size: 18),
+                            child: const Icon(Icons.sms_outlined, color: AppColors.primaryGold, size: 16),
                           ),
                           const SizedBox(width: 10),
                           const Text(
                             'Direct Cellular SMS Shift OTP',
-                            style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w900),
+                            style: TextStyle(color: AppColors.textPrimary, fontSize: 13.5, fontWeight: FontWeight.w900),
                           ),
                         ],
                       ),
@@ -583,8 +597,9 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(
                               color: (_smsFeedbackIsError || auth.errorMessage != null)
-                                  ? AppColors.urgentRed.withOpacity(0.4)
-                                  : AppColors.dispatchEmerald.withOpacity(0.4),
+                                  ? AppColors.urgentRed.withOpacity(0.3)
+                                  : AppColors.dispatchEmerald.withOpacity(0.3),
+                              width: 1.0,
                             ),
                           ),
                           child: Text(
@@ -593,8 +608,8 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                               color: (_smsFeedbackIsError || auth.errorMessage != null)
                                   ? AppColors.urgentRed
                                   : AppColors.dispatchEmerald,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w700,
                             ),
                           ),
                         ),
@@ -603,54 +618,55 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
 
                       const Text(
                         'COURIER PHONE NUMBER *',
-                        style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w800),
+                        style: TextStyle(color: AppColors.textSecondary, fontSize: 10.5, fontWeight: FontWeight.w800),
                       ),
                       const SizedBox(height: 6),
                       TextFormField(
                         controller: _phoneController,
                         keyboardType: TextInputType.phone,
-                        style: const TextStyle(color: Colors.white),
+                        style: const TextStyle(color: AppColors.textPrimary, fontSize: 14),
                         decoration: InputDecoration(
                           hintText: 'e.g. 08077776601 or +234...',
                           hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 13),
                           filled: true,
-                          fillColor: Colors.black26,
+                          fillColor: AppColors.surfaceElevated,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.obsidianBorder)),
-                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.obsidianBorder)),
-                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primaryPurple, width: 2)),
-                          prefixIcon: const Icon(Icons.phone, color: AppColors.primaryPurple, size: 20),
+                          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0)),
+                          enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0)),
+                          focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5)),
+                          prefixIcon: const Icon(Icons.phone, color: AppColors.primaryGold, size: 18),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      const SizedBox(height: 12),
 
                       SizedBox(
                         height: 46,
                         child: ElevatedButton(
                           onPressed: (_isSendingSms || (_smsDispatched && _smsCooldownSeconds > 0)) ? null : _handleSendSmsOtp,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: AppColors.primaryPurple,
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            backgroundColor: AppColors.primaryGold,
+                            foregroundColor: Colors.black,
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                           ),
                           child: _isSendingSms
-                              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                              ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
                               : Text(
                                   _smsDispatched && _smsCooldownSeconds > 0
                                       ? 'Resend SMS in ${_smsCooldownSeconds}s'
                                       : (_smsDispatched ? 'Resend SMS Shift Code' : 'Send SMS Shift Code'),
-                                  style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                                  style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 13),
                                 ),
                         ),
                       ),
 
                       if (_smsDispatched) ...[
                         const SizedBox(height: 16),
-                        Container(height: 1, color: AppColors.obsidianBorder),
+                        const Divider(color: AppColors.surfaceBorder, height: 1),
                         const SizedBox(height: 14),
                         const Text(
                           'ENTER 6-DIGIT SMS CODE:',
-                          style: TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w800),
+                          style: TextStyle(color: AppColors.textSecondary, fontSize: 10.5, fontWeight: FontWeight.w800),
                         ),
                         const SizedBox(height: 6),
                         TextFormField(
@@ -663,35 +679,37 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                             fontWeight: FontWeight.w900,
                             letterSpacing: 8,
                             fontFamily: 'monospace',
-                            color: AppColors.richGold,
+                            color: AppColors.primaryGold,
                           ),
                           decoration: InputDecoration(
                             counterText: '',
                             hintText: '000000',
                             hintStyle: const TextStyle(color: AppColors.textMuted, letterSpacing: 8),
                             filled: true,
-                            fillColor: Colors.black45,
+                            fillColor: AppColors.surfaceElevated,
                             contentPadding: const EdgeInsets.symmetric(vertical: 12),
-                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.obsidianBorder)),
-                            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.richGold, width: 2)),
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0)),
+                            enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0)),
+                            focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5)),
                           ),
                         ),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 12),
 
                         SizedBox(
-                          height: 48,
+                          height: 46,
                           child: ElevatedButton(
                             onPressed: _isVerifyingSms ? null : _handleVerifySmsOtp,
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.richGold,
-                              foregroundColor: const Color(0xFF080414),
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              backgroundColor: AppColors.dispatchEmerald,
+                              foregroundColor: Colors.white,
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                             ),
                             child: _isVerifyingSms
-                                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Color(0xFF080414), strokeWidth: 2.5))
+                                ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
                                 : const Text(
                                     'Verify Code & Start Shift ➔',
-                                    style: TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+                                    style: TextStyle(fontSize: 13.5, fontWeight: FontWeight.w900),
                                   ),
                           ),
                         ),
@@ -709,7 +727,7 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                                 onTap: _handleSendSmsOtp,
                                 child: const Text(
                                   'Resend Code',
-                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.richGold, decoration: TextDecoration.underline),
+                                  style: TextStyle(fontSize: 11, fontWeight: FontWeight.w800, color: AppColors.primaryGold, decoration: TextDecoration.underline),
                                 ),
                               ),
                           ],
@@ -720,7 +738,7 @@ class _RiderLoginScreenState extends State<RiderLoginScreen> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 20),
             ],
           ),
         ),

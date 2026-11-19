@@ -1,3 +1,4 @@
+// lib/widgets/rider_duty_switch_card.dart
 import 'package:flutter/material.dart';
 import '../core/constants/app_colors.dart';
 
@@ -22,89 +23,85 @@ class RiderDutySwitchCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.obsidianCard,
-        borderRadius: BorderRadius.circular(20),
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isOnline ? AppColors.dispatchEmerald.withOpacity(0.4) : AppColors.obsidianBorder,
-          width: 1.5,
+          color: isOnline ? AppColors.dispatchEmerald.withOpacity(0.4) : AppColors.surfaceBorder,
+          width: 1.0,
         ),
-        boxShadow: isOnline
-            ? [
-                BoxShadow(
-                  color: AppColors.dispatchEmerald.withOpacity(0.12),
-                  blurRadius: 20,
-                  spreadRadius: 2,
-                )
-              ]
-            : null,
       ),
       child: Column(
         children: [
           Row(
             children: [
               Container(
-                width: 48,
-                height: 48,
+                width: 44,
+                height: 44,
                 decoration: BoxDecoration(
-                  color: isOnline
-                      ? AppColors.dispatchEmerald.withOpacity(0.15)
-                      : Colors.white.withOpacity(0.05),
-                  shape: BoxShape.circle,
+                  color: isOnline ? AppColors.dispatchEmerald.withOpacity(0.15) : AppColors.surfaceElevated,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isOnline ? AppColors.dispatchEmerald.withOpacity(0.3) : AppColors.surfaceBorder,
+                    width: 1.0,
+                  ),
                 ),
                 child: Icon(
                   isOnline ? Icons.radar : Icons.power_settings_new,
                   color: isOnline ? AppColors.dispatchEmerald : AppColors.textMuted,
-                  size: 26,
+                  size: 22,
                 ),
               ),
-              const SizedBox(width: 14),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: isOnline ? AppColors.dispatchEmerald : AppColors.textMuted,
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                        const SizedBox(width: 6),
                         Text(
                           isOnline ? 'DUTY ACTIVE • ONLINE' : 'STANDBY • OFFLINE',
                           style: TextStyle(
                             color: isOnline ? AppColors.dispatchEmerald : AppColors.textMuted,
                             fontWeight: FontWeight.w900,
-                            fontSize: 13,
-                            letterSpacing: 0.5,
+                            fontSize: 12,
+                            letterSpacing: 0.4,
                           ),
                         ),
-                        if (isOnline) ...[
-                          const SizedBox(width: 6),
-                          Container(
-                            width: 8,
-                            height: 8,
-                            decoration: const BoxDecoration(
-                              color: AppColors.dispatchEmerald,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        ]
                       ],
                     ),
                     const SizedBox(height: 3),
                     Text(
                       fleetName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: const TextStyle(
                         color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
+                        fontWeight: FontWeight.w800,
                         fontSize: 14,
                       ),
                     ),
                   ],
                 ),
               ),
-              Switch(
-                value: isOnline,
-                onChanged: (_) => onToggle(),
-                activeColor: AppColors.dispatchEmerald,
-                activeTrackColor: AppColors.dispatchEmerald.withOpacity(0.3),
-                inactiveThumbColor: AppColors.textMuted,
-                inactiveTrackColor: Colors.black26,
+              Transform.scale(
+                scale: 0.9,
+                child: Switch(
+                  value: isOnline,
+                  onChanged: (_) => onToggle(),
+                  activeColor: AppColors.dispatchEmerald,
+                  activeTrackColor: AppColors.dispatchEmerald.withOpacity(0.25),
+                  inactiveThumbColor: AppColors.textMuted,
+                  inactiveTrackColor: AppColors.surfaceElevated,
+                ),
               ),
             ],
           ),
@@ -112,25 +109,39 @@ class RiderDutySwitchCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.25),
-              borderRadius: BorderRadius.circular(10),
+              color: AppColors.surfaceElevated,
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.two_wheeler, size: 16, color: AppColors.richGold),
+                    const Icon(Icons.two_wheeler, size: 15, color: AppColors.primaryGold),
                     const SizedBox(width: 6),
                     Text(
                       vehicleType,
-                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600),
+                      style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
-                Text(
-                  licensePlate,
-                  style: const TextStyle(color: AppColors.textPrimary, fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
+                  ),
+                  child: Text(
+                    licensePlate,
+                    style: const TextStyle(
+                      color: AppColors.primaryGold,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.8,
+                    ),
+                  ),
                 ),
               ],
             ),

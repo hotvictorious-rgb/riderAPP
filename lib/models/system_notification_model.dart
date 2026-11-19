@@ -27,6 +27,20 @@ class SystemNotificationModel {
 
   bool get isRead => readAt != null;
 
+  /// Strictly checks whether this is a courier mission or payout alert,
+  /// strictly blocking customer personal handover PINs or admin operational alerts.
+  bool get isCourierDispatchAlert {
+    final b = body.toLowerCase();
+    final tit = title.toLowerCase();
+    if (b.contains('secret 6-digit handover pin') ||
+        b.contains('provide this to the courier only') ||
+        tit.contains('doorstep pin:') ||
+        tit.contains('payment proof uploaded')) {
+      return false;
+    }
+    return true;
+  }
+
   factory SystemNotificationModel.fromJson(Map<String, dynamic> json) {
     DateTime? parseDate(dynamic val) {
       if (val == null) return null;

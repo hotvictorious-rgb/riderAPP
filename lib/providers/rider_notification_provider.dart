@@ -39,10 +39,12 @@ class RiderNotificationProvider with ChangeNotifier {
       final response = await _apiClient.get(ApiEndpoints.inAppNotifications);
       if (response.statusCode == 200 && (response.data['status'] == true || response.data['status'] == 'success' || response.data['success'] == true)) {
         _unreadCount = response.data['unread_count'] as int? ?? 0;
-        final rawList = response.data['notifications'] as List? ?? [];
+        final rawList = (response.data['notifications'] ?? response.data['data']) as List? ?? [];
         _notifications = rawList
             .map((item) => SystemNotificationModel.fromJson(item as Map<String, dynamic>))
+            .where((item) => item.isCourierDispatchAlert)
             .toList();
+        _unreadCount = _notifications.where((n) => !n.isRead).length;
       }
     } catch (e) {
       _errorMessage = 'Unable to refresh dispatch alerts.';

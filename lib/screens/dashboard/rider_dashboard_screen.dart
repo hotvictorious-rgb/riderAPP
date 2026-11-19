@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/courier_contact_helper.dart';
 import '../../providers/rider_dashboard_provider.dart';
 import '../../providers/rider_delivery_provider.dart';
 import '../../providers/rider_notification_provider.dart';
@@ -38,10 +39,15 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
     final deliv = Provider.of<RiderDeliveryProvider>(context);
 
     return Scaffold(
-      backgroundColor: AppColors.obsidianBg,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('DISPATCH RADAR'),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.support_agent, color: AppColors.primaryGold),
+            tooltip: 'Call Central Dispatch Hotline',
+            onPressed: () => CourierContactHelper.callDispatchHotline(),
+          ),
           Consumer<RiderNotificationProvider>(
             builder: (context, notifProv, _) {
               return Stack(
@@ -64,7 +70,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                       child: Container(
                         padding: const EdgeInsets.all(3),
                         decoration: const BoxDecoration(
-                          color: AppColors.crimsonReject,
+                          color: AppColors.urgentRed,
                           shape: BoxShape.circle,
                         ),
                         constraints: const BoxConstraints(
@@ -77,7 +83,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                           style: const TextStyle(
                             color: Colors.white,
                             fontSize: 9,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w900,
                           ),
                         ),
                       ),
@@ -93,9 +99,12 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
               Navigator.push(context, MaterialPageRoute(builder: (_) => const RiderProfileScreen()));
             },
           ),
+          const SizedBox(width: 4),
         ],
       ),
       body: RefreshIndicator(
+        color: AppColors.primaryGold,
+        backgroundColor: AppColors.surface,
         onRefresh: () async {
           await Future.wait([
             dash.fetchDashboard(),
@@ -105,6 +114,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
           ]);
         },
         child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,7 +127,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                 licensePlate: dash.profile?.licensePlate.isNotEmpty == true ? dash.profile!.licensePlate : '--',
                 onToggle: () => dash.toggleDuty(),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 14),
 
               // Operational Telemetry HUD Card
               RiderTelemetryCard(
@@ -129,7 +139,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                 fleetName: dash.profile?.fleetCompany ?? '--',
                 onTimeRate: dash.dashboardMetrics?.onTimeRatePercent ?? 100.0,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Active Assignments Section
               Row(
@@ -144,9 +154,17 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  Text(
-                    '${deliv.activeDeliveries.length} Pending Handover',
-                    style: const TextStyle(color: AppColors.dispatchEmerald, fontSize: 11, fontWeight: FontWeight.w800),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.dispatchEmerald.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.25), width: 1.0),
+                    ),
+                    child: Text(
+                      '${deliv.activeDeliveries.length} Pending Handover',
+                      style: const TextStyle(color: AppColors.dispatchEmerald, fontSize: 10.5, fontWeight: FontWeight.w800),
+                    ),
                   ),
                 ],
               ),
@@ -156,13 +174,24 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                 Container(
                   padding: const EdgeInsets.all(28),
                   alignment: Alignment.center,
-                  decoration: BoxDecoration(color: AppColors.obsidianCard, borderRadius: BorderRadius.circular(16)),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
+                  ),
                   child: const Column(
                     children: [
                       Icon(Icons.check_circle_outline, color: AppColors.dispatchEmerald, size: 36),
-                      SizedBox(height: 8),
-                      Text('All assigned packages delivered!', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700)),
-                      Text('Stay online to receive dispatch alerts.', style: TextStyle(color: AppColors.textMuted, fontSize: 12)),
+                      SizedBox(height: 10),
+                      Text(
+                        'All assigned packages delivered!',
+                        style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w800, fontSize: 14),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        'Stay online on radar to receive automatic dispatch alerts.',
+                        style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+                      ),
                     ],
                   ),
                 )
@@ -197,7 +226,7 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                             backgroundColor: success ? AppColors.dispatchEmerald : AppColors.urgentRed,
                             content: Text(
                               success
-                                  ? '📍  Doorstep Arrival Logged! Customer notified.'
+                                  ? '📍 Doorstep Arrival Logged! Customer notified.'
                                   : (deliv.errorMessage ?? 'Failed to log arrival.'),
                             ),
                           ),
@@ -209,7 +238,14 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                         context: context,
                         builder: (_) => DoorstepHandoverManifestDialog(
                           assignment: a,
-                          onSubmit: (otp, manifest, overallPhoto, itemDefectPhotos) async { final res = await deliv.submitDoorstepHandover(orderId: a.id, otp: otp, manifestItems: manifest, overallPhoto: overallPhoto, itemDefectPhotos: itemDefectPhotos);
+                          onSubmit: (otp, manifest, overallPhoto, itemDefectPhotos) async {
+                            final res = await deliv.submitDoorstepHandover(
+                              orderId: a.id,
+                              otp: otp,
+                              manifestItems: manifest,
+                              overallPhoto: overallPhoto,
+                              itemDefectPhotos: itemDefectPhotos,
+                            );
                             if (context.mounted && res['success'] == true) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
@@ -229,14 +265,19 @@ class _RiderDashboardScreenState extends State<RiderDashboardScreen> {
                         builder: (_) => DeliveryAttemptFailedDialog(
                           orderNumber: a.orderNumber,
                           customerName: a.customerName,
-                          onSubmit: (reason, notes, livePhoto) => deliv.recordDeliveryAttemptFailed(orderId: a.id, reason: reason, notes: notes, livePhoto: livePhoto),
+                          onSubmit: (reason, notes, livePhoto) => deliv.recordDeliveryAttemptFailed(
+                            orderId: a.id,
+                            reason: reason,
+                            notes: notes,
+                            livePhoto: livePhoto,
+                          ),
                         ),
                       ).then((res) {
                         if (res != null && res['success'] == true && context.mounted) {
                           final maxReached = res['max_attempts_reached'] == true;
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              backgroundColor: maxReached ? AppColors.dispatchAmber : AppColors.dispatchEmerald,
+                              backgroundColor: maxReached ? AppColors.primaryGold : AppColors.dispatchEmerald,
                               content: Text(
                                 maxReached
                                     ? 'Max attempts reached! Parcel moved to Returns tab for shop return.'

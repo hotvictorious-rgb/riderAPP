@@ -63,36 +63,45 @@ class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppColors.obsidianCard,
+      backgroundColor: AppColors.surface,
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: const BorderSide(color: AppColors.richGold, width: 1.5),
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
       ),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(22),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 54,
-              height: 54,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
-                color: AppColors.richGold.withOpacity(0.15),
+                color: AppColors.primaryGold.withOpacity(0.12),
                 shape: BoxShape.circle,
+                border: Border.all(color: AppColors.primaryGold.withOpacity(0.25), width: 1.0),
               ),
-              child: const Icon(Icons.store, color: AppColors.richGold, size: 28),
+              child: const Icon(Icons.store, color: AppColors.primaryGold, size: 24),
             ),
             const SizedBox(height: 14),
             const Text(
               'Merchant Return Handover',
-              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 17, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 4),
-            Text(
-              'Case: ${widget.returnCase.caseNumber}',
-              style: const TextStyle(color: AppColors.richGold, fontSize: 12, fontWeight: FontWeight.w800),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceElevated,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                'Case: ${widget.returnCase.caseNumber}',
+                style: const TextStyle(color: AppColors.primaryGold, fontSize: 11, fontWeight: FontWeight.w800),
+              ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 10),
             Text(
               'Drop-off at ${widget.returnCase.shopName}.\nAsk the merchant for their 6-digit Return Confirmation PIN.',
               textAlign: TextAlign.center,
@@ -106,7 +115,7 @@ class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
               onPhotoChanged: (f) => setState(() => _livePhoto = f),
               title: 'Merchant Return Counter Snap',
               hint: 'Snap live picture of parcel placed on merchant counter.',
-              isRequired: false,
+              isRequired: true,
             ),
             const SizedBox(height: 16),
 
@@ -115,20 +124,22 @@ class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
               keyboardType: TextInputType.number,
               maxLength: 6,
               textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.richGold, fontSize: 24, fontWeight: FontWeight.w900, letterSpacing: 8),
+              style: const TextStyle(color: AppColors.primaryGold, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 8),
               decoration: InputDecoration(
                 counterText: '',
                 hintText: '••••••',
                 hintStyle: const TextStyle(color: AppColors.textMuted, letterSpacing: 8),
                 filled: true,
-                fillColor: Colors.black26,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.obsidianBorder)),
-                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.richGold, width: 2)),
+                fillColor: AppColors.surfaceElevated,
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0)),
+                enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0)),
+                focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5)),
               ),
             ),
             if (_error != null) ...[
               const SizedBox(height: 10),
-              Text(_error!, style: const TextStyle(color: AppColors.urgentRed, fontSize: 11)),
+              Text(_error!, style: const TextStyle(color: AppColors.urgentRed, fontSize: 11, fontWeight: FontWeight.w700)),
             ],
             const SizedBox(height: 20),
             Row(
@@ -136,23 +147,26 @@ class _VendorReturnOtpDialogState extends State<VendorReturnOtpDialog> {
                 Expanded(
                   child: TextButton(
                     onPressed: _isSubmitting ? null : () => Navigator.pop(context),
-                    child: const Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
+                    child: const Text('Cancel', style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w700)),
                   ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
                   flex: 2,
-                  child: ElevatedButton(
-                    onPressed: _isSubmitting ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.richGold,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: SizedBox(
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryGold,
+                        foregroundColor: Colors.black,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: _isSubmitting
+                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
+                          : const Text('Certify Return to Shop', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12.5)),
                     ),
-                    child: _isSubmitting
-                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.black, strokeWidth: 2))
-                        : const Text('Certify Return to Shop', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12)),
                   ),
                 ),
               ],

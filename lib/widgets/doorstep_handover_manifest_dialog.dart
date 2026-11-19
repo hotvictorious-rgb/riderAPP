@@ -102,19 +102,34 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
       _error = null;
     });
 
-    final manifestPayload = _manifest.map((i) => i.toManifestJson()).toList();
-    final result = await widget.onSubmit(otp, manifestPayload, _overallPhoto, _itemDefectPhotos);
+    final manifestPayload = _manifest
+        .map((i) => {
+              'order_item_id': i.orderItemId,
+              'accepted_quantity': i.acceptedQuantity,
+              'rejected_quantity': i.rejectedQuantity,
+              'rejection_category': i.rejectionCategory,
+              'rejection_notes': i.rejectionNotes,
+            })
+        .toList();
 
-    if (mounted) {
-      if (result['success'] == true) {
-        Navigator.pop(context, true);
-      } else {
+    try {
+      final res = await widget.onSubmit(otp, manifestPayload, _overallPhoto, _itemDefectPhotos);
+      if (mounted) {
+        if (res['success'] == true) {
+          Navigator.pop(context, true);
+        } else {
+          setState(() {
+            _isSubmitting = false;
+            _error = res['message'] as String? ?? 'Handover verification failed.';
+            _isLocked = res['is_locked'] == true;
+          });
+        }
+      }
+    } catch (e) {
+      if (mounted) {
         setState(() {
           _isSubmitting = false;
-          _error = result['message'] as String? ?? 'Handover certification failed.';
-          if (result['locked'] == true) {
-            _isLocked = true;
-          }
+          _error = 'Communication failure: $e';
         });
       }
     }
@@ -123,14 +138,17 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppColors.obsidianCard,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: const BorderSide(color: AppColors.primaryPurple, width: 1.5),
-      ),
+      backgroundColor: AppColors.surface,
+      elevation: 0,
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
+      ),
       child: ConstrainedBox(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.88),
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.85,
+        ),
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Column(
@@ -144,29 +162,38 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: AppColors.dispatchEmerald.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.4)),
+                      color: AppColors.dispatchEmerald.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(color: AppColors.dispatchEmerald.withOpacity(0.3), width: 1.0),
                     ),
                     child: const Row(
                       children: [
-                        Icon(Icons.verified_user, size: 13, color: AppColors.dispatchEmerald),
-                        SizedBox(width: 4),
-                        Text('DOORSTEP PROTOCOL', style: TextStyle(color: AppColors.dispatchEmerald, fontSize: 10, fontWeight: FontWeight.w900)),
+                        Icon(Icons.verified_user, size: 12, color: AppColors.dispatchEmerald),
+                        SizedBox(width: 5),
+                        Text('DOORSTEP PROTOCOL', style: TextStyle(color: AppColors.dispatchEmerald, fontSize: 9.5, fontWeight: FontWeight.w900)),
                       ],
                     ),
                   ),
-                  Text(
-                    widget.assignment.orderNumber,
-                    style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 13),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceElevated,
+                      borderRadius: BorderRadius.circular(6),
+                      border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
+                    ),
+                    child: Text(
+                      widget.assignment.orderNumber,
+                      style: const TextStyle(color: AppColors.primaryGold, fontWeight: FontWeight.w900, fontSize: 12),
+                    ),
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 14),
               Text(
                 'Handover: ${widget.assignment.customerName}',
-                style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.w900),
+                style: const TextStyle(color: AppColors.textPrimary, fontSize: 17, fontWeight: FontWeight.w900),
               ),
+              const SizedBox(height: 2),
               Text(
                 widget.assignment.deliveryAddress,
                 style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
@@ -176,10 +203,11 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
               // Mode Selector (Full vs Partial Acceptance)
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.black26,
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: AppColors.obsidianBorder),
+                  color: AppColors.surfaceElevated,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
                 ),
+                padding: const EdgeInsets.all(4),
                 child: Row(
                   children: [
                     Expanded(
@@ -194,11 +222,11 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                           });
                         },
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
-                            color: !_isItemizedMode ? AppColors.dispatchEmerald.withOpacity(0.2) : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                            border: !_isItemizedMode ? Border.all(color: AppColors.dispatchEmerald.withOpacity(0.5)) : null,
+                            color: !_isItemizedMode ? AppColors.dispatchEmerald.withOpacity(0.15) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            border: !_isItemizedMode ? Border.all(color: AppColors.dispatchEmerald.withOpacity(0.4), width: 1.0) : null,
                           ),
                           alignment: Alignment.center,
                           child: Text(
@@ -212,15 +240,16 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                         ),
                       ),
                     ),
+                    const SizedBox(width: 4),
                     Expanded(
                       child: GestureDetector(
                         onTap: () => setState(() => _isItemizedMode = true),
                         child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
+                          padding: const EdgeInsets.symmetric(vertical: 9),
                           decoration: BoxDecoration(
-                            color: _isItemizedMode ? AppColors.urgentRed.withOpacity(0.2) : Colors.transparent,
-                            borderRadius: BorderRadius.circular(12),
-                            border: _isItemizedMode ? Border.all(color: AppColors.urgentRed.withOpacity(0.5)) : null,
+                            color: _isItemizedMode ? AppColors.urgentRed.withOpacity(0.15) : Colors.transparent,
+                            borderRadius: BorderRadius.circular(10),
+                            border: _isItemizedMode ? Border.all(color: AppColors.urgentRed.withOpacity(0.4), width: 1.0) : null,
                           ),
                           alignment: Alignment.center,
                           child: Text(
@@ -256,6 +285,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                 onPhotoChanged: (f) => setState(() => _overallPhoto = f),
                 title: 'Doorstep Handover Overall Proof',
                 hint: 'Snap live picture of parcel handover at doorstep.',
+                isRequired: true,
               ),
               const SizedBox(height: 16),
 
@@ -267,15 +297,17 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                 keyboardType: TextInputType.number,
                 maxLength: 6,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.richGold, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 6),
+                style: const TextStyle(color: AppColors.primaryGold, fontSize: 22, fontWeight: FontWeight.w900, letterSpacing: 8),
                 decoration: InputDecoration(
                   counterText: '',
                   hintText: '••••••',
-                  hintStyle: const TextStyle(color: AppColors.textMuted, letterSpacing: 6),
+                  hintStyle: const TextStyle(color: AppColors.textMuted, letterSpacing: 8),
                   filled: true,
-                  fillColor: Colors.black26,
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.obsidianBorder)),
-                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primaryPurple, width: 2)),
+                  fillColor: AppColors.surfaceElevated,
+                  contentPadding: const EdgeInsets.symmetric(vertical: 14),
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0)),
+                  enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0)),
+                  focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(14), borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5)),
                 ),
               ),
 
@@ -286,7 +318,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                   decoration: BoxDecoration(
                     color: AppColors.urgentRed.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: AppColors.urgentRed.withOpacity(0.3)),
+                    border: Border.all(color: AppColors.urgentRed.withOpacity(0.3), width: 1.0),
                   ),
                   child: const Row(
                     children: [
@@ -340,25 +372,29 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                   Expanded(
                     child: TextButton(
                       onPressed: _isSubmitting ? null : () => Navigator.pop(context),
-                      child: const Text('Cancel', style: TextStyle(color: AppColors.textMuted)),
+                      child: const Text('Cancel', style: TextStyle(color: AppColors.textMuted, fontWeight: FontWeight.w700)),
                     ),
                   ),
                   const SizedBox(width: 10),
                   Expanded(
                     flex: 2,
-                    child: ElevatedButton(
-                      onPressed: (_isSubmitting || _isLocked) ? null : _handleConfirm,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _hasRejections ? AppColors.urgentRed : AppColors.dispatchEmerald,
-                        padding: const EdgeInsets.symmetric(vertical: 13),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    child: SizedBox(
+                      height: 46,
+                      child: ElevatedButton(
+                        onPressed: (_isSubmitting || _isLocked) ? null : _handleConfirm,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _hasRejections ? AppColors.urgentRed : AppColors.dispatchEmerald,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        ),
+                        child: _isSubmitting
+                            ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : Text(
+                                _hasRejections ? 'Certify Partial Handover' : 'Confirm Full Delivery',
+                                style: const TextStyle(fontWeight: FontWeight.w900, fontSize: 12.5),
+                              ),
                       ),
-                      child: _isSubmitting
-                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                          : Text(
-                              _hasRejections ? 'Certify Partial Handover' : 'Confirm Full Delivery',
-                              style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w900, fontSize: 12),
-                            ),
                     ),
                   ),
                 ],
@@ -375,10 +411,11 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.black26,
+        color: AppColors.surfaceElevated,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: item.rejectedQuantity > 0 ? AppColors.urgentRed.withOpacity(0.4) : AppColors.obsidianBorder,
+          color: item.rejectedQuantity > 0 ? AppColors.urgentRed.withOpacity(0.4) : AppColors.surfaceBorder,
+          width: 1.0,
         ),
       ),
       child: Column(
@@ -390,12 +427,19 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
               Expanded(
                 child: Text(
                   item.productName,
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12.5),
+                  style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w700, fontSize: 12.5),
                 ),
               ),
-              Text(
-                'Total: ${item.orderedQuantity}',
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w700),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(6),
+                ),
+                child: Text(
+                  'Total: ${item.orderedQuantity}',
+                  style: const TextStyle(color: AppColors.textSecondary, fontSize: 10.5, fontWeight: FontWeight.w700),
+                ),
               ),
             ],
           ),
@@ -429,7 +473,7 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                   Text(
                     '${item.rejectedQuantity}',
                     style: TextStyle(
-                      color: item.rejectedQuantity > 0 ? AppColors.urgentRed : Colors.white,
+                      color: item.rejectedQuantity > 0 ? AppColors.urgentRed : AppColors.textPrimary,
                       fontWeight: FontWeight.w900,
                       fontSize: 13,
                     ),
@@ -460,11 +504,12 @@ class _DoorstepHandoverManifestDialogState extends State<DoorstepHandoverManifes
                 labelStyle: const TextStyle(color: AppColors.textMuted, fontSize: 11),
                 isDense: true,
                 filled: true,
-                fillColor: Colors.black38,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                fillColor: AppColors.surface,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(10), borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0)),
               ),
-              dropdownColor: AppColors.obsidianCard,
-              style: const TextStyle(color: Colors.white, fontSize: 11),
+              dropdownColor: AppColors.surfaceElevated,
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 11),
               items: const [
                 DropdownMenuItem(value: 'vendor_issue', child: Text('Vendor Issue (Wrong/Defective Item)')),
                 DropdownMenuItem(value: 'transit_damage', child: Text('Transit Damage (Courier Incident)')),

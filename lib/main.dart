@@ -30,7 +30,7 @@ void main() async {
       providers: [
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(create: (_) => RiderDashboardProvider(apiClient, storageService)),
-        ChangeNotifierProvider(create: (_) => RiderDeliveryProvider(apiClient)),
+        ChangeNotifierProvider(create: (_) => RiderDeliveryProvider(apiClient, storageService)),
         ChangeNotifierProvider(create: (_) => RiderNotificationProvider(apiClient)),
       ],
       child: const RiderTerminalApp(),

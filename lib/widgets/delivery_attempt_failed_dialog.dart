@@ -68,10 +68,11 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppColors.obsidianCard,
+      backgroundColor: AppColors.surface,
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: AppColors.urgentRed.withOpacity(0.5), width: 1.5),
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
       ),
       child: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -81,14 +82,14 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
           children: [
             Center(
               child: Container(
-                width: 50,
-                height: 50,
+                width: 48,
+                height: 48,
                 decoration: BoxDecoration(
-                  color: AppColors.urgentRed.withOpacity(0.15),
+                  color: AppColors.urgentRed.withOpacity(0.12),
                   shape: BoxShape.circle,
-                  border: Border.all(color: AppColors.urgentRed.withOpacity(0.4)),
+                  border: Border.all(color: AppColors.urgentRed.withOpacity(0.25), width: 1.0),
                 ),
-                child: const Icon(Icons.report_problem_outlined, color: AppColors.urgentRed, size: 26),
+                child: const Icon(Icons.report_problem_outlined, color: AppColors.urgentRed, size: 24),
               ),
             ),
             const SizedBox(height: 14),
@@ -96,14 +97,14 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
             Center(
               child: const Text(
                 'Report Delivery Issue',
-                style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900),
+                style: TextStyle(color: AppColors.textPrimary, fontSize: 17, fontWeight: FontWeight.w900),
               ),
             ),
             const SizedBox(height: 3),
             Center(
               child: Text(
                 'Order ${widget.orderNumber} • ${widget.customerName}',
-                style: const TextStyle(color: AppColors.textMuted, fontSize: 11, fontWeight: FontWeight.w600),
+                style: const TextStyle(color: AppColors.textSecondary, fontSize: 11, fontWeight: FontWeight.w600),
               ),
             ),
             const SizedBox(height: 16),
@@ -113,8 +114,8 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
               photo: _livePhoto,
               onPhotoChanged: (f) => setState(() => _livePhoto = f),
               title: 'Estate Gate / Premises Proof Snap',
-              hint: 'Snap live photo of closed gate or premises. Visible to Customer and Admin to verify physical presence.',
-              isRequired: false,
+              hint: 'Snap live photo of closed gate or premises. Verifies physical courier presence.',
+              isRequired: true,
             ),
             const SizedBox(height: 14),
 
@@ -132,10 +133,11 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
                   margin: const EdgeInsets.only(bottom: 8),
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
                   decoration: BoxDecoration(
-                    color: isSelected ? AppColors.urgentRed.withOpacity(0.12) : Colors.white.withOpacity(0.03),
-                    borderRadius: BorderRadius.circular(10),
+                    color: isSelected ? AppColors.urgentRed.withOpacity(0.12) : AppColors.surfaceElevated,
+                    borderRadius: BorderRadius.circular(12),
                     border: Border.all(
-                      color: isSelected ? AppColors.urgentRed.withOpacity(0.6) : Colors.white.withOpacity(0.08),
+                      color: isSelected ? AppColors.urgentRed.withOpacity(0.5) : AppColors.surfaceBorder,
+                      width: 1.0,
                     ),
                   ),
                   child: Row(
@@ -152,7 +154,7 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
                           style: TextStyle(
                             color: isSelected ? Colors.white : AppColors.textSecondary,
                             fontSize: 11.5,
-                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                            fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
                           ),
                         ),
                       ),
@@ -171,19 +173,24 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
             TextField(
               controller: _notesController,
               maxLines: 2,
-              style: const TextStyle(color: Colors.white, fontSize: 12),
+              style: const TextStyle(color: AppColors.textPrimary, fontSize: 12),
               decoration: InputDecoration(
                 hintText: 'e.g., Called recipient 3 times, phone switched off...',
-                hintStyle: TextStyle(color: AppColors.textMuted.withOpacity(0.5), fontSize: 11.5),
+                hintStyle: const TextStyle(color: AppColors.textMuted, fontSize: 11.5),
                 filled: true,
-                fillColor: Colors.black.withOpacity(0.3),
+                fillColor: AppColors.surfaceElevated,
+                contentPadding: const EdgeInsets.all(12),
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.obsidianBorder),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: AppColors.urgentRed),
+                  borderRadius: BorderRadius.circular(12),
+                  borderSide: const BorderSide(color: AppColors.urgentRed, width: 1.5),
                 ),
               ),
             ),
@@ -204,26 +211,29 @@ class _DeliveryAttemptFailedDialogState extends State<DeliveryAttemptFailedDialo
                     onPressed: _isSubmitting ? null : () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textMuted,
-                      side: const BorderSide(color: AppColors.obsidianBorder),
-                      padding: const EdgeInsets.symmetric(vertical: 11),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('Cancel'),
+                    child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w700)),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isSubmitting ? null : _handleSubmit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.urgentRed,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 11),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: SizedBox(
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: _isSubmitting ? null : _handleSubmit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.urgentRed,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: _isSubmitting
+                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                          : const Text('Log Attempt', style: TextStyle(fontWeight: FontWeight.w900, fontSize: 12.5)),
                     ),
-                    child: _isSubmitting
-                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Text('Log Attempt', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 12.5)),
                   ),
                 ),
               ],

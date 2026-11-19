@@ -63,51 +63,59 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
   @override
   Widget build(BuildContext context) {
     return Dialog(
-      backgroundColor: AppColors.obsidianCard,
+      backgroundColor: AppColors.surface,
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(24),
-        side: BorderSide(color: AppColors.dispatchAmber.withOpacity(0.5), width: 1.5),
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
       ),
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(22),
+        padding: const EdgeInsets.all(20),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Icon Header
             Container(
-              width: 54,
-              height: 54,
+              width: 48,
+              height: 48,
               decoration: BoxDecoration(
-                color: AppColors.dispatchAmber.withOpacity(0.15),
+                color: AppColors.primaryGold.withOpacity(0.12),
                 shape: BoxShape.circle,
-                border: Border.all(color: AppColors.dispatchAmber.withOpacity(0.4)),
+                border: Border.all(color: AppColors.primaryGold.withOpacity(0.25), width: 1.0),
               ),
-              child: const Icon(Icons.store, color: AppColors.dispatchAmber, size: 28),
+              child: const Icon(Icons.store, color: AppColors.primaryGold, size: 24),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
 
             const Text(
               'Merchant Shop Handover',
-              style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w900),
+              style: TextStyle(color: AppColors.textPrimary, fontSize: 17, fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 4),
-            Text(
-              'Order ${widget.orderNumber}',
-              style: const TextStyle(color: AppColors.dispatchAmber, fontSize: 12, fontWeight: FontWeight.w800),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceElevated,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                'Order ${widget.orderNumber}',
+                style: const TextStyle(color: AppColors.primaryGold, fontSize: 11, fontWeight: FontWeight.w800),
+              ),
             ),
             const SizedBox(height: 12),
 
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.04),
+                color: AppColors.surfaceElevated,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.white.withOpacity(0.06)),
+                border: Border.all(color: AppColors.surfaceBorder, width: 1.0),
               ),
               child: Text(
                 'Collect package at ${widget.shopName}. Ask merchant staff for their 6-digit Pickup Handover PIN to certify collection.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, height: 1.45),
+                style: const TextStyle(color: AppColors.textSecondary, fontSize: 11.5, height: 1.4),
               ),
             ),
             const SizedBox(height: 16),
@@ -118,6 +126,7 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
               onPhotoChanged: (f) => setState(() => _livePhoto = f),
               title: 'Merchant Counter Parcel Snap',
               hint: 'Snap live photo of package at merchant counter. Live proof permanently protects you from transit damage claims.',
+              isRequired: true,
             ),
             const SizedBox(height: 16),
 
@@ -128,24 +137,29 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
               maxLength: 6,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: AppColors.dispatchAmber,
-                fontSize: 24,
+                color: AppColors.primaryGold,
+                fontSize: 22,
                 fontWeight: FontWeight.w900,
-                letterSpacing: 10,
+                letterSpacing: 8,
               ),
               decoration: InputDecoration(
                 hintText: '••••••',
-                hintStyle: TextStyle(color: AppColors.textMuted.withOpacity(0.4), letterSpacing: 10),
+                hintStyle: const TextStyle(color: AppColors.textMuted, letterSpacing: 8),
                 counterText: '',
                 filled: true,
-                fillColor: Colors.black.withOpacity(0.35),
+                fillColor: AppColors.surfaceElevated,
+                contentPadding: const EdgeInsets.symmetric(vertical: 14),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: BorderSide(color: AppColors.dispatchAmber.withOpacity(0.4)),
+                  borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(14),
+                  borderSide: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: AppColors.dispatchAmber, width: 2),
+                  borderSide: const BorderSide(color: AppColors.primaryGold, width: 1.5),
                 ),
               ),
             ),
@@ -168,26 +182,29 @@ class _ShopPickupOtpDialogState extends State<ShopPickupOtpDialog> {
                     onPressed: _isLoading ? null : () => Navigator.pop(context, false),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.textMuted,
-                      side: const BorderSide(color: AppColors.obsidianBorder),
+                      side: const BorderSide(color: AppColors.surfaceBorder, width: 1.0),
                       padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
-                    child: const Text('Cancel'),
+                    child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.w700)),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _submit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.dispatchAmber,
-                      foregroundColor: Colors.black,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: SizedBox(
+                    height: 46,
+                    child: ElevatedButton(
+                      onPressed: _isLoading ? null : _submit,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primaryGold,
+                        foregroundColor: Colors.black,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                      ),
+                      child: _isLoading
+                          ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
+                          : const Text('Verify Pickup', style: TextStyle(fontWeight: FontWeight.w900)),
                     ),
-                    child: _isLoading
-                        ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black))
-                        : const Text('Verify Pickup', style: TextStyle(fontWeight: FontWeight.w900)),
                   ),
                 ),
               ],
